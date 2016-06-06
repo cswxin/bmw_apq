@@ -1,0 +1,364 @@
+{% extends "survey/survey_base.html" %}
+
+{% block script %}
+<script language="javascript">
+
+var theForm = null;
+
+$(document).ready(function($) {
+	$("#paper_form").submit( function() {
+		var theForm = this;
+		$(":radio").attr('disabled', false);
+	    $(":checkbox").attr('disabled', false);
+		if (theForm.A1a[0].checked&&isEmpty(theForm.dealer_name.value))
+			{
+				alert("请输入总机报出的经销商店名！");
+				theForm.dealer_name.focus();
+				return false;
+			}
+		if (theForm.A1a[0].checked&&!isEmpty(theForm.dealer_name.value)){
+			theForm.A1a__open.value = theForm.dealer_name.value;
+		}
+		
+		if (theForm.A4[0].checked&&isEmpty(theForm.reserve_man.value))
+		{
+			alert("请输入预约员姓名！");
+			theForm.reserve_man.focus();
+			return false;
+		}
+		if (theForm.A4[0].checked&&!isEmpty(theForm.reserve_man.value)){
+			theForm.A4__open.value = theForm.reserve_man.value;
+		}
+		
+		var question_list = ['A1a','A2','A4','A3','A52a','A5','A6'];
+		var show_list = ['A1','A2','A3','A4','A5','A6','A7'];
+		
+		var project_id = $("input[name='pid']").val()
+		if (project_id == 4){
+			question_list = ['A1a','A2','A4','A3','A6'];
+			show_list = ['A1','A2','A3','A4','A7'];
+		}
+		
+		var no_list = ['A3','A52a','A6'];
+		if (project_id == 4){
+			no_list = ['A3','A6'];
+		}
+		for (var i=0; i < no_list.length; i++) {
+			set_no_answer(theForm,no_list[i]);
+		}
+		
+		for (var i = 0;i<question_list.length;i++){
+			var result = check_radio(theForm,question_list[i],show_list[i]);
+			if (!result){
+				re_no_answer(theForm,no_list);
+				return result;
+			}
+		}
+		  
+	});
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<table border="0" cellspacing="0" cellpadding="0" width="97%" style="margin:5px;">
+  <tbody>
+
+  <tr> 
+    <td colspan="2" align="left" style="padding-left:20px;padding-top:10px;"> 
+	<div style="padding-bottom:10px;">
+	<span style="padding-left:0px;" class="STYLE2">问卷编号：</span>
+		{{answers.survey_code|default_if_none:''}}
+	</div>
+
+    <div class="news-box_service">
+		<div class="news-box2_service">
+		  <div align="left" style="padding: 10px;">
+		  <span class="STYLE1">A. 预约
+		  </span></div> 
+		</div>
+	</div>
+
+      <!--<hr width="98%" color="#00000" size=1>--></td>
+  </tr>
+
+  <tr> 
+    <td colspan="2" align="center"><br>
+	  <table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;margin-top:10px;">
+        <tbody><tr>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center"><strong>题号</strong><strong> </strong></p></td>
+          <td width="24%" bgcolor="#FFFFFF"><p align="center"><strong>考核点</strong><strong> </strong></p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center"><strong>是</strong><strong> </strong></p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center"><strong>否</strong><strong> </strong></p></td>
+          <td width="4%" bgcolor="#FFFFFF"><p align="center"><strong>不涉及</strong><strong> </strong></p></td>
+          <td width="28%" bgcolor="#FFFFFF"><p align="center"><strong>选择“否</strong><strong>/</strong><strong>不涉及”原因</strong><strong> </strong></p></td>
+          <td width="18%" bgcolor="#FFFFFF"><p><strong>评估标准说明</strong><strong> </strong></p></td>
+          <td width="17%" bgcolor="#FFFFFF"><strong>操作注意事项</strong></td>
+        </tr>
+        <tr>
+          <td width="3%" height="91" bgcolor="#FFFFFF">A1.&nbsp;</td>
+          <td width="24%" align="left" bgcolor="#FFFFFF"><p>电话是否在3声内含3声被接起？ （单选）</p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A1a" value="A1">
+          </p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A1a" value="A2">
+          </p></td>
+          <td width="4%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A1a" value="A3">
+          </p></td>
+          <td width="28%" align="left" bgcolor="#FFFFFF">
+          	总机报出的经销店名称:<br>
+			<input name="dealer_name" type="text" class="input11" value="{% ifequal answers.A1a.0 'A1' %}{{answers.A1a.1|default_if_none:''}}{% endifequal %}" size="30" maxlength="250"><br>
+			<br>
+          	"否/不涉及"原因：<br>
+            <input name="A1a__open" type="text" class="input11" value="{% ifnotequal answers.A1a.0 'A1' %}{{answers.A1a.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+            <br>
+            "否/不涉及"原因_EN：
+            <input name="A1a__open__EN" type="text" class="input11" value="{% ifnotequal answers.A1a.0 'A1' %}{{trans_contents.A1a|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;"></td>
+          <td width="18%" align="left" bgcolor="#FFFFFF">
+          	<p>
+          		{% if project.id != 4 %}
+          		本项目使用的是{% if project.id == 2 %}宝马{% endif %}{% if project.id == 3 %}MINI{% endif %}官方网站上公布的电话，优先顺序依次是：<br>1.预约专线；<br>2.售后总机；<br>3.经销商总机。<br>要求第一个接电话的人要在3声内（含3声）接起电话并报出经销店的名称。
+          		{% else %}
+          		总机在接起电话时应报出经销店的名称。
+          		{% endif %}
+          	</p>
+          </td>
+          <td width="17%" {% if project.id != 4 %}rowspan="2"{% endif %} align="left" bgcolor="#FFFFFF">
+          	{% if project.id != 4 %}
+          	陪访员需要根据指定的电话号码拨打电话，只要该电话在3声内（含3声）被接起并报出经销店的名称，那么此题给分。<br>
+			拨打电话时，可能会出现如下3种情况：<br>
+			1. 总机直接是预约直线：<br>
+			首先判断A1题是否3声内接起<br>
+			然后判断A2题是否能致电一次即可完成预约<br>
+			2. 总机接听后转到预约部：<br>
+			首先评估A1题总机是否在3声内接起,其次评估转接时是否在6声内被接起，<br>
+			然后评估A2题是否转接后能一次性完成预约<br>
+			3. 总机告之有预约直线：<br>
+			如果接听的员工让您重新拨打预约直线的，请追问：“你能帮我转一下吗？“<br>
+			- 如果被告之他那里不可以转接的，A2题算做“否”。同时A1题按照标准判断。<br>
+			- 如果可以转接但不愿转接的，A2题算做“否”。同时A1题按照标准判断。<br>
+			{% else %}
+			3声彩铃是10秒
+			{% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td width="3%" bgcolor="#FFFFFF">A2.&nbsp;</td>
+          <td width="24%" align="left" bgcolor="#FFFFFF"><p>客人是否一次致电经销商就能顺利完成预约维修？（铃声响6声为一次）（单选）</p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A2" value="A1">
+          </p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A2" value="A2">
+          </p></td>
+          <td width="4%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A2" value="A3">
+          </p></td>
+          <td width="28%" align="left" bgcolor="#FFFFFF">"否/不涉及"原因：<br>
+            <input name="A2__open" type="text" class="input11" value="{% ifnotequal answers.A2.0 'A1' %}{{answers.A2.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+			<br>
+            "否/不涉及"原因_EN：
+            <input name="A2__open__EN" type="text" class="input11" value="{% ifnotequal answers.A2.0 'A1' %}{{trans_contents.A2|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">			</td>
+          <td width="18%" align="left" bgcolor="#FFFFFF">
+          	如果电话是由总机转接到预约部的，预约员需要在6声内接起电话进行预约，此过程中不接受电话断线，无人接听及忙线。</td>
+          {% if project.id == 4 %}
+          <td width="17%" align="left" bgcolor="#FFFFFF"></td>
+          {% endif %}
+          </tr>
+        <tr>
+          <td width="3%" bgcolor="#FFFFFF">A3.&nbsp;</td>
+          <td width="24%" align="left" bgcolor="#FFFFFF"><p>预约专员是否在接起电话时报出他/她的姓名?（单选）</p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A4" value="A1">
+          </p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A4" value="A2">
+          </p></td>
+          <td width="4%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A4" value="A3">
+          </p></td>
+          <td width="28%" align="left" bgcolor="#FFFFFF">
+          	预约员姓名:<br><input name="reserve_man" type="text" class="input11" value="{% ifequal answers.A4.0 'A1' %}{{answers.A4.1|default_if_none:''}}{% endifequal %}" size="30" maxlength="250">
+			<br>
+          	"否/不涉及"原因：<br>
+            <input name="A4__open" type="text" class="input11" value="{% ifnotequal answers.A4.0 'A1' %}{{answers.A4.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+			<br>
+            "否/不涉及"原因_EN：
+            <input name="A4__open__EN" type="text" class="input11" value="{% ifnotequal answers.A4.0 'A1' %}{{trans_contents.A4|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">			</td>
+          <td width="18%" align="left" bgcolor="#FFFFFF"></td>
+          <td width="17%" align="left" bgcolor="#FFFFFF"></td>
+        </tr>
+        <tr>
+          <td width="3%" bgcolor="#FFFFFF">A4.&nbsp;</td>
+          <td width="24%" align="left" bgcolor="#FFFFFF"><p>在做预约时是否获取了全部信息？客人姓名，车辆型号，公里数和车牌号码。（多选）</p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A3" value="A1">
+          </p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A3" value="A2">
+          </p></td>
+          <td width="4%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A3" value="A3">
+          </p></td>
+          <td width="28%" align="left" bgcolor="#FFFFFF">
+          	"否"原因：
+          	{% for alt in A3 %}
+			<br><input name="ck_A3" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.A3 %}checked{% endif %}>{{alt.title}}
+			{% endfor %}
+			<br>"否/不涉及"原因：<br>
+            <input name="input_A3" type="text" class="input11" value="{% ifnotequal answers.A3.0 'A1' %}{{answers.A3.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+            <input name="A3__open" type="hidden" value=""/>
+			<br>
+            "否/不涉及"原因_EN：
+            <input name="A3__open__EN" type="text" class="input11" value="{% ifnotequal answers.A3.0 'A1' %}{{trans_contents.A3|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">			</td>
+          <td width="18%" align="left" bgcolor="#FFFFFF"></td>
+          <td width="17%" align="left" bgcolor="#FFFFFF">
+          	（1）如果选择“否“，请务必注明哪些信息没有被问到！<br>
+          	（2）打电话时先不要主动说出这些信息，等待被询问。<br>
+          	（3）需要提前设计好公里数和车牌号码。</td>
+        </tr>
+        {% if project.id != 4 %}
+        <tr>
+          <td width="3%" bgcolor="#FFFFFF">A5.&nbsp;</td>
+          <td width="24%" align="left" bgcolor="#FFFFFF"><p>针对单项SRP，预约专员是否告知客户本次进店预计的总时间和费用？（单选）</p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A52a" value="A1">
+          </p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A52a" value="A2">
+          </p></td>
+          <td width="4%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A52a" value="A3">
+          </p></td>
+          <td width="28%" align="left" bgcolor="#FFFFFF">
+          	"否"原因：
+          	{% for alt in A52a %}
+			<br><input name="ck_A52a" type="radio" value="{{alt.cid}}" {% if alt.cid in alt_ans.A52a %}checked{% endif %}>{{alt.title}}
+			{% endfor %}
+          	<br>"否/不涉及"原因：<br>
+            <input name="input_A52a" type="text" class="input11" value="{% ifnotequal answers.A52a.0 'A1' %}{{answers.A52a.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+			<input name="A52a__open" type="hidden" value=""/>
+			<br>
+            "否/不涉及"原因_EN：
+            <input name="A52a__open__EN" type="text" class="input11" value="{% ifnotequal answers.A52a.0 'A1' %}{{trans_contents.A52a|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">			</td>
+          <td width="18%" align="left" bgcolor="#FFFFFF"></td>
+          <td width="17%" align="left" bgcolor="#FFFFFF">（1）拨好电话前设计好公里数和大概要做的保养项目。<br>（2）不能都设计成做机油保养。</td>
+        </tr>
+        <tr>
+          <td width="3%" bgcolor="#FFFFFF">A6.&nbsp;</td>
+          <td width="24%" align="left" bgcolor="#FFFFFF"><p>预约专员是否提醒客户携带保养手册? （单选）</p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A5" value="A1">
+          </p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A5" value="A2">
+          </p></td>
+          <td width="4%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A5" value="A3">
+          </p></td>
+          <td width="28%" align="left" bgcolor="#FFFFFF">"否/不涉及"原因：<br>
+            <input name="A5__open" type="text" class="input11" value="{% ifnotequal answers.A5.0 'A1' %}{{answers.A5.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+			<br>
+            "否/不涉及"原因_EN：
+            <input name="A5__open__EN" type="text" class="input11" value="{% ifnotequal answers.A5.0 'A1' %}{{trans_contents.A5|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+		  </td>
+          <td width="18%" align="left" bgcolor="#FFFFFF"></td>
+          <td width="17%" align="left" bgcolor="#FFFFFF"></td>
+        </tr>
+        {% endif %}
+        <tr>
+          <td width="3%" bgcolor="#FFFFFF">A7.&nbsp;</td>
+          <td width="24%" align="left" bgcolor="#FFFFFF"><p>是否收到经销店的预约提醒?（单选）</p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A6" value="A1">
+          </p></td>
+          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A6" value="A2">
+          </p></td>
+          <td width="4%" bgcolor="#FFFFFF"><p align="center">
+            <input type="radio" name="A6" value="A3">
+          </p></td>
+          <td width="28%" align="left" bgcolor="#FFFFFF">
+          	"否"原因：
+          	{% for alt in A6 %}
+			<br><input name="ck_A6" type="radio" value="{{alt.cid}}" {% if alt.cid in alt_ans.A6 %}checked{% endif %}>{{alt.title}}
+			{% endfor %}
+          	<br>"否/不涉及"原因：<br>
+            <input name="input_A6" type="text" class="input11" value="{% ifnotequal answers.A6.0 'A1' %}{{answers.A6.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+			<input name="A6__open" type="hidden" value=""/>
+			<br>
+            "否/不涉及"原因_EN：
+            <input name="A6__open__EN" type="text" class="input11" value="{% ifnotequal answers.A6.0 'A1' %}{{trans_contents.A6|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+		  </td>
+          <td width="18%" align="left" bgcolor="#FFFFFF">客户应在预约日的前一天收到以短信息或电话形式的预约维修提醒。</td>
+          <td width="17%" align="left" bgcolor="#FFFFFF">
+          	{% if project.id != 4 %}
+          	（1）当预约专员要求留下联系方式时，请陪访员根据培训要求留下相应的手机号以便收集提醒证据，拨打完预约电话后，请务必注意保持手机的开机状态。<br>
+			（2）如果在预约日的前一天，收到短信或电话提醒，请陪访员搜集好证据（拍照或提供电话清单等等） 。即使没有收到任何短信或电话提醒，也需要提供相应的证据。<br>
+			（3）如果在预约日的前一天，收到未接来电，那么需要回拨这个未接来电，查明是否是经销商致电。如果确认是经销商致电，那么此题给分。<br>
+			{% else %}
+			当预约员要求留下联系方式时，请评估员根据培训要求留下相应的手机号以便收集提醒证据。
+			{% endif %}
+          </td>
+        </tr>
+      </tbody></table>
+	  <br>
+    </td>
+  </tr>
+</tbody></table>
+<input type="hidden" name="p" value="A"/>
+<input type="hidden" name="pid" value="{{project.id|default_if_none:''}}"/>
+<script language="JavaScript">
+	set_radio($("#paper_form input[name='A1a']"),"{{answers.A1a.0}}");
+	set_radio($("#paper_form input[name='A2']"),"{{answers.A2.0}}");
+	set_radio($("#paper_form input[name='A4']"),"{{answers.A4.0}}");
+	set_radio($("#paper_form input[name='A3']"),"{{answers.A3.0}}");
+	set_radio($("#paper_form input[name='A52a']"),"{{answers.A52a.0}}");
+	set_radio($("#paper_form input[name='A5']"),"{{answers.A5.0}}");
+	set_radio($("#paper_form input[name='A6']"),"{{answers.A6.0}}");
+	if ({{tran_perm}}){
+		$(':input:not([name$="__EN"])').attr('readonly',true);
+		$(':input[name^="input_"]').attr('readonly',false);
+		$(':input[name$="__open"]').attr('readonly',false);
+		$(':input[name$="__EN"]').attr('readonly',false);
+        $(":radio").attr('disabled', 'disabled');
+	    $(":checkbox").attr('disabled', 'disabled');
+	}else{
+		$(':input[name$="__EN"]').attr('readonly',true);
+		$(':input:not([name$="__EN"])').attr('readonly',false);
+		if ({{manage_perm}}){
+			$(':input[name$="__EN"]').attr('readonly',false);
+		}
+	}
+	
+	var project_id = "{{project.id|default_if_none:''}}";
+	var no_list = ['A3','A52a','A6'];
+	if (project_id == 4){
+		no_list = ['A3','A6'];
+	}
+	
+	$(":radio").click(function () {
+	    var r = $(this).attr("name");
+	    $(":radio[name=" + r + "]:not(:checked)").attr("tag", 0);
+	    if ($(this).attr("tag") == 1) {
+	        $(this).attr("checked", false);
+	        $(this).attr("tag", 0);
+	    }
+	    else {
+	        $(this).attr("tag", 1);
+	    }
+	    for (var i=0; i < no_list.length; i++) {
+		  if (r == no_list[i]){
+		  	if ($(this).val() != 'A2'){
+		  		off_check(r);
+		  	}else{
+		  		on_check(r);
+		  	}
+		  }
+		}
+	});
+	
+</script>
+{% endblock %}

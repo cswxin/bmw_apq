@@ -1,0 +1,113 @@
+#encoding:utf-8
+'''
+Created on 2012-5-18
+
+@author: junhua
+'''
+import os, sys
+
+sys.path.insert(0, os.path.abspath(os.curdir))
+from django.conf import settings
+
+from service.core import _project, _term
+from service.core import _checkpoint
+from service.core import _question
+from service.core import _paper
+from service.easyExcel import easyExcel
+
+from mc import enums
+from survey.models import Question
+from survey.survey_utils import get_respondentdata_dict_by_paper
+
+START_COL_NUM = ord('a')
+END_COL_NUM = ord('z')
+COL_DICT = {} #{'qid_21':'a','qid_22':'b',...,'qid_21':'aa'}
+
+def make_excel(term_id):
+    term = _term.get_term_by_id(term_id)
+    target_file = os.path.join(settings.RESOURCES_ROOT, u'data/%s_option_data.xls' % term.name_cn)
+    #默认保存2007的格式，需手动转换
+    print target_file
+    projects = _project.get_2012_projects()
+    
+    excel = easyExcel()
+    try:
+        for index, project in enumerate(projects):
+            sheetname = project.name
+            excel.setSheetName('sheet%d' % (index + 1), sheetname)
+            gen_col_dict(project, excel, sheetname)
+            papers = _paper.get_papers(project=project, paper_type=enums.FW_PAPER_TYPE, term=term)
+            for i, paper in enumerate(papers):
+                ans_dict = get_respondentdata_dict_by_paper(paper)
+                excel.setRangeVal(sheetname, 'a%s' % (i + 2), paper.dealer.name)
+                excel.setRangeVal(sheetname, 'b%s' % (i + 2), paper.dealer.name_cn)
+                excel.setRangeVal(sheetname, 'c%s' % (i + 2), paper.id)
+                for key in COL_DICT.keys():
+                    keys = key.split('_')
+                    qid = keys[0]
+                    qkey = '%s__open' % Question.objects.get(id=qid).cid
+                    ans_cid = keys[1]
+                    #print paper.id, ans_dict
+                    ans = ans_dict[qkey]
+                    ans_list = []
+                    if not ans:
+                        continue
+                    if '^-^' in ans:
+                        ans_list = ans.split('^-^')
+                    if ans_list:
+                        for a in ans_list:
+                            cell = '%s%s' % (COL_DICT[key], i + 2)
+                            try:
+                                alt_cid = int(a)
+                                if int(ans_cid) == alt_cid:
+                                    excel.setRangeVal(sheetname, cell, alt_cid)
+                            except:
+                                if ans_cid == 'open':
+                                    excel.setRangeVal(sheetname, cell, a)
+        excel.save(target_file)
+    finally:
+        excel.close()
+        
+def gen_col_dict(project, excel, sheetname):
+    global COL_DICT
+    COL_DICT = {}
+    excel.setRangeVal(sheetname, 'a1', u'经销商代码')
+    excel.setRangeVal(sheetname, 'b1', u'经销商名称')
+    excel.setRangeVal(sheetname, 'c1', u'问卷id')
+    cp_list = _checkpoint.get_project_sub_cp_list(project).filter(question__questiontype=2)
+    col_index = 3
+    for cp in cp_list:
+        alt_list = _question.get_alt_list_exclude_a(cp.question)
+        if alt_list:
+            for alt in alt_list:
+                cell = get_char(col_index)
+                COL_DICT['%s_%s' % (cp.question.id, alt.cid)] = cell
+                excel.setRangeVal(sheetname, '%s1' % cell, '%s_%s' % (cp.question.name_abbr, alt.cid))
+                col_index += 1
+        cell = get_char(col_index)
+        COL_DICT['%s_open' % cp.question.id] = cell
+        excel.setRangeVal(sheetname, '%s1' % cell, '%s_open' % cp.question.name_abbr)
+        col_index += 1
+
+char_list = []
+def gen_char_list(index, need_empty=False):
+    #index从0开始
+    global char_list
+    if need_empty:
+        char_list = []
+    if index < 26:
+        char_list.append(chr(index + START_COL_NUM))
+    else:
+        temp = index / 26 - 1
+        char_list.append(chr(index % 26 + START_COL_NUM))
+        gen_char_list(temp)
+        
+def get_char(index):
+    gen_char_list(index, need_empty=True)
+    char_list.reverse()
+    return ''.join(char_list)
+    
+if __name__ == '__main__':
+    make_excel(5)
+#    for i in range(27 * 26 + 1):
+#        print get_char(i),

@@ -1,0 +1,446 @@
+{% extends "survey/survey_base.html" %}
+{% block script %}
+<script language="javascript">
+    $(document).ready(function($){
+        $("#paper_form").submit(function(){
+            var theForm = this;
+            $(":radio").attr('disabled', false);
+	    	$(":checkbox").attr('disabled', false);
+            if (isEmpty(theForm.F49a_A1.value)) {
+                alert("请输入进店前左前轮胎压！");
+                theForm.F49a_A1.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49a_A1) == "false") {
+                alert("进店前左前轮胎压输入格式有误(正确的格式为x.xx)！");
+                theForm.F49a_A1.focus();
+                return false;
+            }
+            if (isEmpty(theForm.F49a_A2.value)) {
+                alert("请输入进店前右前轮胎压！");
+                theForm.F49a_A2.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49a_A2) == "false") {
+                alert("进店前右前轮胎压输入格式有误(正确的格式为x.xx)！");
+                theForm.F49a_A2.focus();
+                return false;
+            }
+            
+            if (isEmpty(theForm.F49a_A3.value)) {
+                alert("请输入进店前左后轮胎压！");
+                theForm.F49a_A3.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49a_A3) == "false") {
+                alert("进店前左后轮胎压输入格式有误(正确的格式为x.xx)！");
+                theForm.F49a_A3.focus();
+                return false;
+            }
+            
+            if (isEmpty(theForm.F49a_A4.value)) {
+                alert("请输入进店前右后轮胎压！");
+                theForm.F49a_A4.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49a_A4) == "false") {
+                alert("进店前右后轮胎压输入格式有误(正确的格式为x.xx)！");
+                theForm.F49a_A4.focus();
+                return false;
+            }
+            
+            if (isEmpty(theForm.F49b_A1.value)) {
+                alert("请输入门柱显示前轮胎压起始值！");
+                theForm.F49b_A1.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49b_A1) == "false") {
+                alert("门柱显示前轮胎压起始值输入格式有误(正确的格式为x.xx)！");
+                theForm.F49b_A1.focus();
+                return false;
+            }
+            
+            if (isEmpty(theForm.F49b_A2.value)) {
+                alert("请输入门柱显示前轮胎压截止值！");
+                theForm.F49b_A2.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49b_A2) == "false") {
+                alert("门柱显示前轮胎压截止值输入格式有误(正确的格式为x.xx)！");
+                theForm.F49b_A2.focus();
+                return false;
+            }
+            
+            
+            if (isEmpty(theForm.F49b_A3.value)) {
+                alert("请输入门柱显示后轮胎压起始值！");
+                theForm.F49b_A3.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49b_A3) == "false") {
+                alert("门柱显示后轮胎压起始值输入格式有误(正确的格式为x.xx)！");
+                theForm.F49b_A3.focus();
+                return false;
+            }
+            
+            if (isEmpty(theForm.F49b_A4.value)) {
+                alert("请输入门柱显示后轮胎压截止值！");
+                theForm.F49b_A4.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49b_A4) == "false") {
+                alert("门柱显示后轮胎压截止值输入格式有误(正确的格式为x.xx)！");
+                theForm.F49b_A4.focus();
+                return false;
+            }
+            
+            
+            if (isEmpty(theForm.F49c_A1.value)) {
+                alert("请输入离店后左前轮胎压！");
+                theForm.F49c_A1.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49c_A1) == "false") {
+                alert("离店后左前轮胎压输入格式有误(正确的格式为x.xx)！");
+                theForm.F49c_A1.focus();
+                return false;
+            }
+            if (isEmpty(theForm.F49c_A2.value)) {
+                alert("请输入离店后右前轮胎压！");
+                theForm.F49c_A2.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49c_A2) == "false") {
+                alert("离店后右前轮胎压输入格式有误(正确的格式为x.xx)！");
+                theForm.F49c_A2.focus();
+                return false;
+            }
+            
+            if (isEmpty(theForm.F49c_A3.value)) {
+                alert("请输入离店后左后轮胎压！");
+                theForm.F49c_A3.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49c_A3) == "false") {
+                alert("离店后左后轮胎压输入格式有误(正确的格式为x.xx)！");
+                theForm.F49c_A3.focus();
+                return false;
+            }
+            
+            if (isEmpty(theForm.F49c_A4.value)) {
+                alert("请输入离店后右后轮胎压！");
+                theForm.F49c_A4.focus();
+                return false;
+            }
+            if (CheckInput(theForm.F49c_A4) == "false") {
+                alert("离店后右后轮胎压输入格式有误(正确的格式为x.xx)！");
+                theForm.F49c_A4.focus();
+                return false;
+            }
+            
+            if (isEmpty(theForm.F49d_A1.value)) {
+                alert("请输入左前轮轮胎型号！");
+                theForm.F49d_A1.focus();
+                return false;
+            }
+            if (isEmpty(theForm.F49d_A2.value)) {
+                alert("请输入右前轮轮胎型号！");
+                theForm.F49d_A2.focus();
+                return false;
+            }
+            if (isEmpty(theForm.F49d_A3.value)) {
+                alert("请输入左后轮轮胎型号！");
+                theForm.F49d_A3.focus();
+                return false;
+            }
+            if (isEmpty(theForm.F49d_A4.value)) {
+                alert("请输入右后轮轮胎型号！");
+                theForm.F49d_A4.focus();
+                return false;
+            }
+            
+			var question_list = ['F48','F49'];
+			var show_list = ['F47','F48'];
+			
+			var project_id = $("input[name='pid']").val()
+			if (project_id != 4){
+				var no_list = ['F48'];
+				for (var i=0; i < no_list.length; i++) {
+					set_no_answer(theForm,no_list[i]);
+				}
+			}
+			
+			for (var i = 0;i<question_list.length;i++){
+				var result = check_radio(theForm,question_list[i],show_list[i]);
+				if (!result){
+					if (project_id != 4){
+						re_no_answer(theForm,no_list);
+					}
+					return result;
+				}
+			}
+        });
+    });
+</script>
+{% endblock %}
+{% block content %}
+<table border="0" cellspacing="0" cellpadding="0" width="97%" style="margin:5px;">
+    <tbody>
+        <tr>
+            <td colspan="2" align="left" style="padding-left:20px;padding-top:10px;">
+                <div style="padding-bottom:10px;">
+                    <span style="padding-left:0px;" class="STYLE2">问卷编号：</span>
+                    {{answers.survey_code|default_if_none:''}}
+                </div>
+                <div class="news-box_service">
+                    <div class="news-box2_service">
+                        <div align="left" style="padding: 10px;">
+                            <span class="STYLE1">F. 维修服务之后</span>
+                        </div>
+                    </div>
+                </div>
+                <!--<hr width="98%" color="#00000" size=1>-->
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;margin-top:10px;">
+                    <tbody>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>题号</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="24%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>考核点</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>是</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>否</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>不涉及</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="31%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>选择</strong>
+                                    <strong>“</strong>
+                                    <strong>否</strong>
+                                    <strong>/</strong>
+                                    <strong>不涉及</strong>
+                                    <strong>”</strong>
+                                    <strong>原因</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="13%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>评估标准说明</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="16%" bgcolor="#FFFFFF">
+                                <strong>操作注意事项</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                F47.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                	在维修保养结束后，收音机的频道/CD/电视频道是否恢复到车辆进店时的设置？ （多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="F48" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="F48" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="F48" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in F48 %}
+									<br><input name="ck_F48" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.F48 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									<br>"否/不涉及"原因：<br>
+									<input name="input_F48" type="text" class="input11" value="{% ifnotequal answers.F48.0 'A1' %}{{answers.F48.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="F48__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="F48__open__EN" type="text" class="input11" value="{% ifnotequal answers.F48.0 'A1' %}{{trans_contents.F48|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	在维修保养后，必须把车辆的收音机频道/电视频道调回到进店时播放的频道。<br>
+								CD必须调回到进厂时播放的那张光碟.
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	请评估员在进店前与车主将车内收音机调至一固定频道或者将CD放置固定光碟之后（评估员在此处对当时调整好的频道或光碟进行确认录音），然后再开车进入经销店。
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                F48.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    在此次访问中，是否所有的胎压都被调整到正确的数值?（单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="F49" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="F49" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="F49" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    <strong>进店前测量胎压：</strong>
+                                    <br>
+                                    左前轮：<input name="F49a_A1" type="text" class="input11" value="{{answers.F49a.0|default_if_none:''}}" size="10" maxlength="30">
+                                    <br>
+                                    左后轮：<input name="F49a_A3" type="text" class="input11" value="{{answers.F49a.2|default_if_none:''}}" size="10" maxlength="30">
+                                    <br>
+                                    右前轮：<input name="F49a_A2" type="text" class="input11" value="{{answers.F49a.1|default_if_none:''}}" size="10" maxlength="30">
+                                    <br>
+                                    右后轮：<input name="F49a_A4" type="text" class="input11" value="{{answers.F49a.3|default_if_none:''}}" size="10" maxlength="30">
+                                </p>
+                                <p>
+                                    <strong>门柱显示胎压：</strong>
+                                    <br>
+                                    前轮胎压范围：<input name="F49b_A1" type="text" class="input11" value="{{answers.F49b.0|default_if_none:''}}" size="6" maxlength="30">至<input name="F49b_A2" type="text" class="input11" value="{{answers.F49b.1|default_if_none:''}}" size="6" maxlength="30">
+                                    <br>
+                                    后轮胎压范围：<input name="F49b_A3" type="text" class="input11" value="{{answers.F49b.2|default_if_none:''}}" size="6" maxlength="30">至<input name="F49b_A4" type="text" class="input11" value="{{answers.F49b.3|default_if_none:''}}" size="6" maxlength="30">
+                                </p>
+                                <p>
+                                    <strong>离店后测量胎压：</strong>
+                                    <br>
+                                    左前轮：<input name="F49c_A1" type="text" class="input11" value="{{answers.F49c.0|default_if_none:''}}" size="10" maxlength="30">
+                                    <br>
+                                    左后轮：<input name="F49c_A3" type="text" class="input11" value="{{answers.F49c.2|default_if_none:''}}" size="10" maxlength="30">
+                                    <br>
+                                    右前轮：<input name="F49c_A2" type="text" class="input11" value="{{answers.F49c.1|default_if_none:''}}" size="10" maxlength="30">
+                                    <br>
+                                    右后轮：<input name="F49c_A4" type="text" class="input11" value="{{answers.F49c.3|default_if_none:''}}" size="10" maxlength="30">
+                                </p>
+                                <p>
+                                    <strong>记录轮胎型号：</strong>
+                                    <br>
+                                    左前轮：<input name="F49d_A1" type="text" class="input11" value="{{answers.F49d.0|default_if_none:''}}" size="25" maxlength="30">
+                                    <br>
+                                    左后轮：<input name="F49d_A3" type="text" class="input11" value="{{answers.F49d.2|default_if_none:''}}" size="25" maxlength="30">
+                                    <br>
+                                    右前轮：<input name="F49d_A2" type="text" class="input11" value="{{answers.F49d.1|default_if_none:''}}" size="25" maxlength="30">
+                                    <br>
+                                    右后轮：<input name="F49d_A4" type="text" class="input11" value="{{answers.F49d.3|default_if_none:''}}" size="25" maxlength="30">
+                                </p>
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="F49__open" type="text" class="input11" value="{% ifnotequal answers.F49.0 'A1' %}{{answers.F49.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="F49__open__EN" type="text" class="input11" value="{% ifnotequal answers.F49.0 'A1' %}{{trans_contents.F49|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                                请确保胎压值在门柱上标示的最小值与最大值之间。且需要确保两个前轮的胎压值和两个后轮的胎压值分别相同。我们接受正负0.1的误差。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                (1)请在进店前（经销店就近，且不被经销店发现的地方）测量胎压，出店后也再次测量胎压。
+                                <br>
+                                (2)录音中必须报出4个轮胎的型号！
+                                <br>
+                                (3)要求对轮胎型号拍照！
+                                <br>
+                                (4)要求对门柱标准胎压值拍照！
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<input type="hidden" name="p" value="E"/>
+<input type="hidden" name="pid" value="{{project.id|default_if_none:''}}"/>
+<script language="JavaScript">
+    set_radio($("#paper_form input[name='F48']"), "{{answers.F48.0}}");
+    set_radio($("#paper_form input[name='F49']"), "{{answers.F49.0}}");
+	if ({{tran_perm}}){
+		$(':input:not([name$="__EN"])').attr('readonly',true);
+		$(':input[name$="__EN"]').attr('readonly',false);
+		$(':input[name^="input_"]').attr('readonly',false);
+		$(':input[name$="__open"]').attr('readonly',false);
+	    $(":radio").attr('disabled', 'disabled');
+	    $(":checkbox").attr('disabled', 'disabled');
+	}else{
+		$(':input[name$="__EN"]').attr('readonly',true);
+		$(':input:not([name$="__EN"])').attr('readonly',false);
+		if ({{manage_perm}}){
+			$(':input[name$="__EN"]').attr('readonly',false);
+		}
+	}
+	
+	var project_id = "{{project.id|default_if_none:''}}";
+	
+	$(":radio").click(function () {
+	    var r = $(this).attr("name");
+	    $(":radio[name=" + r + "]:not(:checked)").attr("tag", 0);
+	    if ($(this).attr("tag") == 1) {
+	        $(this).attr("checked", false);
+	        $(this).attr("tag", 0);
+	    }
+	    else {
+	        $(this).attr("tag", 1);
+	    }
+	    if (project_id != 4){
+			var no_list = ['F48'];
+		    for (var i=0; i < no_list.length; i++) {
+			  if (r == no_list[i]){
+			  	if ($(this).val() != 'A2'){
+			  		off_check(r);
+			  	}else{
+			  		on_check(r);
+			  	}
+			  }
+			}
+		}
+	});
+</script>
+{% endblock %}

@@ -1,0 +1,1 @@
+python manage.py dumpdata survey.Project survey.Question survey.Alternative survey.MatrixRow > survey\fixtures\survey.json

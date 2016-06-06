@@ -1,0 +1,527 @@
+{% extends "survey/survey_base.html" %}
+{% block css %}
+<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+{% endblock %}
+{% block script %}
+<script type="text/javascript" src="/static/js/jquery-ui-1.8.9.custom.min.js">
+</script>
+<script type="text/javascript" src="/static/js/jquery.ui.datepicker-zh-CN.js">
+</script>
+<script language="javascript">
+    $(document).ready(function($){
+		$('#C28DT').datepicker();
+        $("#paper_form").submit(function(){
+            var theForm = this;
+            $(":radio").attr('disabled', false);
+	    	$(":checkbox").attr('disabled', false);
+			var visit_date = "{{answers.visit_date|default_if_none:''}}";
+			var visit_begin_time = "{{answers.visit_begin_time|default_if_none:''}}";
+			
+			if (isEmpty(theForm.C28DT.value)) {
+                alert("请选择完工日期！");
+                theForm.C28DT.focus();
+                return false;
+            }
+            if (isEmpty(theForm.C28EndHour.value)) {
+                alert("请选择完工小时！");
+                theForm.C28EndHour.focus();
+                return false;
+            }
+            if (isEmpty(theForm.C28EndMinute.value)) {
+                alert("请选择完工分钟！");
+                theForm.C28EndMinute.focus();
+                return false;
+            }
+			if (visit_date){
+	            if (theForm.C28DT.value < visit_date) {
+	                alert("完工日期输入有误！");
+	                theForm.C28DT.focus();
+	                return false;
+	            }
+			}
+			theForm.repare_finish_time.value = theForm.C28EndHour.value+":"+theForm.C28EndMinute.value;
+			theForm.repare_finish_date.value = theForm.C28DT.value;
+			
+			var question_list = ['C24','C25','C26','C28','C29'];
+			var show_list = ['C25','C26','C27','C28','C29'];
+			
+			var no_list = ['C24','C25'];
+			
+			for (var i=0; i < no_list.length; i++) {
+				set_no_answer(theForm,no_list[i]);
+			}
+			
+			for (var i = 0;i<question_list.length;i++){
+				var result = check_radio(theForm,question_list[i],show_list[i]);
+				if (!result){
+					re_no_answer(theForm,no_list);
+					return result;
+				}
+			}
+            
+        });
+    });
+</script>
+{% endblock %}
+{% block content %}
+<table border="0" cellspacing="0" cellpadding="0" width="97%" style="margin:5px;">
+    <tbody>
+        <tr>
+            <td colspan="2" align="left" style="padding-left:20px;padding-top:10px;">
+                <div style="padding-bottom:10px;">
+                    <span style="padding-left:0px;" class="STYLE2">问卷编号：</span>
+                    {{answers.survey_code|default_if_none:''}}
+                </div>
+                <div class="news-box_service">
+                    <div class="news-box2_service">
+                        <div align="left" style="padding: 10px;">
+                            <span class="STYLE1">C. 客户等待</span>
+                        </div>
+                        <p>
+                        </p>
+                    </div>
+                </div>
+                <!--<hr width="98%" color="#00000" size=1>-->
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <p>
+                    &nbsp;
+                </p>
+                <table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;margin-top:10px;">
+                    <tbody>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>题号</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="24%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>考核点</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>是</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>否</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>不涉及</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="25%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>选择“否</strong>
+                                    <strong>/</strong>
+                                    <strong>不涉及”原因</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="16%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>评估标准说明</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="19%" bgcolor="#FFFFFF">
+                                <strong>操作注意事项</strong>
+                            </td>
+                        </tr>
+                         <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                C25.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    总体来看,经销店是否干净整洁?（多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C24" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C24" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C24" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in C24 %}
+									<br><input name="ck_C24" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.C24 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="C24other" type="text" class="input11" value="{% if '98' in alt_ans.C24 %}{{answers.C24other|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+                                    <input name="input_C24" type="text" class="input11" value="{% ifnotequal answers.C24.0 'A1' %}{{answers.C24.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="C24__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<input name="C24__open__EN" type="text" class="input11" value="{% ifnotequal answers.C24.0 'A1' %}{{trans_contents.C24|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                在工作时间内,经销店必须保持干净整洁，尤其是洗手间，客户休息区/VIP区，服务接待区。<br>
+                                宝马APQ团队将保留该评分点的最终裁断权。
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+                                （1）如果此题失分，必须提供2个时间点的证据（录像/照片）。一个是提供刚发现不干净点时的证据，另一个是提供10分钟后该不干净点的证据。评估员不一定要一直守在不干净点处，可以10分钟后再次回来拍摄。<br>
+                                （2）如果此题失分，要求2个时间点的证据（录像/照片）必须清晰。如果只有一个时间点的证据，那么此题不能判断。<br>
+                                （3）如恰逢雨雪天气，虽然地面会有污物，但只要看到有清洁人员在及时打扫也可被接受。<br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                C26.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    是否在客人等待期间给其提供茶点/可休息区域？（座椅，饮料，当前的报纸杂志，传媒） （多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C25" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C25" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C25" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in C25 %}
+									<br><input name="ck_C25" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.C25 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="C25other" type="text" class="input11" value="{% if '98' in alt_ans.C25 %}{{answers.C25other|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+                                    <input name="input_C25" type="text" class="input11" value="{% ifnotequal answers.C25.0 'A1' %}{{answers.C25.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="C25__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<input name="C25__open__EN" type="text" class="input11" value="{% ifnotequal answers.C25.0 'A1' %}{{trans_contents.C25|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                当前的报纸杂志指最近3个月的杂志或今天/昨天的报纸。
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+								（1）{% if project.id != 4 %}宝马{% else %}竞品{% endif %}杂志不在审核范围内。<br>
+								（2）如果有很多种杂志和报纸，则只需要抽查。但请注意，当地的日报必须检查。<br>
+								（3）周刊：只接受当期和上一期的周刊。<br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                C27.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    当车辆在车间维修时客人是否有可能看到自己的车辆？ （单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C26" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C26" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C26" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<input name="C26__open" type="text" class="input11" value="{% ifnotequal answers.C26.0 'A1' %}{{answers.C26.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    <br>
+                                    "否/不涉及"原因_EN：<input name="C26__open__EN" type="text" class="input11" value="{% ifnotequal answers.C26.0 'A1' %}{{trans_contents.C26|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                通过实时摄像头或窗户。
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+                            	(1)无论是通过摄像头/玻璃/窗户，必须看到车主的车辆才能给分。<br>
+								(2)如果经销店有多种方式（摄像头/玻璃/窗户）看到维修的车辆，那么只要有一种方式能看到神秘客的车此题就可以得分。<br>
+								(3)如果有摄像头但是坏了，此题算“否”。<br>
+								(4)只能看见文字显示车辆的状态，此题算“否”。如：NS6578洗车，CF4523路试…<br>
+								(5)如果经销店只有旋转的摄像头，那么只要能调试到神秘客的车的镜头就给分。陪访员可以自己去调试，也可以请其他人帮忙调试。<br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                C28.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    如果没有加工项的情况下，是否按之前承诺的时间完成服务？（单选）
+                                    <br>
+                                    <strong><em>请记录最终交车时间！</em></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C28" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C28" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C28" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    <strong>&nbsp;</strong>
+                                </p>
+                                <p>
+                                    <strong>最终完工日期：</strong>&nbsp;&nbsp;<input id="C28DT" name="C28DT" type="text" class="input1" value="{{answers.repare_finish_date|default_if_none:''}}" size="12" readonly="readonly" style="background-color:#E6E6E6;">
+                                    <br>
+                                    <br>
+                                    <strong>最终完工时间: </strong>
+                                    <select name="C28EndHour" class="inputbox">
+                                        <option value="00">00</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                    </select>
+                                    时
+                                    <select name="C28EndMinute" class="inputbox">
+                                        <option value="00">00</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                        <option value="24">24</option>
+                                        <option value="25">25</option>
+                                        <option value="26">26</option>
+                                        <option value="27">27</option>
+                                        <option value="28">28</option>
+                                        <option value="29">29</option>
+                                        <option value="30">30</option>
+                                        <option value="31">31</option>
+                                        <option value="32">32</option>
+                                        <option value="33">33</option>
+                                        <option value="34">34</option>
+                                        <option value="35">35</option>
+                                        <option value="36">36</option>
+                                        <option value="37">37</option>
+                                        <option value="38">38</option>
+                                        <option value="39">39</option>
+                                        <option value="40">40</option>
+                                        <option value="41">41</option>
+                                        <option value="42">42</option>
+                                        <option value="43">43</option>
+                                        <option value="44">44</option>
+                                        <option value="45">45</option>
+                                        <option value="46">46</option>
+                                        <option value="47">47</option>
+                                        <option value="48">48</option>
+                                        <option value="49">49</option>
+                                        <option value="50">50</option>
+                                        <option value="51">51</option>
+                                        <option value="52">52</option>
+                                        <option value="53">53</option>
+                                        <option value="54">54</option>
+                                        <option value="55">55</option>
+                                        <option value="56">56</option>
+                                        <option value="57">57</option>
+                                        <option value="58">58</option>
+                                        <option value="59">59</option>
+                                    </select>
+                                    分 
+                                </p>
+                                <p>
+                                    "否/不涉及"原因：<input name="C28__open" type="text" class="input11" value="{% ifnotequal answers.C28.0 'A1' %}{{answers.C28.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    <br>
+                                    "否/不涉及"原因_EN：<input name="C28__open__EN" type="text" class="input11" value="{% ifnotequal answers.C28.0 'A1' %}{{trans_contents.C28|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                                <p>
+                                    &nbsp;
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	如果同意加项，则本题“未涉及”。<br>
+                            	如果服务顾问在“接车过程”中没有告知客户最终完工时间，则本题失分。<br>
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+                            	(1)如果之前告之的完工时间是精确的时间，必须准时交车才算是，1分钟的延误都不能接受；<br>
+                            	(2)如果之前告之的完工时间是大概的时间，可接受10分钟内的延误。<br>
+                            	(3)有加工项，直接判断不涉及<br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                C29.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    是否在早于约定完工时间前1小时通知延误交车？ （单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C29" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C29" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C29" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<input name="C29__open" type="text" class="input11" value="{% ifnotequal answers.C29.0 'A1' %}{{answers.C29.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    <br>
+                                    "否/不涉及"原因_EN：<input name="C29__open__EN" type="text" class="input11" value="{% ifnotequal answers.C29.0 'A1' %}{{trans_contents.C29|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                如有额外工项，则本题“未涉及”。
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+                            	如果预计在一个小时内完工，又发生延误了，此题判“未涉及”。
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<input type="hidden" name="repare_finish_date" value="{{answers.repare_finish_date|default_if_none:''}}"/>
+<input type="hidden" name="repare_finish_time" value="{{answers.repare_finish_time|default_if_none:''}}"/>
+<input type="hidden" name="p" value="C"/>
+<script language="javascript">
+    var form = document.getElementById('paper_form');
+    var finish_time = "{{answers.repare_finish_time|default_if_none:''}}";
+    if (finish_time!="") {
+        var list = finish_time.split(':');
+        form.C28EndHour.value = list[0];
+        form.C28EndMinute.value = list[1];
+    }
+    set_radio($("#paper_form input[name='C24']"), "{{answers.C24.0}}");
+    set_radio($("#paper_form input[name='C25']"), "{{answers.C25.0}}");
+    set_radio($("#paper_form input[name='C26']"), "{{answers.C26.0}}");
+    set_radio($("#paper_form input[name='C28']"), "{{answers.C28.0}}");
+    set_radio($("#paper_form input[name='C29']"), "{{answers.C29.0}}");
+	if ({{tran_perm}}){
+		$(':input:not([name$="__EN"])').attr('readonly',true);
+		$(':input[name$="__EN"]').attr('readonly',false);
+		$(':input[name^="input_"]').attr('readonly',false);
+		$(':input[name$="__open"]').attr('readonly',false);
+	    $(":radio").attr('disabled', 'disabled');
+	    $(":checkbox").attr('disabled', 'disabled');
+	}else{
+		$(':input[name$="__EN"]').attr('readonly',true);
+		$(':input:not([name$="__EN"])').attr('readonly',false);
+		if ({{manage_perm}}){
+			$(':input[name$="__EN"]').attr('readonly',false);
+		}
+	}
+	
+	var project_id = "{{project.id|default_if_none:''}}";
+	var no_list = ['C24','C25'];
+	
+	$(":radio").click(function () {
+	    var r = $(this).attr("name");
+	    $(":radio[name=" + r + "]:not(:checked)").attr("tag", 0);
+	    if ($(this).attr("tag") == 1) {
+	        $(this).attr("checked", false);
+	        $(this).attr("tag", 0);
+	    }
+	    else {
+	        $(this).attr("tag", 1);
+	    }
+	    for (var i=0; i < no_list.length; i++) {
+		  if (r == no_list[i]){
+		  	if ($(this).val() != 'A2'){
+		  		off_check(r);
+		  	}else{
+		  		on_check(r);
+		  	}
+		  }
+		}
+	});
+</script>
+{% endblock %}

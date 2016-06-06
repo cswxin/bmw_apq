@@ -1,0 +1,356 @@
+{% extends "survey/survey_base.html" %}
+{% block script %}
+<script language="javascript">
+    $(document).ready(function($){
+        $("#paper_form").submit(function(){
+            var theForm = this;
+            $(":radio").attr('disabled', false);
+	    	$(":checkbox").attr('disabled', false);
+			var question_list = ['E44','E45','E46','E47'];
+			var show_list = ['E43','E44','E45','E46'];
+			
+			var project_id = $("input[name='pid']").val()
+			if (project_id == 4){
+            	//竞品问卷
+            	question_list = ['E44','E47'];
+            	show_list = ['E43','E46'];
+            }
+			
+			var no_list = ['E44','E46','E47'];
+			if (project_id == 4){
+				no_list = ['E44','E47'];
+			}
+			for (var i=0; i < no_list.length; i++) {
+				set_no_answer(theForm,no_list[i]);
+			}
+			
+			for (var i = 0;i<question_list.length;i++){
+				var result = check_radio(theForm,question_list[i],show_list[i]);
+				if (!result){
+					re_no_answer(theForm,no_list);
+					return result;
+				}
+			}
+        });
+    });
+</script>
+{% endblock %}
+{% block content %}
+<table border="0" cellspacing="0" cellpadding="0" width="97%" style="margin:5px;">
+    <tbody>
+        <tr>
+            <td colspan="2" align="left" style="padding-left:20px;padding-top:10px;">
+                <div style="padding-bottom:10px;">
+                    <span style="padding-left:0px;" class="STYLE2">问卷编号：</span>
+                    {{answers.survey_code|default_if_none:''}}
+                </div>
+                <div class="news-box_service">
+                    <div class="news-box2_service">
+                        <div align="left" style="padding: 10px;">
+                            <span class="STYLE1">E. 车辆交接</span>
+                        </div>
+                    </div>
+                </div>
+                <!--<hr width="98%" color="#00000" size=1>-->
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;margin-top:10px;">
+                    <tbody>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>题号</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="24%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>考核点</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>是</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>否</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>不涉及</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="31%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>选择</strong>
+                                    <strong>“</strong>
+                                    <strong>否</strong>
+                                    <strong>/</strong>
+                                    <strong>不涉及</strong>
+                                    <strong>”</strong>
+                                    <strong>原因</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="13%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>评估标准说明</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="16%" bgcolor="#FFFFFF">
+                                <strong>操作注意事项</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                E43.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    服务顾问或服务顾问助理是否告知车辆停放位置并陪同客人交付车辆？ （单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E44" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E44" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E44" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in E44 %}
+									<br><input name="ck_E44" type="radio" value="{{alt.cid}}" {% if alt.cid in alt_ans.E44 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									<br>"否/不涉及"原因：<br>
+									<input name="input_E44" type="text" class="input11" value="{% ifnotequal answers.E44.0 'A1' %}{{answers.E44.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="E44__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="E44__open__EN" type="text" class="input11" value="{% ifnotequal answers.E44.0 'A1' %}{{trans_contents.E44|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                                不能只告知客人车辆停放的位置，需陪同客人至其车辆停车处交车。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            </td>
+                        </tr>
+                        {% if project.id != 4 %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                E44.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                	是否在服务顾问把车辆交接给客人之前把瓶装水放在前部杯架上?（单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E45" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E45" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E45" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="E45__open" type="text" class="input11" value="{% ifnotequal answers.E45.0 'A1' %}{{answers.E45.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="E45__open__EN" type="text" class="input11" value="{% ifnotequal answers.E45.0 'A1' %}{{trans_contents.E45|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	至少在车辆前排座椅的杯架中放置两瓶水，如果没有杯架则需把水放在前门内侧的储物盒中。维修保养结束后，需有人把水放进车内。考虑天气原因，可视情况给到客户手中。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	（1）陪访员需要在出店后给出两瓶水或多瓶水的镜头,或者拍照片。<br>
+								（2）如果没有提供水，也需要提供录音等等证据。<br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                E45.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                	在车辆交接过程中，服务顾问是否提醒/帮助客人调整座椅和后视镜位置？（多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E46" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E46" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E46" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in E46 %}
+									<br><input name="ck_E46" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.E46 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="E46other" type="text" class="input11" value="{% if '98' in alt_ans.E46 %}{{answers.E46other|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+									<input name="input_E46" type="text" class="input11" value="{% ifnotequal answers.E46.0 'A1' %}{{answers.E46.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="E46__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="E46__open__EN" type="text" class="input11" value="{% ifnotequal answers.E46.0 'A1' %}{{trans_contents.E46|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	在“提车过程”或“车辆交接过程”中，服务顾问需要提醒客户检查座椅和后视镜的位置。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	陪访员注意服务顾问需要有提醒客户检查座椅和后视镜这样类似的话语，并注意录音。<br>
+								（1）首先服务顾问需要提醒客人“座椅和后视镜的位置是否合适。”<br>
+								（2）如果客人觉得座椅和后视镜的位置不合适，服务顾问需要主动询问客人“是否需要帮助。”<br>
+								（3）如果客人提出需要服务顾问的帮助，那么服务顾问有义务帮助其调整，直到客人满意为止。<br>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                E46.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    车辆是否清洗吸尘干净？ （多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E47" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E47" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E47" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in E47 %}
+									<br><input name="ck_E47" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.E47 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="E47other" type="text" class="input11" value="{% if '98' in alt_ans.E47 %}{{answers.E47other|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+									<input name="input_E47" type="text" class="input11" value="{% ifnotequal answers.E47.0 'A1' %}{{answers.E47.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="E47__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="E47__open__EN" type="text" class="input11" value="{% ifnotequal answers.E47.0 'A1' %}{{trans_contents.E47|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	无油污印记；<br>
+                            	吸尘车内地板和脚垫；<br>
+                            	清洗和擦干车辆；<br>
+                            	清理烟灰缸；<br>
+                            	无泥水。<br>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	（1）如果客人进店前车辆有需要特殊清洗剂或设备才能洗掉的污迹，则不算在考核范围内。<br>
+								（2）如果客人主动要求不洗车，那么判“未涉及”。<br>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<input type="hidden" name="p" value="E"/>
+<input type="hidden" name="pid" value="{{project.id|default_if_none:''}}"/>
+<script language="JavaScript">
+    set_radio($("#paper_form input[name='E44']"), "{{answers.E44.0}}");
+    set_radio($("#paper_form input[name='E45']"), "{{answers.E45.0}}");
+    set_radio($("#paper_form input[name='E46']"), "{{answers.E46.0}}");
+    set_radio($("#paper_form input[name='E47']"), "{{answers.E47.0}}");
+	if ({{tran_perm}}){
+		$(':input:not([name$="__EN"])').attr('readonly',true);
+		$(':input[name$="__EN"]').attr('readonly',false);
+		$(':input[name^="input_"]').attr('readonly',false);
+		$(':input[name$="__open"]').attr('readonly',false);
+	    $(":radio").attr('disabled', 'disabled');
+	    $(":checkbox").attr('disabled', 'disabled');
+	}else{
+		$(':input[name$="__EN"]').attr('readonly',true);
+		$(':input:not([name$="__EN"])').attr('readonly',false);
+		if ({{manage_perm}}){
+			$(':input[name$="__EN"]').attr('readonly',false);
+		}
+	}
+	
+	var project_id = "{{project.id|default_if_none:''}}";
+	var no_list = ['E44','E46','E47'];
+	if (project_id == 4){
+		no_list = ['E44','E47'];
+	}
+	
+	$(":radio").click(function () {
+	    var r = $(this).attr("name");
+	    $(":radio[name=" + r + "]:not(:checked)").attr("tag", 0);
+	    if ($(this).attr("tag") == 1) {
+	        $(this).attr("checked", false);
+	        $(this).attr("tag", 0);
+	    }
+	    else {
+	        $(this).attr("tag", 1);
+	    }
+	    for (var i=0; i < no_list.length; i++) {
+		  if (r == no_list[i]){
+		  	if ($(this).val() != 'A2'){
+		  		off_check(r);
+		  	}else{
+		  		on_check(r);
+		  	}
+		  }
+		}
+	});
+</script>
+{% endblock %}

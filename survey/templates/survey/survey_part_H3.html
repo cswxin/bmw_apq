@@ -1,0 +1,139 @@
+{% extends "survey/survey_base.html" %}
+{% block script %}
+<script language="javascript">
+    $(document).ready(function($){
+        $("#paper_form").submit(function(){
+        	$(":radio").attr('disabled', false);
+	    	$(":checkbox").attr('disabled', false);
+            var theForm = this;
+			var question_list = {{question_cid_list|safe}};
+			for (var i = 0;i<question_list.length;i++){
+				var result = check_radio(theForm,question_list[i]);
+				if (!result){
+					return result;
+				}
+			}
+        });
+    });
+</script>
+{% endblock %}
+{% block content %}
+<table border="0" cellspacing="0" cellpadding="0" width="97%" style="margin:5px;">
+    <tbody>
+        <tr>
+            <td colspan="2" align="left" style="padding-left:20px;padding-top:10px;">
+                <div style="padding-bottom:10px;">
+                    <span style="padding-left:0px;" class="STYLE2">问卷编号：</span>
+                    {{answers.survey_code|default_if_none:''}}
+                </div>
+                <div class="news-box_service">
+                    <div class="news-box2_service">
+                        <div align="left" style="padding:10px;">
+                            <span class="STYLE1">与客人确认的几道问题</span>
+                        </div>
+                    </div>
+                </div>
+                <!--<hr width="98%" color="#00000" size=1>-->
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <br>
+                <table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;margin-top:10px;">
+                    <tbody>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>题号</strong>
+                                </p>
+                            </td>
+                            <td width="24%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>考核点</strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>是</strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>否</strong>
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>不涉及</strong>
+                                </p>
+                            </td>
+                            <td width="25%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>客人陈述的选择“否/不涉及”原因</strong>
+                                </p>
+                            </td>
+                            <td width="17%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>评估员补充说明</strong>
+                                </p>
+                            </td>
+                        </tr>
+                        {% for qu in questions %}
+				        <tr>
+				          <td width="3%" bgcolor="#FFFFFF">{{qu.cid}}.&nbsp;</td>
+				          <td width="24%" align="left" bgcolor="#FFFFFF"><p>{{qu.title}}</p></td>
+				          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="{{qu.cid}}" value="A1">
+				          </p></td>
+				          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="{{qu.cid}}" value="A2">
+				          </p></td>
+				          <td width="4%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="{{qu.cid}}" value="A3">
+				          </p></td>
+				          <td width="28%" align="left" bgcolor="#FFFFFF">"否/不涉及"原因：<br>
+				            <input name="{{qu.cid}}__open" type="text" class="input11" value="{% if qu.answer0 != 'A1' %}{{qu.answer1|default_if_none:''}}{% endif %}" size="30" maxlength="250">
+							<br>
+				            "否/不涉及"原因_EN：<br>
+				            <input name="{{qu.cid}}__open__EN" type="text" class="input11" value="{% if qu.answer0 != 'A1' %}{{qu.trans_contents|default_if_none:''}}{% endif %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                          </td>
+				          <td width="18%" align="left" bgcolor="#FFFFFF">
+                            补充说明：<br>
+                            <input name="{{qu.cid}}__addon" type="text" class="input11" value="{{qu.addon|default_if_none:''}}" size="30" maxlength="250">
+                            <br>
+                            补充说明_EN：<br>
+                            <input name="{{qu.cid}}__addon__EN" type="text" class="input11" value="{{qu.addon_en|default_if_none:''}}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+						  </td>
+				        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <br>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<input type="hidden" name="p" value="G"/>
+<script language="JavaScript">
+    var form = document.getElementById('paper_form');
+    
+    {% for qu in questions %}
+    set_radio(form.{{qu.cid}}, "{{qu.answer0}}");
+    {% endfor %}
+    
+	if ({{tran_perm}}){
+		$(':input:not([name$="__EN"])').attr('readonly',true);
+		$(':input[name$="__EN"]').attr('readonly',false);
+		$(':input[name^="input_"]').attr('readonly',false);
+		$(':input[name$="__open"]').attr('readonly',false);
+	    $(":radio").attr('disabled', 'disabled');
+	    $(":checkbox").attr('disabled', 'disabled');
+	}else{
+		$(':input[name$="__EN"]').attr('readonly',true);
+		$(':input:not([name$="__EN"])').attr('readonly',false);
+		if ({{manage_perm}}){
+			$(':input[name$="__EN"]').attr('readonly',false);
+		}
+	}
+</script>
+{% endblock %}

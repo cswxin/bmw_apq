@@ -1,0 +1,1061 @@
+{% extends "survey/survey_base.html" %}
+{% block script %}
+<script language="javascript">
+    $(document).ready(function($){
+        $("#paper_form").submit(function(){
+            var theForm = this;
+            $(":radio").attr('disabled', false);
+	    	$(":checkbox").attr('disabled', false);
+            if (isEmpty(theForm.final_price.value)){
+                alert("请输入最终价格！");
+                theForm.final_price.focus();
+                return false;
+			}
+			if (isNaN(theForm.final_price.value)){
+                alert("最终价格有误！");
+                theForm.final_price.focus();
+                return false;
+			}
+            
+            var question_list = ['D30','D31','D32','D33','D35','D37','D62','D36','D41a','D63','D40a','D42','D43'];
+            var show_list = ['D30','D31','D32','D33','D34','D35','D36','D37','D38','D39','D40','D41','D42'];
+            
+            var project_id = $("input[name='pid']").val()
+            if (project_id == 3){
+            	//MINI问卷
+            	question_list = ['D30','D31','D32','D33','D35','D37','D62','D36','D41a','T1','T2','D42','D43'];
+            }
+            if (project_id == 4){
+            	//竞品问卷
+            	question_list = ['D31','S3','S4','D35','D37','S5','S6','D42','D43'];
+            	show_list = ['D31','D32','D33','D34','D35','D38','D40','D41','D42'];
+            }
+            
+            var no_list = ['D41a','D63','D43'];
+            if (project_id == 3){
+				no_list = ['D41a','T1','D43'];
+			}
+			if (project_id == 4){
+				no_list = ['D43'];
+			}
+			for (var i=0; i < no_list.length; i++) {
+				set_no_answer(theForm,no_list[i]);
+			}
+            
+            for (var i = 0; i < question_list.length; i++) {
+                var result = check_radio(theForm, question_list[i],show_list[i]);
+                if (!result) {
+                	re_no_answer(theForm,no_list);
+                    return result;
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% block content %}
+<table border="0" cellspacing="0" cellpadding="0" width="97%" style="margin:5px;">
+    <tbody>
+        <tr>
+            <td colspan="2" align="left" style="padding-left:20px;padding-top:10px;">
+                <div style="padding-bottom:10px;">
+                    <span style="padding-left:0px;" class="STYLE2">问卷编号：</span>
+                    {{answers.survey_code|default_if_none:''}}
+                </div>
+                <div class="news-box_service">
+                    <div class="news-box2_service">
+                        <div align="left" style="padding: 10px;">
+                            <span class="STYLE1">D. 提车 & 付款</span>
+                        </div>
+                        <p>
+                        </p>
+                    </div>
+                </div>
+                <!--<hr width="98%" color="#00000" size=1>-->
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;margin-top:10px;">
+                    <tbody>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>题号</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="24%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>考核点</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>是</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>否</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>不涉及</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="25%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>选择</strong>
+                                    <strong>“</strong>
+                                    <strong>否</strong>
+                                    <strong>/</strong>
+                                    <strong>不涉及</strong>
+                                    <strong>”</strong>
+                                    <strong>原因</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="16%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>评估标准说明</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="19%" bgcolor="#FFFFFF">
+                                <strong>操作注意事项</strong>
+                            </td>
+                        </tr>
+                        {% if project.id != 4 %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D30.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    如果为单独SRP项目是否在两小时内完成?（单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D30" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D30" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D30" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="D30__open" type="text" class="input11" value="{% ifnotequal answers.D30.0 'A1' %}{{answers.D30.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D30__open__EN" type="text" class="input11" value="{% ifnotequal answers.D30.0 'A1' %}{{trans_contents.D30|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	(1)如果是两个及两个以上SRP项目，则本题“未涉及”。<br>
+                            	(2)如果客户在经销店内用午餐，则本题“未涉及”。<br>
+                            	(3)如果有查修项目（TXT文本行的查修也算作查修），即使收费项目只有单项SRP，但是工单上面提到检查xxxx（实际为查修内容），本题也为“未涉及”。<br>
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+                            	从客人的车辆驶入经销店园区经过保安停车杆处开始计时，至客人驾驶车辆离开经销店园区经过保安停车杆处为止。<br>
+                            	（1）务必精确记录进店、离店时间。<br>
+                            	（2）要求评估员必须在进出经销店大门的时候报时。<br>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D31.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    是否为同一位服务顾问在客人交车和提车时接待客人？ （单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D31" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D31" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D31" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="D31__open" type="text" class="input11" value="{% ifnotequal answers.D31.0 'A1' %}{{answers.D31.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D31__open__EN" type="text" class="input11" value="{% ifnotequal answers.D31.0 'A1' %}{{trans_contents.D31|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                                可接受服务顾问提前向客人告知会有另一位同事帮忙交付车辆。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                &nbsp;
+                            </td>
+                        </tr>
+                        {% if project.id != 4 %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D32.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    当客人来提车时，是否已准备好预览帐单以便向客人解释？ （单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D32" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D32" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D32" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="D32__open" type="text" class="input11" value="{% ifnotequal answers.D32.0 'A1' %}{{answers.D32.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D32__open__EN" type="text" class="input11" value="{% ifnotequal answers.D32.0 'A1' %}{{trans_contents.D32|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                                预览帐单应该在客人到达服务顾问桌前打印出来备用。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+								如果提前打印的是账单，不是预览账单，也可以接受。
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D33.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    帐单是否按照工项分组罗列？ （单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D33" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D33" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D33" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="D33__open" type="text" class="input11" value="{% ifnotequal answers.D33.0 'A1' %}{{answers.D33.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D33__open__EN" type="text" class="input11" value="{% ifnotequal answers.D33.0 'A1' %}{{trans_contents.D33|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	标准帐单格式应为： 
+                                <p>
+                                    1. 工项A的文字行 
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;工项A的工时 
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;工项A的配件 
+                                    <br>
+                                    2. 工项B的文字行 
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;工项B的工时 
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;工项B的配件 
+                                    <br>
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	请访问结束后对“最终账单“拍照，可分几张拍，务必把账单信息拍清楚。
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if project.id == 4 %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D32.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    当客人来提车时，是否已准备好预览帐单(或类似罗列有最终花费的文件)以便向客人解释？（单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S3" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S3" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S3" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="S3__open" type="text" class="input11" value="{% ifnotequal answers.S3.0 'A1' %}{{answers.S3.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="S3__open__EN" type="text" class="input11" value="{% ifnotequal answers.S3.0 'A1' %}{{trans_contents.S3|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                                预览帐单应该在客人到达服务顾问桌前打印出来备用。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                &nbsp;
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D33.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    帐单的罗列结构是否清晰易懂？（单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S4" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S4" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S4" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="S4__open" type="text" class="input11" value="{% ifnotequal answers.S4.0 'A1' %}{{answers.S4.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="S4__open__EN" type="text" class="input11" value="{% ifnotequal answers.S4.0 'A1' %}{{trans_contents.S4|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	标准帐单格式应为： 
+                                <p>
+                                    1. 工项A的文字行 
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;工项A的工时 
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;工项A的配件 
+                                    <br>
+                                    2. 工项B的文字行 
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;工项B的工时 
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;工项B的配件 
+                                    <br>
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	请访问结束后对“最终账单“拍照，可分几张拍，务必把账单信息拍清楚。
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D34.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    是否把帐单上所有的项目向客人解释清楚？ （单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D35" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D35" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D35" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="D35__open" type="text" class="input11" value="{% ifnotequal answers.D35.0 'A1' %}{{answers.D35.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D35__open__EN" type="text" class="input11" value="{% ifnotequal answers.D35.0 'A1' %}{{trans_contents.D35|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	对账单进行详细解释：<br>
+                            	1.所有完工项目；<br>
+                            	2.每条工项费用小计；<br>
+                            	3.工时费用总计；<br>
+                            	4.配件费用总计；<br>
+                            	5.打折数额（如适用）；<br>
+                            	6.全部费用总计。<br>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D35.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    帐单上的金额是否和客人交车时所同意的报价金额一致或小于报价？ （单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D37" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D37" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D37" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    <strong>最终账单金额：</strong>
+                                    <input name="final_price" type="text" class="input11" value="{{answers.final_price|default_if_none:''}}" size="10" maxlength="30">元
+                                </p>
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="D37__open" type="text" class="input11" value="{% ifnotequal answers.D37.0 'A1' %}{{answers.D37.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D37__open__EN" type="text" class="input11" value="{% ifnotequal answers.D37.0 'A1' %}{{trans_contents.D37|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                    <br>
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                &nbsp;
+                            </td>
+                        </tr>
+                        {% if project.id != 4 %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D36.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    服务顾问在准备账单时是否使用KSD导入维修保养服务套餐（SRP）的正确工时代码，配件代码及套餐项目？（单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D62" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D62" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D62" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="D62__open" type="text" class="input11" value="{% ifnotequal answers.D62.0 'A1' %}{{answers.D62.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D62__open__EN" type="text" class="input11" value="{% ifnotequal answers.D62.0 'A1' %}{{trans_contents.D62|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	1.服务顾问必须使用KSD导入维修保养服务套餐包，以便确保正确的工时代码，配件代码及套餐项目；<br>
+                            	2.对于保养服务套餐（SRP），禁止收取额外的易耗品费用。<br>
+                            	3.到虑到KSD不定期更新，请按以下方式操作:<br>
+                            	&nbsp;&nbsp;&nbsp;a.如果根据更新的KSD导出的价格高于现行SRP价格，经销店需给与客户相应折扣使最终价格与SRP价格相等；<br>
+                            	&nbsp;&nbsp;&nbsp;b.如果根据更新的KSD导出的价格低于现行SRP价格，经销店可补充相应开放工时使最终价格与SRP价格相等，或直接使用KSD导出的价格；<br>
+                            	&nbsp;&nbsp;&nbsp;c.a和b的前提条件是经销店必须使用正确的工时代码，配件代码及套餐项目。<br>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                注意：只需要判断账单上SRP项目的金额是否与SRP宣传资料上的对应金额相符：<br>
+                                （1）如果账单上SRP项目的金额与SRP宣传资料上的对应金额相符，那么此题得分。<br>
+                                （2）如果账单上SRP项目的金额与SRP宣传资料上的对应金额不相符，那么不做任何判断，把此题的判断权留给BMW.<br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D37.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>服务顾问是否向维修SRP项目的客户解释车间已经检查并调整其车辆的胎压？（单选）</p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D36" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D36" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D36" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="D36__open" type="text" class="input11" value="{% ifnotequal answers.D36.0 'A1' %}{{answers.D36.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D36__open__EN" type="text" class="input11" value="{% ifnotequal answers.D36.0 'A1' %}{{trans_contents.D36|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	规定必须为任何代有SRP工项的车辆检查胎压，且此胎压需要与门柱上的标示一致。<br>
+								在“提车过程”中客人需被告知已根据轮胎型号把其车辆的胎压调整到标准的范围之内。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF"></td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D38.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    服务顾问是否建议客户下次进店前进行预约并且说明了预约的好处？ （多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D41a" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D41a" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D41a" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in D41a %}
+									<br><input name="ck_D41a" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.D41a %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="D41aother" type="text" class="input11" value="{% if '98' in alt_ans.D41a %}{{answers.D41aother|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+									<input name="input_D41a" type="text" class="input11" value="{% ifnotequal answers.D41a.0 'A1' %}{{answers.D41a.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="D41a__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D41a__open__EN" type="text" class="input11" value="{% ifnotequal answers.D41a.0 'A1' %}{{trans_contents.D41a|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	服务顾问必须在“提车过程”中建议客人在下次保养维修前做预约，即使客户已经在本次访问前做过预约。<br>
+                            	预约的好处介绍至少为：如果客户预约，经销店会提前安排技师，预留备件以节省维修保养时间，可确保通过预约快修通道单项SRP项目可以在两个小时内提车。<br>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if project.id == 4 %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D38.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    服务顾问是否建议客户下次进店前进行预约？（单选）<br>
+                                    (不必说明预约的好处.)
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S5" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S5" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S5" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="S5__open" type="text" class="input11" value="{% ifnotequal answers.S5.0 'A1' %}{{answers.S5.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="S5__open__EN" type="text" class="input11" value="{% ifnotequal answers.S5.0 'A1' %}{{trans_contents.S5|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	服务顾问必须在“提车过程”中建议客人在下次保养维修前做预约，即使客户已经在本次访问前做过预约。<br>
+                            	预约的好处介绍至少为：如果客户预约，经销店会提前安排技师，预留备件以节省维修保养时间，可确保通过预约快修通道单项SRP项目可以在两个小时内提车。<br>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if project.id == 2 %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D39.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    服务顾问是否将宝马事故救援热线号码打印或者写在结算单上，并向客户介绍？（多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D63" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D63" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D63" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in D63 %}
+									<br><input name="ck_D63" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.D63 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="D63other" type="text" class="input11" value="{% if '98' in alt_ans.D63 %}{{answers.D63other|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+									<input name="input_D63" type="text" class="input11" value="{% ifnotequal answers.D63.0 'A1' %}{{answers.D63.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="D63__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D63__open__EN" type="text" class="input11" value="{% ifnotequal answers.D63.0 'A1' %}{{trans_contents.D63|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	1.服务顾问需要将宝马事故救援热线号码打印或写在结算单上；<br>
+                            	2.服务顾问至少向客户提及“宝马终身免费事故救援”的热线号码；这是标准话术，方言差异可以接受。<br>
+                            	3.如果客户感兴趣，则向客户介绍相应的项目细节。<br>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                注意：服务顾问还需要提到“宝马”、“终身”、“免费”这三点才能给分。
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D40.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                	是否将保养记录登记在保养手册上或者打印了电子维修记录？（单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D40a" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D40a" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D40a" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="D40a__open" type="text" class="input11" value="{% ifnotequal answers.D40a.0 'A1' %}{{answers.D40a.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D40a__open__EN" type="text" class="input11" value="{% ifnotequal answers.D40a.0 'A1' %}{{trans_contents.D40a|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	服务顾问应在保养手册上或者打印出来的电子维修记录上签字和盖章。对所有F20以后（含）的新车型必须打印电子维修记录。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	注意：如果服务顾问在车主进店后离店前询问车主“是否携带保养手册”，但神秘客没有携带保养手册，那么此题也得分。
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if project.id == 3 %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D39.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    服务顾问是否将MINI事故救援热线号码打印或者写在结算单上，并向客户介绍？（多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="T1" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="T1" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="T1" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in T1 %}
+									<br><input name="ck_T1" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.T1 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="T1other" type="text" class="input11" value="{% if '98' in alt_ans.T1 %}{{answers.T1other|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+									<input name="input_T1" type="text" class="input11" value="{% ifnotequal answers.T1.0 'A1' %}{{answers.T1.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="T1__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="T1__open__EN" type="text" class="input11" value="{% ifnotequal answers.T1.0 'A1' %}{{trans_contents.T1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	1.服务顾问需要将MINI事故救援热线号码打印或写在结算单上；<br>
+                            	2.服务顾问至少向客户提及“MINI终身免费事故救援”的热线号码；这是标准话术，方言差异可以接受。<br>
+                            	3.如果客户感兴趣，则向客户介绍相应的项目细节。<br>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                注意：服务顾问还需要提到“Mini”、“终身”、“免费”这三点才能给分。
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D40.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                	是否将保养记录登记在保养手册上？（单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="T2" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="T2" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="T2" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="T2__open" type="text" class="input11" value="{% ifnotequal answers.T2.0 'A1' %}{{answers.T2.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="T2__open__EN" type="text" class="input11" value="{% ifnotequal answers.T2.0 'A1' %}{{trans_contents.T2|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	服务顾问应在保养手册上或者打印出来的电子维修记录上签字和盖章。对所有F20以后（含）的新车型必须打印电子维修记录。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if project.id == 4 %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D40.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                	是否将保养记录登记在保养手册上？（单选）<br>
+                                	无电子维修记录。
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S6" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S6" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="S6" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="S6__open" type="text" class="input11" value="{% ifnotequal answers.S6.0 'A1' %}{{answers.S6.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="S6__open__EN" type="text" class="input11" value="{% ifnotequal answers.S6.0 'A1' %}{{trans_contents.S6|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	服务顾问应在保养手册上或者打印出来的电子维修记录上签字和盖章。对所有F20以后（含）的新车型必须打印电子维修记录。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D41.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    客户在出纳处的等待是否在3分钟以内？ （单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D42" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D42" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D42" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="D42__open" type="text" class="input11" value="{% ifnotequal answers.D42.0 'A1' %}{{answers.D42.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D42__open__EN" type="text" class="input11" value="{% ifnotequal answers.D42.0 'A1' %}{{trans_contents.D42|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+								客人结账到达出纳处至离开的时间应在3分钟以内。<br>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	(1)指出纳处结账的整个过程应该在3分钟内结账完毕。从客户到达收银台开始计时，至客户离开收银台结束，必须在3分钟内。<br>
+								(2)如果到达收银台需要排队，排队时间也需要计算在内。<br>
+								(3)如果超过了3分钟，则详细记录在出纳处用时几分几秒。<br>
+								(4)如果客户要求开增值税的发票，则判“未涉及”。<br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D42.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                	出纳人员是否向客人说出“谢谢”及“再见”?（单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D43" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D43" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D43" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in D43 %}
+									<br><input name="ck_D43" type="radio" value="{{alt.cid}}" {% if alt.cid in alt_ans.D43 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									<br>"否/不涉及"原因：<br>
+									<input name="input_D43" type="text" class="input11" value="{% ifnotequal answers.D43.0 'A1' %}{{answers.D43.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="D43__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D43__open__EN" type="text" class="input11" value="{% ifnotequal answers.D43.0 'A1' %}{{trans_contents.D43|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	最好能拍摄到出纳人员的嘴形
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<input type="hidden" name="p" value="D"/>
+<input type="hidden" name="pid" value="{{project.id|default_if_none:''}}"/>
+<script language="javascript">
+    set_radio($("#paper_form input[name='D30']"), "{{answers.D30.0}}");
+    set_radio($("#paper_form input[name='D31']"), "{{answers.D31.0}}");
+    set_radio($("#paper_form input[name='D32']"), "{{answers.D32.0}}");//宝马、MINI
+    set_radio($("#paper_form input[name='D33']"), "{{answers.D33.0}}");//宝马、MINI
+    set_radio($("#paper_form input[name='S3']"), "{{answers.S3.0}}");//竞品
+    set_radio($("#paper_form input[name='S4']"), "{{answers.S4.0}}");//竞品
+    set_radio($("#paper_form input[name='D35']"), "{{answers.D35.0}}");
+    set_radio($("#paper_form input[name='D37']"), "{{answers.D37.0}}");
+	set_radio($("#paper_form input[name='D62']"), "{{answers.D62.0}}");
+    set_radio($("#paper_form input[name='D36']"), "{{answers.D36.0}}");
+    set_radio($("#paper_form input[name='D41a']"), "{{answers.D41a.0}}");
+    set_radio($("#paper_form input[name='S5']"), "{{answers.S5.0}}");//竞品
+    set_radio($("#paper_form input[name='D63']"), "{{answers.D63.0}}");//宝马
+    set_radio($("#paper_form input[name='D40a']"), "{{answers.D40a.0}}");//宝马
+    set_radio($("#paper_form input[name='T1']"), "{{answers.T1.0}}");//MINI
+    set_radio($("#paper_form input[name='T2']"), "{{answers.T2.0}}");//MINI
+    set_radio($("#paper_form input[name='S6']"), "{{answers.S6.0}}");//竞品
+    set_radio($("#paper_form input[name='D42']"), "{{answers.D42.0}}");
+    set_radio($("#paper_form input[name='D43']"), "{{answers.D43.0}}");
+	if ({{tran_perm}}){
+		$(':input:not([name$="__EN"])').attr('readonly',true);
+		$(':input[name$="__EN"]').attr('readonly',false);
+		$(':input[name^="input_"]').attr('readonly',false);
+		$(':input[name$="__open"]').attr('readonly',false);
+	    $(":radio").attr('disabled', 'disabled');
+	    $(":checkbox").attr('disabled', 'disabled');
+	}else{
+		$(':input[name$="__EN"]').attr('readonly',true);
+		$(':input:not([name$="__EN"])').attr('readonly',false);
+		if ({{manage_perm}}){
+			$(':input[name$="__EN"]').attr('readonly',false);
+		}
+	}
+	
+	var project_id = "{{project.id|default_if_none:''}}";
+	var no_list = ['D41a','D63','D43'];
+    if (project_id == 3){
+		no_list = ['D41a','T1','D43'];
+	}
+	if (project_id == 4){
+		no_list = ['D43'];
+	}
+	
+	$(":radio").click(function () {
+	    var r = $(this).attr("name");
+	    $(":radio[name=" + r + "]:not(:checked)").attr("tag", 0);
+	    if ($(this).attr("tag") == 1) {
+	        $(this).attr("checked", false);
+	        $(this).attr("tag", 0);
+	    }
+	    else {
+	        $(this).attr("tag", 1);
+	    }
+	    for (var i=0; i < no_list.length; i++) {
+		  if (r == no_list[i]){
+		  	if ($(this).val() != 'A2'){
+		  		off_check(r);
+		  	}else{
+		  		on_check(r);
+		  	}
+		  }
+		}
+	});
+</script>
+{% endblock %}

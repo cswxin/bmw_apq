@@ -1,0 +1,816 @@
+{% extends "survey/survey_base.html" %}
+{% block css %}
+<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+{% endblock %}
+{% block script %}
+<script type="text/javascript" src="/static/js/jquery-ui-1.8.9.custom.min.js">
+</script>
+<script type="text/javascript" src="/static/js/jquery.ui.datepicker-zh-CN.js">
+</script>
+<script language="javascript">
+    
+    var theForm = null;
+    
+    $(document).ready(function($) {
+    	theForm = document.getElementById('paper_form');
+    
+    	$.datepicker.setDefaults($.datepicker.regional['zh-CN']);
+    	$( "#booking_date" ).datepicker();
+    	$( "#visit_date" ).datepicker();
+    	$("#paper_form").submit( function() {
+    		var theForm = this;
+    		if (!isNum(theForm.customer_code.value,4)) {
+    			alert('客人编号输入有误!');
+    			theForm.customer_code.focus();
+    			return false;
+    		}
+    		if (!isNum(theForm.city_code.value,2) && !isNum(theForm.city_code.value,3)) {
+    			alert('城市编号输入有误!');
+    			theForm.city_code.focus();
+    			return false;
+    		}
+    		// if (!isNum(theForm.dealer_code[0].value,5)) {
+    			// alert('经销商编号输入有误!');
+    			// theForm.dealer_code[0].focus();
+    			// return false;
+    		// }
+    		// if (!isNum(theForm.dealer_code[1].value,5)) {
+    			// alert('经销商编号输入有误!');
+    			// theForm.dealer_code[1].focus();
+    			// return false;
+    		// }
+    		if (theForm.dealer_code[0].value!=theForm.dealer_code[1].value) {
+    			alert('两次输入经销商编号不匹配!');
+    			theForm.dealer_code[0].focus();
+    			return false;
+    		}
+    		var visit_date_list = theForm.visit_date.value.split('-');
+    		var visit_date_str = visit_date_list[0].slice(2)+visit_date_list[1]+visit_date_list[2];
+    		if (!isNum(theForm.visit_date_str.value,6)||(theForm.visit_date_str.value != visit_date_str)) {
+    			alert('访问日期输入有误!');
+    			theForm.visit_date_str.focus();
+    			return false;
+    		}
+    		if (!isNum(theForm.visitor_numb.value)) {
+    			alert('进店人数输入有误!');
+    			theForm.visitor_numb.focus();
+    			return false;
+    		}
+    		if (isEmpty(theForm.dealer_name_cn.value)) {
+    			alert('请填写经销商店名!');
+    			theForm.dealer_name_cn.focus();
+    			return false;
+    		}
+    		if (isEmpty(theForm.consultant_name.value)) {
+    			alert('请填写评估员姓名!');
+    			theForm.consultant_name.focus();
+    			return false;
+    		}
+    		if (isEmpty(theForm.consultant_name.value)) {
+    			alert('请填写服务顾问姓名!');
+    			theForm.consultant_name.focus();
+    			return false;
+    		}
+    		if (isEmpty(theForm.customer_name.value)) {
+    			alert('请填写客人姓名!');
+    			theForm.customer_name.focus();
+    			return false;
+    		}
+    		if (isEmpty(theForm.customer_address.value)) {
+    			alert('请填写客人联系方式!');
+    			theForm.customer_address.focus();
+    			return false;
+    		}
+    		if (!isRadioSelected(theForm.consultant_sex)) {
+    			alert('请选择服务顾问性别!');
+    			theForm.consultant_sex[0].focus();
+    			return false;
+    		}
+    		var booking_begin_time = theForm.booking_begin_hour.value+':'+theForm.booking_begin_minute.value;
+    		if (!isValidTime(booking_begin_time)) {
+    			alert('请选择电话预约开始时间');
+    			theForm.booking_begin_hour.focus();
+    			return false;
+    		}
+    		var booking_end_time = theForm.booking_end_hour.value+':'+theForm.booking_end_minute.value;
+    		if (!isValidTime(booking_end_time)) {
+    			alert('请选择电话预约结束时间');
+    			theForm.booking_end_hour.focus();
+    			return false;
+    		}
+    		var visit_begin_time = theForm.visit_begin_hour.value+':'+theForm.visit_begin_minute.value;
+    		if (!isValidTime(visit_begin_time)) {
+    			alert('请选择访问开始时间');
+    			theForm.visit_begin_hour.focus();
+    			return false;
+    		}
+    		var visit_end_time = theForm.visit_end_hour.value+':'+theForm.visit_end_minute.value;
+    		if (!isValidTime(visit_end_time)) {
+    			alert('请选择访问结束时间');
+    			theForm.visit_end_hour.focus();
+    			return false;
+    		}
+    
+    		if (!isRadioSelected(theForm.service_type)) {
+    			alert('请选择接受售后服务类型！!');
+    			theForm.service_type[0].focus();
+    			return false;
+    		}
+    		if (isEmpty(theForm.car_type.value)) {
+    			alert('请选择受访者车型!');
+    			theForm.car_type.focus();
+    			return false;
+    		}		
+    		if (theForm.car_type.value == 'A26') {
+    			if (isEmpty(theForm.car_type__open.value)) {
+    				alert("请输入其他车型!");
+    				theForm.car_type__open.focus();
+    				return (false);
+    			}
+    			else {
+    			}
+    		}
+    		if (!isRadioSelected(theForm.at_mt)) {
+    			alert('请选择择排档方式!');
+    			theForm.at_mt[0].focus();
+    			return false;
+    		}
+    		theForm.booking_begin_time.value = theForm.booking_begin_hour.value+":"+theForm.booking_begin_minute.value;
+    		theForm.booking_end_time.value = theForm.booking_end_hour.value+":"+theForm.booking_end_minute.value;
+    		theForm.visit_begin_time.value = theForm.visit_begin_hour.value+":"+theForm.visit_begin_minute.value;
+    		theForm.visit_end_time.value = theForm.visit_end_hour.value+":"+theForm.visit_end_minute.value;
+    		theForm.survey_code.value = theForm.city_code.value + theForm.dealer_code[0].value + "{% if respondent %}{{respondent.user.username}}{% else %}{{user.username|default_if_none:''}}{% endif %}" + theForm.visit_date_str.value;
+    
+    	});
+    	$("#car_type").change( function() {
+    		if ($(this).val() == 'A26') {
+    			$("#SpanCarTypeOther").show();
+    		}
+    		else {
+    			$("#SpanCarTypeOther").hide();
+    		}
+    	});
+    });
+    
+    function isValidTime(timeStr) {
+    	var re1 = /\d\d:\d\d/;
+    	return re1.test(timeStr);
+    }
+    
+</script>
+{% endblock %}
+{% block content %}
+<table border="0" cellspacing="0" cellpadding="0" width="97%" style="margin:5px;">
+    <tbody>
+        <tr>
+            <td colspan="2" align="center">
+                <p align="center">
+                    <br>
+                    <span class="STYLE1">{{project.name}}(
+                        <font color="red">
+                            {{term.name|default_if_none:''}}
+                        </font>)
+                    </span>
+                </p>
+                <hr width="98%" color="#00000" size="1">
+                <table width="96%" border="0" cellpadding="1" cellspacing="1" style="text-align:center;margin-top:10px;">
+                    <tbody>
+                        <tr>
+                            <td align="left" height="40">
+                                　客人编号:<input name="customer_code" id="customer_code" type="text" class="underline" value="{{answers.customer_code|default_if_none:''}}" size="4" maxlength="4">
+                                <br>
+                                <br>
+                                评估员编号:<input name="appraiser_code" id="appraiser_code" type="text" class="underline" value="{% if respondent %}{{respondent.user.username}}{% else %}{{user.username|default_if_none:''}}{% endif %}" size="4" maxlength="4" readonly='readonly'>
+                                <br>
+                                <br>
+                                <span style="padding-left:0px;">　问卷编号:</span>
+                                <input name="city_code" id="city_code" type="text" class="underline" value="{{answers.city_code|default_if_none:''}}" size="3" maxlength="3">
+                                <font size="5">
+                                    -
+                                </font>
+                                <input name="dealer_code" id="dealer_code" type="text" class="underline" value="{{answers.dealer_code|default_if_none:''}}" size="10" maxlength="10">
+                                <font size="5">
+                                    -
+                                </font>
+                                <input name="appraiser_code_again" id="appraiser_code_again" type="text" class="underline" value="{% if respondent %}{{respondent.user.username}}{% else %}{{user.username|default_if_none:''}}{% endif %}" size="4" maxlength="4" readonly='readonly'>
+                                <font size="5">
+                                    -
+                                </font>
+                                <input name="visit_date_str" id="visit_date0" type="text" class="underline" value="" size="6" maxlength="6"">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" height="60">
+                                <strong>评估员承诺: </strong>
+                                <br>
+                                我清楚本人的访问质量对最终研究结果的影响。我保证严格遵循访问程序。我保证交回问卷所填各项内容均是真实情况的反映，绝无欺骗行为。若有一份作假，一经查出，我愿意将我所做的全部问卷作废并承担由此产生的一切后果。
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" height="30">
+                                评估员姓名:<input name="appraiser_name" type="text" class="underline" value="{% if respondent %}{{respondent.user.last_name}}{{respondent.user.first_name}}{% else %}{{user.last_name|default_if_none:''}}{{user.first_name|default_if_none:''}}{% endif %}" size="15" readonly="readonly">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;margin-top:10px;">
+                    <tbody>
+                        <tr>
+                            <td height="30" colspan="3" bgcolor="#FFFFFF">
+                                <p class="STYLE3"> 请填写经销商信息 </p>                            </td>
+                            <td height="30" colspan="6" bgcolor="#FFFFFF">
+                                <p class="STYLE3">
+                                    <strong>请填写访问信息</strong>                                </p>                            </td>
+                        </tr>
+                        <tr>
+                            <td width="172" height="30" bgcolor="#FFFFFF">
+                                <p> 经销商店名</p>                            </td>
+                            <td height="30" colspan="2" align="left" bgcolor="#FFFFFF" valign="bottom">
+                                <p>
+                                   	中文:<input name="dealer_name_cn" type="text" class="underline" value="{{respondent.dealer.name_cn|default_if_none:''}}" size="45"><br>
+									EN:&nbsp;<input name="dealer_name__EN" type="text" class="underline" value="{{trans_contents.dealer_name|default_if_none:''}}" size="45">
+                                </p>                            </td>
+                            <td height="30" colspan="2" bgcolor="#FFFFFF">
+                                <p>
+                                    电话预约:<input id="booking_date" name="booking_date" type="text" class="underline" value="{{answers.booking_date|default_if_none:''}}" size="12" readonly="readonly" style="background-color:#E6E6E6;">
+                                </p>                            </td>
+                            <td width="379" height="30" colspan="4" bgcolor="#FFFFFF">
+                                <p>
+                                    <select name="booking_begin_hour" class="inputbox">
+                                        <option value="">-</option>
+                                        <option value="00">00</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                    </select>
+									时
+                                    <select name="booking_begin_minute" class="inputbox">
+                                        <option value="">-</option>
+                                        <option value="00">00</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                        <option value="24">24</option>
+                                        <option value="25">25</option>
+                                        <option value="26">26</option>
+                                        <option value="27">27</option>
+                                        <option value="28">28</option>
+                                        <option value="29">29</option>
+                                        <option value="30">30</option>
+                                        <option value="31">31</option>
+                                        <option value="32">32</option>
+                                        <option value="33">33</option>
+                                        <option value="34">34</option>
+                                        <option value="35">35</option>
+                                        <option value="36">36</option>
+                                        <option value="37">37</option>
+                                        <option value="38">38</option>
+                                        <option value="39">39</option>
+                                        <option value="40">40</option>
+                                        <option value="41">41</option>
+                                        <option value="42">42</option>
+                                        <option value="43">43</option>
+                                        <option value="44">44</option>
+                                        <option value="45">45</option>
+                                        <option value="46">46</option>
+                                        <option value="47">47</option>
+                                        <option value="48">48</option>
+                                        <option value="49">49</option>
+                                        <option value="50">50</option>
+                                        <option value="51">51</option>
+                                        <option value="52">52</option>
+                                        <option value="53">53</option>
+                                        <option value="54">54</option>
+                                        <option value="55">55</option>
+                                        <option value="56">56</option>
+                                        <option value="57">57</option>
+                                        <option value="58">58</option>
+                                        <option value="59">59</option>
+                                    </select>
+									分至
+                                    <select name="booking_end_hour" class="inputbox">
+                                        <option value="">-</option>
+                                        <option value="00">00</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                    </select>
+									 时
+                                    <select name="booking_end_minute" class="inputbox">
+                                        <option value="">-</option>
+                                        <option value="00">00</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                        <option value="24">24</option>
+                                        <option value="25">25</option>
+                                        <option value="26">26</option>
+                                        <option value="27">27</option>
+                                        <option value="28">28</option>
+                                        <option value="29">29</option>
+                                        <option value="30">30</option>
+                                        <option value="31">31</option>
+                                        <option value="32">32</option>
+                                        <option value="33">33</option>
+                                        <option value="34">34</option>
+                                        <option value="35">35</option>
+                                        <option value="36">36</option>
+                                        <option value="37">37</option>
+                                        <option value="38">38</option>
+                                        <option value="39">39</option>
+                                        <option value="40">40</option>
+                                        <option value="41">41</option>
+                                        <option value="42">42</option>
+                                        <option value="43">43</option>
+                                        <option value="44">44</option>
+                                        <option value="45">45</option>
+                                        <option value="46">46</option>
+                                        <option value="47">47</option>
+                                        <option value="48">48</option>
+                                        <option value="49">49</option>
+                                        <option value="50">50</option>
+                                        <option value="51">51</option>
+                                        <option value="52">52</option>
+                                        <option value="53">53</option>
+                                        <option value="54">54</option>
+                                        <option value="55">55</option>
+                                        <option value="56">56</option>
+                                        <option value="57">57</option>
+                                        <option value="58">58</option>
+                                        <option value="59">59</option>
+                                    </select>
+									分                                </p>                            </td>
+                        </tr>
+                        <tr>
+                            <td width="172" rowspan="2" bgcolor="#FFFFFF">
+                                <p>经销商地址</p>                            </td>
+                            <td colspan="2" rowspan="2" align="left" valign="bottom" bgcolor="#FFFFFF" class="underline" type="text">
+                                <p>
+                                    -                                </p>                            </td>
+                            <td height="30" colspan="2" bgcolor="#FFFFFF">
+                                <p>
+                                    访问时间:<input id="visit_date" name="visit_date" type="text" class="underline" value="{{answers.visit_date|default_if_none:''}}" size="12" readonly="readonly" style="background-color:#E6E6E6;">
+                                </p>                            </td>
+                            <td height="30" colspan="4" bgcolor="#FFFFFF">
+                                <p>
+                                    <select name="visit_begin_hour" class="inputbox">
+                                        <option value="">-</option>
+                                        <option value="00">00</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                    </select>
+									 时
+                                    <select name="visit_begin_minute" class="inputbox">
+                                        <option value="">-</option>
+                                        <option value="00">00</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                        <option value="24">24</option>
+                                        <option value="25">25</option>
+                                        <option value="26">26</option>
+                                        <option value="27">27</option>
+                                        <option value="28">28</option>
+                                        <option value="29">29</option>
+                                        <option value="30">30</option>
+                                        <option value="31">31</option>
+                                        <option value="32">32</option>
+                                        <option value="33">33</option>
+                                        <option value="34">34</option>
+                                        <option value="35">35</option>
+                                        <option value="36">36</option>
+                                        <option value="37">37</option>
+                                        <option value="38">38</option>
+                                        <option value="39">39</option>
+                                        <option value="40">40</option>
+                                        <option value="41">41</option>
+                                        <option value="42">42</option>
+                                        <option value="43">43</option>
+                                        <option value="44">44</option>
+                                        <option value="45">45</option>
+                                        <option value="46">46</option>
+                                        <option value="47">47</option>
+                                        <option value="48">48</option>
+                                        <option value="49">49</option>
+                                        <option value="50">50</option>
+                                        <option value="51">51</option>
+                                        <option value="52">52</option>
+                                        <option value="53">53</option>
+                                        <option value="54">54</option>
+                                        <option value="55">55</option>
+                                        <option value="56">56</option>
+                                        <option value="57">57</option>
+                                        <option value="58">58</option>
+                                        <option value="59">59</option>
+                                    </select>
+									 分至
+                                    <select name="visit_end_hour" class="inputbox">
+                                        <option value="">-</option>
+                                        <option value="00">00</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                    </select>
+									时
+                                    <select name="visit_end_minute" class="inputbox">
+                                        <option value="">-</option>
+                                        <option value="00">00</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                        <option value="24">24</option>
+                                        <option value="25">25</option>
+                                        <option value="26">26</option>
+                                        <option value="27">27</option>
+                                        <option value="28">28</option>
+                                        <option value="29">29</option>
+                                        <option value="30">30</option>
+                                        <option value="31">31</option>
+                                        <option value="32">32</option>
+                                        <option value="33">33</option>
+                                        <option value="34">34</option>
+                                        <option value="35">35</option>
+                                        <option value="36">36</option>
+                                        <option value="37">37</option>
+                                        <option value="38">38</option>
+                                        <option value="39">39</option>
+                                        <option value="40">40</option>
+                                        <option value="41">41</option>
+                                        <option value="42">42</option>
+                                        <option value="43">43</option>
+                                        <option value="44">44</option>
+                                        <option value="45">45</option>
+                                        <option value="46">46</option>
+                                        <option value="47">47</option>
+                                        <option value="48">48</option>
+                                        <option value="49">49</option>
+                                        <option value="50">50</option>
+                                        <option value="51">51</option>
+                                        <option value="52">52</option>
+                                        <option value="53">53</option>
+                                        <option value="54">54</option>
+                                        <option value="55">55</option>
+                                        <option value="56">56</option>
+                                        <option value="57">57</option>
+                                        <option value="58">58</option>
+                                        <option value="59">59</option>
+                                    </select>
+									 分                                </p>                            </td>
+                        </tr>
+                        <tr>
+                          <td height="30" colspan="2" valign="middle" bgcolor="#FFFFFF">
+                            <p>进店人数:</p>                            </td>
+                          <td colspan="4" align="left" bgcolor="#FFFFFF" style="padding-left:0px;"><input name="visitor_numb" id="visitor_numb" type="text" class="underline" value="{{answers.visitor_numb|default_if_none:''}}" size="20"/></td>
+                        </tr>
+                        <tr>
+                            <td width="172" height="30" bgcolor="#FFFFFF">
+                                <p>经销商电话</p>                            </td>
+                            <td height="30" colspan="2" align="left" bgcolor="#FFFFFF" valign="bottom">
+                                -                            </td>
+                            <td colspan="2" rowspan="2" valign="middle" bgcolor="#FFFFFF">接受售后服务类型</td>
+                            <td colspan="4" align="left" bgcolor="#FFFFFF" style="padding-left:0px;">
+                                <p>
+                                    <input type="radio" name="service_type" value="A1">1. 首保&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="service_type" value="A3">3. 车辆维修
+                                    <br>
+                                </p>                            </td>
+                        </tr>
+                        <tr>
+                        	<td width="172" hegiht="30" bgcolor="#FFFFFF">
+                        		<p>经销商编号</p>                        	</td>
+							<td height="30" colspan="2" align="left" bgcolor="#FFFFFF" valign="bottom">
+								<input name="dealer_code" id="dealer_code" type="text" class="underline" value="{{answers.dealer_code|default_if_none:''}}" size="20"/>							</td>
+                            <td colspan="4" align="left" bgcolor="#FFFFFF" style="padding-left:0px;">
+                                <input type="radio" name="service_type" value="A2">2. 一般保养&nbsp;&nbsp;<input type="radio" name="service_type" value="A4">4. 租车访问                            </td>
+                        </tr>
+						<tr>
+                            <td width="172" height="30" bgcolor="#FFFFFF">
+                                <p>服务顾问信息 </p>                            </td>
+                            <td height="30" colspan="2" bgcolor="#FFFFFF">
+                               服务顾问姓名:<input name="consultant_name" id="consultant_name" type="text" class="underline" value="{{answers.consultant_name|default_if_none:''}}" size="15">                            </td>
+                            <td width="160" height="30"  bgcolor="#FFFFFF">
+                            	<p>服务顾问性别:</p>                            </td>
+							<td width="160" height="30" colspan="2" bgcolor="#FFFFFF">
+								<span style="float:left;">
+								<input type="radio" name="consultant_sex" id="consultant_sex_male" value="A1">男&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<input type="radio" name="consultant_sex" id="consultant_sex_female" value="A2">女								</span>							</td>
+						</tr>
+                        <tr>
+                            <td rowspan="2" bgcolor="#FFFFFF">客人信息</td>
+                            <td colspan="2" bgcolor="#FFFFFF">
+                                客人姓名:<input type="text" name="customer_name" value="{{answers.customer_name|default_if_none:''}}" class="underline" size="15"/>
+                                <td width="209" height="30" bgcolor="#FFFFFF">
+                                    <p>受访者车型</p>                                </td>
+                                <td height="30" colspan="5" align="left" bgcolor="#FFFFFF" style="padding-left:5px;">
+                                    <p>
+                                        <span style="float:left">
+                                            <select name="car_type" id="car_type" style="width:100px;">
+                                                <option value=""></option>
+                                                <option value="A1">BMW 120i</option>
+                                                <option value="A2">BMW 130i</option>
+                                                <option value="A3">BMW 318i</option>
+                                                <option value="A4">BMW 320i</option>
+                                                <option value="A5">BMW 325i</option>
+                                                <option value="A6">BMW 335i</option>
+                                                <option value="A7">BMW 520Li</option>
+                                                <option value="A8">BMW 523Li</option>
+                                                <option value="A9">BMW 525Li</option>
+                                                <option value="A10">BMW 530Li</option>
+                                                <option value="A11">奥迪A4/A4L</option>
+                                                <option value="A12">奥迪A5</option>
+                                                <option value="A13">奥迪A6L</option>
+                                                <option value="A14">奥迪Q7</option>
+                                                <option value="A15">奥迪A8</option>
+                                                <option value="A16">奔驰B级</option>
+                                                <option value="A17">奔驰C级</option>
+                                                <option value="A18">奔驰E级</option>
+                                                <option value="A19">奔驰R级</option>
+                                                <option value="A20">奔驰ML级</option>
+                                                <option value="A21">奔驰GLK</option>
+                                                <option value="A22">雷克萨斯IS</option>
+                                                <option value="A23">雷克萨斯ES</option>
+                                                <option value="A24">雷克塞斯GX</option>
+                                                <option value="A25">雷克萨斯RX</option>
+                                                <option value="A26">其他</option>
+                                            </select>
+                                        </span>
+                                        <span id="SpanCarTypeOther" style="display:none;">其他车型:<input name="car_type__open" type="text" class="underline" value="{{answers.car_type.1|default_if_none:''}}" size="10" maxlength="30">&nbsp;</span>                                    </p>                                </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" bgcolor="#FFFFFF">
+                                        联系方式:<input type="text" name="customer_address" value="{{answers.customer_address|default_if_none:''}}" class="underline" size="30"/>                                    </td>
+                                    <td width="209" height="27" bgcolor="#FFFFFF">
+                                        <p>排档方式</p>                                    </td>
+                                    <td height="27" colspan="5" bgcolor="#FFFFFF" style="padding-left:0px;">
+                                        <p>
+                                            <input type="radio" name="at_mt" id="at_mt_1" value="A1">1. 自动挡AT<input type="radio" name="at_mt" id="at_mt_2" value="A2">2. 手动挡MT <input type="radio" name="at_mt" id="at_mt_3" value="A3"> 3. 手自一体AT&amp;MT                                        </p>                                    </td>
+                                </tr>
+                            </tbody>
+                            </table>
+          </td>
+                        </tr>
+                        {% if audits %}
+                        <tr>
+                            <td colspan="2" align="center">
+                                <div align="left" style="font-size:14px;margin-top:10px;padding-left:30px;font-weight:bold">
+								数据处理信息
+                                </div>
+                                
+                                <table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;">
+                                    <tbody>
+                                        <tr>
+                                            <td width="197" height="30" bgcolor="#FFFFFF">
+                                                <p align="center">&nbsp;
+                                                    
+                                                </p>
+                                            </td>
+                                            <td width="197" height="30" bgcolor="#FFFFFF">
+                                                <p align="center" class="STYLE6">
+                                                    <strong>编号</strong>
+                                                </p>
+                                            </td>
+                                            <td width="197" height="30" bgcolor="#FFFFFF">
+                                                <p align="center" class="STYLE6">
+                                                    <strong>姓名</strong>
+                                                </p>
+                                            </td>
+                                            <td width="197" height="30" bgcolor="#FFFFFF">
+                                                <p align="center" class="STYLE6">
+                                                    <strong>日期</strong>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        {% for audit in audits %}
+                                        <tr>
+                                            <td width="197" height="30" bgcolor="#FFFFFF">
+                                                <p align="center" class="STYLE7"> {{audit.name|default_if_none:''}} </p>
+                                            </td>
+                                            <td width="197" height="30" bgcolor="#FFFFFF">
+                                                <p align="center">{{audit.user.username|default_if_none:''}}</p>
+                                            </td>
+                                            <td width="197" height="30" bgcolor="#FFFFFF">
+                                                <p align="center">{{audit.user.first_name|default_if_none:''}}{{audit.user.last_name|default_if_none:''}}</p>
+                                            </td>
+                                            <td width="197" height="30" bgcolor="#FFFFFF">
+                                                <p align="center">{{audit.created|default_if_none:""}}</p>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                <input type="hidden" name="booking_begin_time" value="{{answers.booking_begin_time|default_if_none:''}}"/>
+				<input type="hidden" name="booking_end_time" value="{{answers.booking_end_time|default_if_none:''}}"/>
+				<input type="hidden" name="visit_begin_time" value="{{answers.visit_begin_time|default_if_none:''}}"/>
+				<input type="hidden" name="visit_end_time" value="{{answers.visit_end_time|default_if_none:''}}"/>
+				<input type="hidden" name="survey_code" value="{{answers.survey_code|default_if_none:''}}"/>
+				<input type="hidden" name="rid" value="{{rid|default_if_none:''}}"/>
+				<input type="hidden" name="pid" value="{{project.id|default_if_none:''}}"/>
+				<input type="hidden" name="term_id" value="{{term.id|default_if_none:''}}"/>
+                <script language="JavaScript">
+                    var form = document.getElementById('paper_form');
+                    form.car_type.value = "{{answers.car_type.0|default_if_none:''}}";
+                    if (form.booking_begin_time.value != "") {
+                        var list = form.booking_begin_time.value.split(':');
+                        form.booking_begin_hour.value = list[0];
+                        form.booking_begin_minute.value = list[1];
+                    }
+                    if (form.visit_begin_time.value != "") {
+                        var list = form.visit_begin_time.value.split(':');
+                        form.visit_begin_hour.value = list[0];
+                        form.visit_begin_minute.value = list[1];
+                    }
+                    if (form.booking_end_time.value != "") {
+                        var list = form.booking_end_time.value.split(':');
+                        form.booking_end_hour.value = list[0];
+                        form.booking_end_minute.value = list[1];
+                    }
+                    if (form.visit_end_time.value != "") {
+                        var list = form.visit_end_time.value.split(':');
+                        form.visit_end_hour.value = list[0];
+                        form.visit_end_minute.value = list[1];
+                    }
+                    if (form.survey_code.value != "") {
+                        var list = form.survey_code.value.split('{{answers.dealer_code|default_if_none:''}}{{answers.appraiser_code|default_if_none:''}}');
+                        form.city_code.value = list[0];
+                        form.visit_date_str.value = list[1];
+                    }
+                    set_radio(form.service_type, "{{answers.service_type.0}}");
+                    set_radio(form.consultant_sex, "{{answers.consultant_sex.0}}");
+                    set_radio(form.at_mt, "{{answers.at_mt.0}}");
+					if ({{tran_perm}}){
+						$(':input:not([name$="__EN"])').attr('readonly',true);
+						$(':input[name$="__EN"]').attr('readonly',false);
+					    $("input[@type='radio']").click(function(){return false});
+					}else{
+						$(':input[name$="__EN"]').attr('readonly',true);
+						if ({{manage_perm}}){
+							$(':input[name$="__EN"]').attr('readonly',false);
+						}
+					}
+                </script>
+                {% endblock %}

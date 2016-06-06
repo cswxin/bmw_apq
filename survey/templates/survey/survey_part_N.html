@@ -1,0 +1,786 @@
+{% extends "survey/survey_base.html" %}
+{% block script %}
+<script language="javascript">
+    $(document).ready(function($){
+        $("#paper_form").submit(function(){
+            var theForm = this;
+            $(":radio").attr('disabled', false);
+	    	$(":checkbox").attr('disabled', false);
+            var consultant_name = "{{answers.consultant_name|default_if_none:''}}";
+            
+			var question_list = ['B11a_n','B12_n','B14a_n','B15_n','B16_n','B21a_n','D36_n','D41a_n','D43_n','E46_n','E47_n','B60_n','B61_n','C26_n','D63_n'];
+			var show_list = ['B11','B13','B14','B15','B16','B18','D37','D38','D42','E45','E46','B23','B24','C27','D39'];
+			var no_list 
+			
+			
+			for (var i = 0;i<question_list.length;i++){
+				var result = check_radio(theForm,question_list[i]);
+				if (!result){
+					return result;
+				}
+			}
+        });
+    });
+</script>
+{% endblock %}
+{% block content %}
+<table border="0" cellspacing="0" cellpadding="0" width="97%" style="margin:5px;">
+    <tbody>
+        <tr>
+            <td colspan="2" align="left" style="padding-left:20px;padding-top:10px;">
+                <div style="padding-bottom:10px;">
+                    <span style="padding-left:0px;" class="STYLE2">问卷编号：</span>
+                    {{answers.survey_code|default_if_none:''}}
+                </div>
+                <div class="news-box_service">
+                    <div class="news-box2_service">
+                        <div align="left" style="padding: 10px;">
+                            <span class="STYLE1">新增加部分</span>
+                        </div>
+                    </div>
+                </div>
+                <!--<hr width="98%" color="#00000" size=1>-->
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;margin-top:10px;">
+                    <tbody>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>题号</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="24%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>考核点</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>是</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>否</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>不涉及</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="31%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>选择</strong>
+                                    <strong>“</strong>
+                                    <strong>否</strong>
+                                    <strong>/</strong>
+                                    <strong>不涉及</strong>
+                                    <strong>”</strong>
+                                    <strong>原因</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="13%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>评估标准说明</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="16%" bgcolor="#FFFFFF">
+                                <strong>操作注意事项</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                          <td width="3%" bgcolor="#FFFFFF">B11.&nbsp;</td>
+				          <td width="24%" align="left" bgcolor="#FFFFFF">
+				          	<p>
+				          		服务顾问是否起身，<strong>使用欢迎用语欢迎客户</strong>并佩戴姓名牌？（多选）<br>
+								<strong><em>请在备注栏内填写接待人员姓名!</em></strong>
+								<strong><em>!</em></strong>
+				          	</p></td>
+				          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="B11a" value="A1">
+				          </p></td>
+				          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="B11a" value="A2">
+				          </p></td>
+				          <td width="4%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="B11a" value="A3">
+				          </p></td>
+				          <td width="28%" align="left" bgcolor="#FFFFFF">
+				          	<p>
+                                <strong>接待人员姓名</strong>
+                                <strong>SA/SAA</strong>
+                                <strong>：</strong><br>
+                                <input name="consultant_name" type="text" class="input11" value="{{answers.consultant_name_n|default_if_none:''}}" size="15" maxlength="30">
+                            </p>
+				          	"否"原因：
+				          	{% for alt in B11a %}
+							<br><input name="ck_B11a" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.B11a %}checked{% endif %}>{{alt.title}}
+							{% endfor %}
+							<br>"否/不涉及"原因：<br>
+				            <input name="input_B11a" type="text" class="input11" value="{% ifnotequal answers.B11a.0 'A1' %}{{answers.B11a.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+							<input name="B11a__open" type="hidden" value=""/>
+							<br>
+				            "否/不涉及"原因_EN：<br>
+				            <input name="B11a__open__EN" type="text" class="input11" value="{% ifnotequal answers.B11a.0 'A1' %}{{trans_contents.B11a|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">			</td>
+				          <td width="18%" align="left" bgcolor="#FFFFFF">
+				          	欢迎用语可以为：您好、您请坐等或相应的方言。</td>
+						  <td width="18%" align="left" bgcolor="#FFFFFF">
+						  	{% if project.id != 4 %}
+						  	(1)宝马要求的名牌上都有名字。如果有挂名牌，上边一定有名字。<br>
+						  	(2)只要能在工单或结算单上确认服务顾问的姓名，则不需要索取名片。<br>
+						  	(3)如果服务顾问见到车主时，服务顾问一直处于站立姿态，那么不再要求“服务顾问起身”。<br>
+						  	{% else %}
+						  	(1)只要能在工单或结算单上确认服务顾问的姓名，则不需要索取名片。<br>
+						  	(2)如果服务顾问见到车主时，服务顾问一直处于站立姿态，那么不再要求“服务顾问起身”。<br>
+						  	{% endif %}
+						  </td>
+                        </tr>
+                        <tr>
+				          <td width="3%" bgcolor="#FFFFFF">B13.&nbsp;</td>
+				          <td width="24%" align="left" bgcolor="#FFFFFF"><p>服务顾问是否使用钥匙读取器读取钥匙信息并介绍CBS概念及提醒客人临近的保养项目？（多选）</p></td>
+				          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="B12" value="A1">
+				          </p></td>
+				          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="B12" value="A2">
+				          </p></td>
+				          <td width="4%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="B12" value="A3">
+				          </p></td>
+				          <td width="28%" align="left" bgcolor="#FFFFFF">
+				          	"否"原因：
+				          	{% for alt in B12 %}
+							<br><input name="ck_B12" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.B12 %}checked{% endif %}>{{alt.title}}
+							{% endfor %}
+							<br>"否/不涉及"原因：<br>
+				            <input name="input_B12" type="text" class="input11" value="{% ifnotequal answers.B12.0 'A1' %}{{answers.B12.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+							<input name="B12__open" type="hidden" value=""/>
+							<br>
+				            "否/不涉及"原因_EN：<br>
+				            <input name="B12__open__EN" type="text" class="input11" value="{% ifnotequal answers.B12.0 'A1' %}{{trans_contents.B12|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">			</td>
+				          <td width="18%" align="left" bgcolor="#FFFFFF">所有工作均要求服务顾问向客户展示电脑屏幕上的CBS数据信息（钥匙数据），但只要求打印必要的保修和BSI项目（也可以为全部工作打印钥匙信息读取界面）。<br>
+				          	服务顾问要向客户介绍宝马车有CBS功能，该功能可根据车辆使用情况向客户提示所需的保养信息（适用于1999年9月以后的车系）。</td>
+						  <td width="18%" align="left" bgcolor="#FFFFFF">
+						  	无论客人做什么项目都要向客人解释CBS信息，即钥匙读取出的钥匙数据。解释的方法可通过转动屏幕或者打印钥匙信息；如果屏幕的角度是倾斜的，能让神秘客看见屏幕上的内容，那么服务顾问直接用手在屏幕上比划，也是可以接受的。<br>
+						  	建议介绍CBS的标准话术是："CBS功能可根据车辆使用情况向客户提示所需的保养信息。"<br>
+						  	<strong>综上所述，此题考核五点：</strong><br>
+						  	1. 用钥匙读取器读钥匙；<br>
+						  	2. 转动屏幕或打印钥匙信息并解释；<br>
+						  	3. 说出CBS的定义。<br>
+						  	4. 提醒客人临近的保养项目。<br>
+							5. 必须在SA桌前解释CBS。<br>
+						  </td>
+				        </tr>
+				        <tr>
+				            <td width="3%" bgcolor="#FFFFFF">B14.&nbsp;</td>
+				            <td width="24%" align="left" bgcolor="#FFFFFF">
+				                <p>是否在客人面前给车辆铺上脚垫和套上方向盘套以及座椅防护罩？（多选）</p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B14a" value="A1">
+				                </p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B14a" value="A2">
+				                </p>
+				            </td>
+				            <td width="5%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B14a" value="A3">
+				                </p>
+				            </td>
+				            <td width="25%" align="left" bgcolor="#FFFFFF">
+				                <p>
+				                    "否"原因：
+						          	{% for alt in B14a %}
+									<br><input name="ck_B14a" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.B14a %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									<br>"否/不涉及"原因：<br>
+									<input name="input_B14a" type="text" class="input11" value="{% ifnotequal answers.B14a.0 'A1' %}{{answers.B14a.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+				                    <input name="B14a__open" type="hidden" value=""/>
+				                    <br>
+				                    "否/不涉及"原因_EN：<br>
+									<input name="B14a__open__EN" type="text" class="input11" value="{% ifnotequal answers.B14a.0 'A1' %}{{trans_contents.B14a|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+				                </p>
+				            </td>
+				            <td width="16%" align="left" bgcolor="#FFFFFF">
+				                要求在“检查车辆过程”中给车辆加以防护措施。
+				            </td>
+				            <td width="19%" align="left" bgcolor="#FFFFFF">
+				            </td>
+				        </tr>
+				        <tr>
+				            <td width="3%" bgcolor="#FFFFFF">B15.&nbsp;</td>
+				            <td width="24%" align="left" bgcolor="#FFFFFF">
+				                <p> 服务顾问是否提醒客人带走车内的贵重物品?（单选）</p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B15" value="A1">
+				                </p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B15" value="A2">
+				                </p>
+				            </td>
+				            <td width="5%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B15" value="A3">
+				                </p>
+				            </td>
+				            <td width="25%" align="left" bgcolor="#FFFFFF">
+				                <p>
+				                    "否/不涉及"原因：<br>
+									<input name="B15__open" type="text" class="input11" value="{% ifnotequal answers.B15.0 'A1' %}{{answers.B15.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+				                    <br>
+				                    "否/不涉及"原因_EN：<br>
+									<input name="B15__open__EN" type="text" class="input11" value="{% ifnotequal answers.B15.0 'A1' %}{{trans_contents.B15|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+				                </p>
+				            </td>
+				            <td width="16%" align="left" bgcolor="#FFFFFF">
+				            	服务顾问必须在“检查车辆过程”中或是在“接车过程”中的任何时候提醒客人带走车内的贵重物品。
+				            </td>
+				            <td width="19%" align="left" bgcolor="#FFFFFF">
+				            </td>
+				        </tr>
+				        <tr>
+				            <td width="3%" bgcolor="#FFFFFF">B16.&nbsp;</td>
+				            <td width="24%" align="left" bgcolor="#FFFFFF">
+				                <p> 服务顾问是否询问客人有无保留旧件的需要?（单选）</p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B16" value="A1">
+				                </p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B16" value="A2">
+				                </p>
+				            </td>
+				            <td width="5%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B16" value="A3">
+				                </p>
+				            </td>
+				            <td width="25%" align="left" bgcolor="#FFFFFF">
+				                <p>
+				                    "否/不涉及"原因：<br>
+									<input name="B16__open" type="text" class="input11" value="{% ifnotequal answers.B16.0 'A1' %}{{answers.B16.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+				                    <br>
+				                    "否/不涉及"原因_EN：<br>
+									<input name="B16__open__EN" type="text" class="input11" value="{% ifnotequal answers.B16.0 'A1' %}{{trans_contents.B16|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+				                </p>
+				            </td>
+				            <td width="16%" align="left" bgcolor="#FFFFFF">
+				            	服务顾问必须在“接车过程”中提出此问题。
+				            </td>
+				            <td width="19%" align="left" bgcolor="#FFFFFF">
+				            	注意：只要是保养项目，就需要询问客人是否要保留旧件。即使是做机油保养，SA也需要询问客人是否要保留旧件。
+				            </td>
+				        </tr>
+				        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                B18.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    是否向客人介绍/解释保养服务套餐（SRP）项目？（多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="B21a" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="B21a" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="B21a" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in B21a %}
+									<br><input name="ck_B21a" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.B21a %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="B21aother" type="text" class="input11" value="{% if '98' in alt_ans.B21a %}{{answers.B21aother|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+									<input name="input_B21a" type="text" class="input11" value="{% ifnotequal answers.B21a.0 'A1' %}{{answers.B21a.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="B21a__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="B21a__open__EN" type="text" class="input11" value="{% ifnotequal answers.B21a.0 'A1' %}{{trans_contents.B21a|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                &nbsp;
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+                            	任何维修保养服务套餐（SRP）项目的神秘顾客，在此次访问中要被告知什么是保养服务套餐（SRP）项目以及它的好处。<br>
+                            	至少介绍到：<br>
+                            	保养服务套餐（SRP）中有12种保养服务套餐；<br>
+                            	其中任何一个套餐的价格在全国的宝马授权经销商中都是相同的。<br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D37.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>服务顾问是否向维修SRP项目的客户解释车间已经检查并调整其车辆的胎压？（单选）</p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D36" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D36" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D36" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="D36__open" type="text" class="input11" value="{% ifnotequal answers.D36.0 'A1' %}{{answers.D36.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D36__open__EN" type="text" class="input11" value="{% ifnotequal answers.D36.0 'A1' %}{{trans_contents.D36|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	规定必须为任何代有SRP工项的车辆检查胎压，且此胎压需要与门柱上的标示一致。<br>
+								在“提车过程”中客人需被告知已根据轮胎型号把其车辆的胎压调整到标准的范围之内。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF"></td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D38.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    服务顾问是否建议客户下次进店前进行预约并且说明了预约的好处？ （多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D41a" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D41a" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D41a" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in D41a %}
+									<br><input name="ck_D41a" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.D41a %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="D41aother" type="text" class="input11" value="{% if '98' in alt_ans.D41a %}{{answers.D41aother|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+									<input name="input_D41a" type="text" class="input11" value="{% ifnotequal answers.D41a.0 'A1' %}{{answers.D41a.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="D41a__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D41a__open__EN" type="text" class="input11" value="{% ifnotequal answers.D41a.0 'A1' %}{{trans_contents.D41a|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	服务顾问必须在“提车过程”中建议客人在下次保养维修前做预约，即使客户已经在本次访问前做过预约。<br>
+                            	预约的好处介绍至少为：如果客户预约，经销店会提前安排技师，预留备件以节省维修保养时间，可确保通过预约快修通道单项SRP项目可以在两个小时内提车。<br>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D42.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                	出纳人员是否向客人说出“谢谢”及“再见”?（单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D43" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D43" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D43" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in D43 %}
+									<br><input name="ck_D43" type="radio" value="{{alt.cid}}" {% if alt.cid in alt_ans.D43 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									<br>"否/不涉及"原因：<br>
+									<input name="input_D43" type="text" class="input11" value="{% ifnotequal answers.D43.0 'A1' %}{{answers.D43.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="D43__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D43__open__EN" type="text" class="input11" value="{% ifnotequal answers.D43.0 'A1' %}{{trans_contents.D43|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	最好能拍摄到出纳人员的嘴形
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                E45.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                	在车辆交接过程中，服务顾问是否提醒/帮助客人调整座椅和后视镜位置？（多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E46" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E46" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E46" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in E46 %}
+									<br><input name="ck_E46" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.E46 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="E46other" type="text" class="input11" value="{% if '98' in alt_ans.E46 %}{{answers.E46other|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+									<input name="input_E46" type="text" class="input11" value="{% ifnotequal answers.E46.0 'A1' %}{{answers.E46.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="E46__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="E46__open__EN" type="text" class="input11" value="{% ifnotequal answers.E46.0 'A1' %}{{trans_contents.E46|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	在“提车过程”或“车辆交接过程”中，服务顾问需要提醒客户检查座椅和后视镜的位置。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	陪访员注意服务顾问需要有提醒客户检查座椅和后视镜这样类似的话语，并注意录音。<br>
+								（1）首先服务顾问需要提醒客人“座椅和后视镜的位置是否合适。”<br>
+								（2）如果客人觉得座椅和后视镜的位置不合适，服务顾问需要主动询问客人“是否需要帮助。”<br>
+								（3）如果客人提出需要服务顾问的帮助，那么服务顾问有义务帮助其调整，直到客人满意为止。<br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                E46.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    车辆是否清洗吸尘干净？ （多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E47" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E47" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="E47" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in E47 %}
+									<br><input name="ck_E47" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.E47 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="E47other" type="text" class="input11" value="{% if '98' in alt_ans.E47 %}{{answers.E47other|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+									<input name="input_E47" type="text" class="input11" value="{% ifnotequal answers.E47.0 'A1' %}{{answers.E47.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="E47__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="E47__open__EN" type="text" class="input11" value="{% ifnotequal answers.E47.0 'A1' %}{{trans_contents.E47|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	无油污印记；<br>
+                            	吸尘车内地板和脚垫；<br>
+                            	清洗和擦干车辆；<br>
+                            	清理烟灰缸；<br>
+                            	无泥水。<br>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	（1）如果客人进店前车辆有需要特殊清洗剂或设备才能洗掉的污迹，则不算在考核范围内。<br>
+								（2）如果客人主动要求不洗车，那么判“未涉及”。<br>
+                            </td>
+                        </tr>
+                        <tr>
+				            <td width="3%" bgcolor="#FFFFFF">B23.&nbsp;</td>
+				            <td width="24%" align="left" bgcolor="#FFFFFF">
+				                <p> 当客户进入休息区之后，休息区服务人员是否向客户介绍了休息区主要设施？（多选）</p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B60" value="A1">
+				                </p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B60" value="A2">
+				                </p>
+				            </td>
+				            <td width="5%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="B60" value="A3">
+				                </p>
+				            </td>
+				            <td width="25%" align="left" bgcolor="#FFFFFF">
+				                <p>
+				                    "否"原因：
+						          	{% for alt in B60 %}
+									<br><input name="ck_B60" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.B60 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="B60other" type="text" class="input11" value="{% if '98' in alt_ans.B60 %}{{answers.B60other|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+									<input name="input_B60" type="text" class="input11" value="{% ifnotequal answers.B60.0 'A1' %}{{answers.B60.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+				                    <input name="B60__open" type="hidden" value=""/>
+				                    <br>
+				                    "否/不涉及"原因_EN：<br>
+									<input name="B60__open__EN" type="text" class="input11" value="{% ifnotequal answers.B60.0 'A1' %}{{trans_contents.B60|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+				                </p>
+				            </td>
+				            <td width="16%" align="left" bgcolor="#FFFFFF">
+				            	介绍至少要涵盖：<br>
+				            	-饮料区；<br>
+				            	-上网区；<br>
+				            	-电视区；<br>
+				            	-无线网络（如适用）。<br>
+				            </td>
+				            <td width="19%" align="left" bgcolor="#FFFFFF">
+				            	注意：服务顾问必须介绍无线网络。
+				            </td>
+				        </tr>
+				        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                B24.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>服务顾问离开客户前，需询问客户是否有服务顾问的联系方式？如果没有，则要求服务顾问向客户留下联系方式。（单选）</p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="B61" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="B61" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="B61" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="B61__open" type="text" class="input11" value="{% ifnotequal answers.B61.0 'A1' %}{{answers.B61.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="B61__open__EN" type="text" class="input11" value="{% ifnotequal answers.B61.0 'A1' %}{{trans_contents.B61|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                服务顾问联系方式可以是留下名片或者是把电话号码写在客户的那联工单上。
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+                            	服务顾问只要在B环节“接车 & 检查车辆”留下名片，此题也可以得分
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                C27.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    当车辆在车间维修时客人是否有可能看到自己的车辆？ （单选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C26" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C26" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="C26" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<input name="C26__open" type="text" class="input11" value="{% ifnotequal answers.C26.0 'A1' %}{{answers.C26.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    <br>
+                                    "否/不涉及"原因_EN：<input name="C26__open__EN" type="text" class="input11" value="{% ifnotequal answers.C26.0 'A1' %}{{trans_contents.C26|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                通过实时摄像头或窗户。
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+                            	(1)无论是通过摄像头/玻璃/窗户，必须看到车主的车辆才能给分。<br>
+								(2)如果经销店有多种方式（摄像头/玻璃/窗户）看到维修的车辆，那么只要有一种方式能看到神秘客的车此题就可以得分。<br>
+								(3)如果有摄像头但是坏了，此题算“否”。<br>
+								(4)只能看见文字显示车辆的状态，此题算“否”。如：NS6578洗车，CF4523路试…<br>
+								(5)如果经销店只有旋转的摄像头，那么只要能调试到神秘客的车的镜头就给分。陪访员可以自己去调试，也可以请其他人帮忙调试。<br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                D39.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    服务顾问是否将宝马事故救援热线号码打印或者写在结算单上，并向客户介绍？（多选）
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D63" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D63" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="D63" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否"原因：
+						          	{% for alt in D63 %}
+									<br><input name="ck_D63" type="checkbox" value="{{alt.cid}}" {% if alt.cid in alt_ans.D63 %}checked{% endif %}>{{alt.title}}
+									{% endfor %}
+									:<input name="D63other" type="text" class="input11" value="{% if '98' in alt_ans.D63 %}{{answers.D63other|default_if_none:''}}{% endif %}" size="15" maxlength="250">
+									<br>"否/不涉及"原因：<br>
+									<input name="input_D63" type="text" class="input11" value="{% ifnotequal answers.D63.0 'A1' %}{{answers.D63.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <input name="D63__open" type="hidden" value=""/>
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="D63__open__EN" type="text" class="input11" value="{% ifnotequal answers.D63.0 'A1' %}{{trans_contents.D63|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	1.服务顾问需要将宝马事故救援热线号码打印或写在结算单上；<br>
+                            	2.服务顾问至少向客户提及“宝马终身免费事故救援”的热线号码；这是标准话术，方言差异可以接受。<br>
+                            	3.如果客户感兴趣，则向客户介绍相应的项目细节。<br>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                注意：服务顾问还需要提到“宝马”、“终身”、“免费”这三点才能给分。
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<input type="hidden" name="p" value="E"/>
+<script language="JavaScript">
+    var form = document.getElementById('paper_form');
+    set_radio(form.A52, "{{answers.A52.0}}");
+    set_radio(form.B53, "{{answers.B53.0}}");
+    set_radio(form.C54, "{{answers.C54.0}}");
+    set_radio(form.E55, "{{answers.E55.0}}");
+	if ({{tran_perm}}){
+		$(':input:not([name$="__EN"])').attr('readonly',true);
+		$(':input[name$="__EN"]').attr('readonly',false);
+		$(':input[name^="input_"]').attr('readonly',false);
+		$(':input[name$="__open"]').attr('readonly',false);
+	    $(":radio").attr('disabled', 'disabled');
+	    $(":checkbox").attr('disabled', 'disabled');
+	}else{
+		$(':input[name$="__EN"]').attr('readonly',true);
+		$(':input:not([name$="__EN"])').attr('readonly',false);
+		if ({{manage_perm}}){
+			$(':input[name$="__EN"]').attr('readonly',false);
+		}
+	}
+	$(":radio").click(function () {
+	    var r = $(this).attr("name");
+	    $(":radio[name=" + r + "]:not(:checked)").attr("tag", 0);
+	    if ($(this).attr("tag") == 1) {
+	        $(this).attr("checked", false);
+	        $(this).attr("tag", 0);
+	    }
+	    else {
+	        $(this).attr("tag", 1);
+	    }
+	});
+</script>
+{% endblock %}

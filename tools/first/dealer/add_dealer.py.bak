@@ -1,0 +1,232 @@
+#encoding:utf-8
+
+import os, sys
+sys.path.insert(0, os.path.abspath(os.curdir))
+
+from django.db.transaction import commit_on_success
+from mc.models import Dealer, DealerType, City, Province
+from mc import get_cur_term
+from django.contrib.auth.models import User, Group
+from userpro.models import UserProfile, UserPermission
+from userpro.enums import *
+import xlrd
+from utils.xpinyin import Pinyin
+pinyin = Pinyin()
+
+from django.conf import settings
+
+LISTORDER = 1
+@commit_on_success
+def update_dealer_listorder(parent=None):
+    global LISTORDER
+    if not parent:
+        LISTORDER = 1
+        parent = Dealer.objects.get(pk=1)
+        parent.listorder = LISTORDER
+        parent.save()
+    sub_dealer_list = Dealer.objects.filter(parent=parent).order_by('id')
+    for sub_dealer in sub_dealer_list:
+        LISTORDER += 1
+        sub_dealer.listorder = LISTORDER
+        sub_dealer.save()
+        if sub_dealer.has_child:
+            update_dealer_listorder(sub_dealer)
+
+dealer_dict = {}
+
+def _float_to_str(text):
+    if isinstance(text, float):
+        return '%s' % int(text)
+    else:
+        return text.strip()
+
+def add_row(sh, rx, dealer_nation, dealertype_bmw, term):
+        texts = sh.row_values(rx)
+        #print texts
+        
+        dealer_code = _float_to_str(texts[0])
+        dealer_abbr_cn = texts[1].strip()
+        dealer_name = texts[2].strip().split('\n')
+        dealer_name_cn = dealer_name[1].strip()
+        dealer_name_en = dealer_name[0].strip()
+        city = texts[3].strip().split('\n')
+        city_cn = city[1].strip()
+        city_en = city[0].strip()
+        province = texts[4].strip().split('\n')
+        province_cn = province[1].strip()
+        province_en = province[0].strip()
+        region1_name = texts[5].strip().split('\n')[0].strip() #大区的name
+        region2_name = city_cn #参照以前老层级关系城市的name
+        
+        region1_dealer = dealer_dict.get(region1_name)
+        if not region1_dealer:
+            print 'level-1', region1_name
+            region1_dealer, create = Dealer.objects.get_or_create(name=region1_name)
+            region1_dealer.name_cn = texts[5].strip().split('\n')[1].strip()
+            region1_dealer.name_en = region1_name
+            region1_dealer.parent = dealer_nation
+            region1_dealer.has_child = True
+            region1_dealer.level = 1
+            region1_dealer.save()
+            dealer_dict[region1_dealer.name] = region1_dealer
+        
+        if dealer_nation:
+            region1_dealer.sf_parent = dealer_nation
+            region1_dealer.xq_parent = dealer_nation
+            region1_dealer.save()
+            
+        #经销商集�
+        jt_dealer_name_en = texts[6].strip()
+        jt_dealer_name_cn = texts[7].strip()
+        jt_dealer_code = _float_to_str(texts[8])
+        
+        jt_dealer = dealer_dict.get(jt_dealer_code)
+        if not jt_dealer:
+            print 'jt_dealer', jt_dealer_code
+            jt_dealer, create = Dealer.objects.get_or_create(name=jt_dealer_code)
+            jt_dealer.name_cn = jt_dealer_name_cn
+            jt_dealer.name_en = jt_dealer_name_en
+            jt_dealer.parent = dealer_nation
+            jt_dealer.jt_parent = dealer_nation
+            jt_dealer.has_child = True
+            jt_dealer.level = 6
+            jt_dealer.save()
+            dealer_dict[jt_dealer.name] = jt_dealer
+        
+        #小区
+        xq_dealer_name_en = texts[9].strip()
+        xq_dealer_name_cn = texts[9].strip()
+        xq_dealer_code = _float_to_str(texts[10])
+        
+        xq_dealer = dealer_dict.get(xq_dealer_code)
+        if not xq_dealer:
+            print 'xq_dealer', xq_dealer_code
+            xq_dealer, create = Dealer.objects.get_or_create(name=xq_dealer_code)
+            xq_dealer.name_cn = xq_dealer_name_cn
+            xq_dealer.name_en = xq_dealer_name_en
+            xq_dealer.parent = dealer_nation
+            xq_dealer.has_child = True
+            xq_dealer.level = 4
+            xq_dealer.save()
+            dealer_dict[xq_dealer.name] = xq_dealer
+        
+        if region1_dealer:
+            xq_dealer.xq_parent = region1_dealer
+            xq_dealer.save()
+        
+        #省份
+        sf_dealer_name_en = province_en
+        sf_dealer_name_cn = province_cn
+        sf_dealer_code = province_cn
+        
+        sf_dealer = dealer_dict.get(sf_dealer_code)
+        if not sf_dealer:
+            print 'sf_dealer', sf_dealer_code
+            sf_dealer, create = Dealer.objects.get_or_create(name=sf_dealer_code)
+            sf_dealer.name_cn = sf_dealer_name_cn
+            sf_dealer.name_en = sf_dealer_name_en
+            sf_dealer.parent = dealer_nation
+            sf_dealer.has_child = True
+            sf_dealer.level = 5
+            sf_dealer.save()
+            dealer_dict[sf_dealer.name] = sf_dealer
+            
+        if region1_dealer:
+            sf_dealer.sf_parent = region1_dealer
+            sf_dealer.save()
+            
+        region2_dealer = dealer_dict.get(region2_name)
+        if not region2_dealer:
+            print 'level-2', region2_name
+            region2_dealer, create = Dealer.objects.get_or_create(name=region2_name)
+            region2_dealer.name_cn = region2_name
+            region2_dealer.name_en = city_en
+            region2_dealer.parent = region1_dealer
+            region2_dealer.has_child = True
+            region2_dealer.level = 2
+            region2_dealer.save()
+            dealer_dict[region2_dealer.name] = region2_dealer
+            
+        if sf_dealer:
+            region2_dealer.sf_parent = sf_dealer
+            region2_dealer.save()
+        
+        leaf_dealer = dealer_dict.get(dealer_code)
+        print 'dealer', dealer_code
+        leaf_dealer, create = Dealer.objects.get_or_create(name=dealer_code)
+        leaf_dealer.name_cn = dealer_name_cn
+        leaf_dealer.name_en = dealer_name_en
+        leaf_dealer.parent = region2_dealer
+        if jt_dealer:
+            leaf_dealer.jt_parent = jt_dealer
+        if xq_dealer:
+            leaf_dealer.xq_parent = xq_dealer
+        if sf_dealer:
+            leaf_dealer.sf_parent = sf_dealer
+        leaf_dealer.has_child = False
+        leaf_dealer.abbr_cn = dealer_abbr_cn
+        leaf_dealer.dealertype = dealertype_bmw
+        leaf_dealer.city_cn = city_cn
+        leaf_dealer.city_en = city_en
+        leaf_dealer.province_cn = province_cn
+        leaf_dealer.province_en = province_en
+        term.dealers.add(leaf_dealer)
+        leaf_dealer.termid = term.id
+        leaf_dealer.level = 3
+        leaf_dealer.save()
+        save_dealer_user(dealer_code, dealer_abbr_cn, DEALER_GROUP, region1_dealer, False)
+        dealer_dict[leaf_dealer.name] = leaf_dealer
+        
+@commit_on_success
+def add_dealer():
+    dealertype_bmw = DealerType.objects.get(name_en=u'BMW')
+    dealer_nation = Dealer.objects.get(name=u'全国')
+    
+    xlsfile = os.path.join(settings.RESOURCES_ROOT, u'first/dealer/APQ 2012 dealer list _0220.xls')
+    book = xlrd.open_workbook(xlsfile)
+    
+    #经销�
+    sh = book.sheet_by_index(0)
+    print sh.name, sh.nrows, sh.ncols
+    term = get_cur_term()
+    term.dealers = []
+    for rx in range(1, sh.nrows):
+        add_row(sh, rx, dealer_nation, dealertype_bmw, term)
+        #break
+    term.save()
+
+#后台：没有登录后台的权限。
+#前台：只可以看到经销商自己的“单店报告”和自己的“历史\现在\未来数据”。
+def save_dealer_user(username, firstname, groupname, dealer, is_staff, is_active=True):
+    name = pinyin.get_pinyin(username).lower()
+    u, create = User.objects.get_or_create(username=name)
+    if create:
+        u.first_name = firstname
+        u.set_password('123456')
+        u.is_staff = is_staff
+        u.is_active = is_active
+        g = Group.objects.get(name=groupname)
+        u.groups = [g, ]
+    else:
+        u.first_name = firstname
+    
+    up, create = UserProfile.objects.get_or_create(user=u)
+    per, create = UserPermission.objects.get_or_create(name=SHOW_DEALER_PAGE)
+    up.user_permissions = [per, ]
+    up.save()
+    u.save()
+
+@commit_on_success
+def add_mini_dealertype():
+    dt, create = DealerType.objects.get_or_create(name_cn='MINI')
+    dt.name_en = 'MINI'
+    dt.save()
+
+def add_dealers():
+    add_mini_dealertype()
+    add_dealer()
+    update_dealer_listorder()
+    
+if __name__ == '__main__':
+    add_dealers()
+    

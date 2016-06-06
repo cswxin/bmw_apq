@@ -1,0 +1,364 @@
+{% extends "survey/survey_base.html" %}
+{% block script %}
+<script language="javascript">
+    $(document).ready(function(){
+        $("#paper_form").submit(function(){
+			var theForm = this;
+			$(":radio").attr('disabled', false);
+	    	$(":checkbox").attr('disabled', false);
+			var question_list = ['G64'];
+			var show_list = ['G51'];
+			
+			var project_id = $("input[name='pid']").val()
+			
+			if (project_id == 2){
+				for (var i = 0;i<question_list.length;i++){
+					var result = check_radio(theForm,question_list[i],show_list[i]);
+					if (!result){
+						return result;
+					}
+				}
+			}
+			
+			
+            if (theForm.G50_A1.value == "") {
+                alert("请输入经销商做得比较好的地方！");
+                theForm.G50_A1.focus();
+                return false;
+            }
+            if (theForm.G50_A2.value == "") {
+                alert("请输入经销商有待改进的地方！");
+                theForm.G50_A2.focus();
+                return false;
+            }
+            if (typeof(theForm.T3) != "undefined" && theForm.T3.value == "") {
+                alert("请输入G50题答案！");
+                theForm.T3.focus();
+                return false;
+            }
+            if (!isRadioSelected(theForm.G51_A1)) {
+                alert("请选择G51_A1题答案！");
+                theForm.G51_A1[0].focus();
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% block content %}
+<table border="0" cellspacing="0" cellpadding="0" width="97%" style="margin:5px;">
+    <tbody>
+        <tr>
+            <td colspan="2" align="left" style="padding-left:20px;padding-top:10px;">
+                <div style="padding-bottom:10px;">
+                    <span style="padding-left:0px;" class="STYLE2">问卷编号：</span>
+                    {{answers.survey_code|default_if_none:''}}
+                </div>
+                <div class="news-box_service">
+                    <div class="news-box2_service">
+                        <div align="left" style="padding: 10px;">
+                            <span class="STYLE1">G. 客户反馈</span>
+                        </div>
+                    </div>
+                </div>
+                <!--<hr width="98%" color="#00000" size=1>-->
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <br>
+                <table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;">
+                    <tbody>
+                        <tr>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>题号</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="29%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>考核点</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="66%" colspan="10" align="left" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>客人反馈</strong>
+                                    <strong></strong>
+                                    <strong>（以下问题必须请车主自己填写！）</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    &nbsp;
+                                </p>
+                            </td>
+                            <td width="29%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    除了以上这些评价的问题之外，经销商的表现有没有您认为做得比较好的地方或有待改进的地方？ 
+                                </p>
+                            </td>
+                            <td width="66%" colspan="10" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="40" bgcolor="#FFFFFF">
+                                G49a.
+                            </td>
+                            <td height="40" align="left" bgcolor="#FFFFFF">
+                                <strong>做得比较好的地方</strong>
+                            </td>
+                            <td width="66%" height="40" colspan="10" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    <input name="G50_A1" type="text" class="input11" value="{{answers.G50.0|default_if_none:''}}" size="90" maxlength="250">
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="40" bgcolor="#FFFFFF">
+                                &nbsp;
+                            </td>
+                            <td height="40" align="left" bgcolor="#FFFFFF">
+                                <strong>做得比较好的地方_EN</strong>
+                            </td>
+                            <td width="66%" height="40" colspan="10" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    <input name="G50_A1__EN" type="text" class="input11" value="{{trans_contents.G50_A1|default_if_none:''}}" size="90" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="40" bgcolor="#FFFFFF">
+                                G49b.
+                            </td>
+                            <td height="40" align="left" bgcolor="#FFFFFF">
+                                <strong>有待改进的地方 </strong>
+                            </td>
+                            <td width="66%" height="40" colspan="10" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    <input name="G50_A2" type="text" class="input11" value="{{answers.G50.1|default_if_none:''}}" size="90" maxlength="250">
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="40" bgcolor="#FFFFFF">
+                                &nbsp;
+                            </td>
+                            <td height="40" align="left" bgcolor="#FFFFFF">
+                                <strong>有待改进的地方_EN</strong>
+                            </td>
+                            <td width="66%" height="40" colspan="10" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    <input name="G50_A2__EN" type="text" class="input11" value="{{trans_contents.G50_A2|default_if_none:''}}" size="90" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    &nbsp;
+                                </p>
+                            </td>
+                            <td width="29%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                            </td>
+                            <td width="60%" colspan="9" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                            </td>
+                            <td width="6%" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                            </td>
+                        </tr>
+                        {% if project.id == 3 %}
+                        <tr>
+                            <td height="40" bgcolor="#FFFFFF">
+                                G50.
+                            </td>
+                            <td height="40" align="left" bgcolor="#FFFFFF">
+                                总体看来,您对宝马4S店里的MINI售后专署接待区域感觉如何?（如适用于MINI授权的宝马经销店客户）
+                            </td>
+                            <td width="66%" height="40" colspan="10" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    <input name="T3" type="text" class="input11" value="{{answers.T3|default_if_none:''}}" size="90" maxlength="250">
+                                </p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td width="4%" bgcolor="#FFFFFF">
+                            	{% if project.id != 3 %}
+                                G50.
+                                {% endif %}
+                                {% if project.id == 3 %}
+                                G51.
+                                {% endif %}
+                            </td>
+                            <td width="29%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    请用1到10分的评分标准给经销商的总体表现打分。1分表示无法接受，5分表示一般，10分表示非常好。分数越高代表经销商的服务越好。
+                                </p>
+                            </td>
+                            <td width="6%" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                                <p>
+                                    <input type="radio" name="G51_A1" value="1">1
+                                    <br>
+                                    无法接受 
+                                </p>
+                            </td>
+                            <td width="6%" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                                <p>
+                                    <input type="radio" name="G51_A1" value="2">2
+                                </p>
+                            </td>
+                            <td width="6%" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                                <p>
+                                    <input type="radio" name="G51_A1" value="3">3
+                                </p>
+                            </td>
+                            <td width="6%" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                                <p>
+                                    <input type="radio" name="G51_A1" value="4">4
+                                </p>
+                            </td>
+                            <td width="6%" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                                <p>
+                                    <input type="radio" name="G51_A1" value="5">5
+                                    <br>
+                                    一般 
+                                </p>
+                            </td>
+                            <td width="6%" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                                <p>
+                                    <input type="radio" name="G51_A1" value="6">6
+                                </p>
+                            </td>
+                            <td width="6%" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                                <p>
+                                    <input type="radio" name="G51_A1" value="7">7
+                                </p>
+                            </td>
+                            <td width="6%" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                                <p>
+                                    <input type="radio" name="G51_A1" value="8">8
+                                </p>
+                            </td>
+                            <td width="7%" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                                <p>
+                                    <input type="radio" name="G51_A1" value="9">9
+                                </p>
+                            </td>
+                            <td width="6%" valign="top" bgcolor="#FFFFFF">
+                                <p>
+                                    &nbsp;
+                                </p>
+                                <p>
+                                    <input type="radio" name="G51_A1" value="10">10
+                                    <br>
+                                    非常好 
+                                </p>
+                            </td>
+                        </tr>
+                        {% if project.id == 2 %}
+				        <tr>
+                            <td height="40" bgcolor="#FFFFFF">
+                                G51.
+                            </td>
+                            <td height="40" align="left" bgcolor="#FFFFFF">
+                                <p>在过去半年内，您是否收到过由宝马厂家邮寄给您的“宝马杂志”?</p>
+                            </td>
+                            <td width="6%" height="40" align="center" bgcolor="#FFFFFF">
+                                <p>
+                                    <input type="radio" name="G64" value="A1">是
+                                </p>
+                            </td>
+                            <td width="6%" height="40" align="center" bgcolor="#FFFFFF">
+                                <p>
+                                    <input type="radio" name="G64" value="A2">否
+                                </p>
+                            </td>
+                            <td width="54%" height="40" colspan="8" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                </p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                <br>
+                <br>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<input type="hidden" name="p" value="G"/>
+<input type="hidden" name="pid" value="{{project.id|default_if_none:''}}"/>
+<script language="JavaScript">
+    set_radio($("#paper_form input[name='G51_A1']"), "{{answers.G51.0}}");
+    set_radio($("#paper_form input[name='G64']"), "{{answers.G64.0}}");
+	if ({{tran_perm}}){
+		$(':input:not([name$="__EN"])').attr('readonly',true);
+		$(':input[name$="__EN"]').attr('readonly',false);
+		$(':input[name^="input_"]').attr('readonly',false);
+		$(':input[name$="__open"]').attr('readonly',false);
+	    $(":radio").attr('disabled', 'disabled');
+	    $(":checkbox").attr('disabled', 'disabled');
+	}else{
+		$(':input[name$="__EN"]').attr('readonly',true);
+		$(':input:not([name$="__EN"])').attr('readonly',false);
+		if ({{manage_perm}}){
+			$(':input[name$="__EN"]').attr('readonly',false);
+		}
+	}
+	$(":radio").click(function () {
+	    var r = $(this).attr("name");
+	    $(":radio[name=" + r + "]:not(:checked)").attr("tag", 0);
+	    if ($(this).attr("tag") == 1) {
+	        $(this).attr("checked", false);
+	        $(this).attr("tag", 0);
+	    }
+	    else {
+	        $(this).attr("tag", 1);
+	    }
+	});
+</script>
+{% endblock %}

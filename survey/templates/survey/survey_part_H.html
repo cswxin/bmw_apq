@@ -1,0 +1,535 @@
+{% extends "survey/survey_base.html" %}
+{% block script %}
+<script language="javascript">
+    $(document).ready(function($){
+        $("#paper_form").submit(function(){
+            var theForm = this;
+            $(":radio").attr('disabled', false);
+	    	$(":checkbox").attr('disabled', false);
+			var question_list = ['H12','H15','H16','H17','H21','H27','H36','H43','H46','H47'];
+			for (var i = 0;i<question_list.length;i++){
+				var result = check_radio(theForm,question_list[i]);
+				if (!result){
+					return result;
+				}
+			}
+        });
+    });
+</script>
+{% endblock %}
+{% block content %}
+<table border="0" cellspacing="0" cellpadding="0" width="97%" style="margin:5px;">
+    <tbody>
+        <tr>
+            <td colspan="2" align="left" style="padding-left:20px;padding-top:10px;">
+                <div style="padding-bottom:10px;">
+                    <span style="padding-left:0px;" class="STYLE2">问卷编号：</span>
+                    {{answers.survey_code|default_if_none:''}}
+                </div>
+                <div class="news-box_service">
+                    <div class="news-box2_service">
+                        <div align="left" style="padding:10px;">
+                            <span class="STYLE1">与客人确认的几道问题</span>
+                        </div>
+                    </div>
+                </div>
+                <!--<hr width="98%" color="#00000" size=1>-->
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <br>
+                <table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;margin-top:10px;">
+                    <tbody>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>题号</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="24%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>考核点</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>是</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>否</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>不涉及</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="25%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>选择</strong>
+                                    <strong>“</strong>
+                                    <strong>否</strong>
+                                    <strong>/</strong>
+                                    <strong>不涉及</strong>
+                                    <strong>”</strong>
+                                    <strong>原因</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="17%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <strong>评估标准说明</strong>
+                                    <strong></strong>
+                                </p>
+                            </td>
+                            <td width="18%" bgcolor="#FFFFFF">
+                                <strong>操作注意事项</strong>
+                            </td>
+                        </tr>
+				        <tr>
+				          <td width="3%" bgcolor="#FFFFFF">H12.&nbsp;</td>
+				          <td width="24%" align="left" bgcolor="#FFFFFF"><p>服务顾问是否使用钥匙读取器读取钥匙信息并介绍CBS概念及提醒客人临近的保养项目？（适用于1999年9月以后的车系）</p></td>
+				          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="H12" value="A1">
+				          </p></td>
+				          <td width="3%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="H12" value="A2">
+				          </p></td>
+				          <td width="4%" bgcolor="#FFFFFF"><p align="center">
+				            <input type="radio" name="H12" value="A3">
+				          </p></td>
+				          <td width="28%" align="left" bgcolor="#FFFFFF">"否/不涉及"原因：<br>
+				            <input name="H12__open" type="text" class="input11" value="{% ifnotequal answers.H12.0 'A1' %}{{answers.H12.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+							<br>
+				            "否/不涉及"原因_EN：<br>
+				            <input name="H12__open__EN" type="text" class="input11" value="{% ifnotequal answers.H12.0 'A1' %}{{trans_contents.H12|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">			</td>
+				          <td width="18%" align="left" bgcolor="#FFFFFF"><strong>本题考核以下三点：</strong><br>
+						  a)服务顾问是否有用钥匙读取器读取钥匙信息的动作；<br>            
+				          b)服务顾问是否让客人看到了读取的钥匙信息（转动电脑屏幕，或者打印出来给客人看）；<br>
+						  c)服务顾问是否大致地把所有列出的车况保养信息与客户浏览介绍了一遍。<br>
+						  ▪	1999年9月以前的车，请选择 “不涉及”。<br>
+						  ▪	如满足条件的车辆，但SA未使用钥匙读取器，则为“否”。<br>
+						  如使用了钥匙读取器，请观察服务顾问是否转动他的电脑屏幕向客人展示钥匙读取的信息，如未向客人展示信息或有邻近的保养但是未提出，均算做“否”。<br>
+						  所有工作均要求服务顾问向客户展示电脑屏幕上的CBS数据信息（钥匙数据）,但只要求打印必要的保修和BSI项目。 (也可以为全部工作打印钥匙信息读取界面。)<br>
+						  服务顾问要向客户介绍宝马车有CBS功能，该功能可根据车辆使用情况向客户提示所需的保养信息。</td>
+						  <td width="18%" align="left" bgcolor="#FFFFFF">
+						  	▪	录像画面稳定<br>
+							▪	评估员一定不能离开车主<br>
+							▪	录音笔请放在车主身上<br>
+							切忌过分主动靠近查看屏幕信息
+						  </td>
+				        </tr>
+				        <tr>
+				            <td width="3%" bgcolor="#FFFFFF">H15.&nbsp;</td>
+				            <td width="24%" align="left" bgcolor="#FFFFFF">
+				                <p> 服务顾问是否提醒客人带走车内的贵重物品?</p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="H15" value="A1">
+				                </p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="H15" value="A2">
+				                </p>
+				            </td>
+				            <td width="5%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="H15" value="A3">
+				                </p>
+				            </td>
+				            <td width="25%" align="left" bgcolor="#FFFFFF">
+				                <p>
+				                    "否/不涉及"原因：<br>
+									<input name="H15__open" type="text" class="input11" value="{% ifnotequal answers.H15.0 'A1' %}{{answers.H15.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+				                    <br>
+				                    "否/不涉及"原因_EN：<br>
+									<input name="H15__open__EN" type="text" class="input11" value="{% ifnotequal answers.H15.0 'A1' %}{{trans_contents.H15|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+				                </p>
+				            </td>
+				            <td width="16%" align="left" bgcolor="#FFFFFF">
+				            	服务顾问必须在“检查车辆过程”中或是在“接车过程”（即B9-B23题这一时间段内）中的任何时候提醒客人带走车内的贵重物品.
+				            </td>
+				            <td width="19%" align="left" bgcolor="#FFFFFF">
+				            	请评估员考察服务顾问是否有提醒客人带走车内贵重物品的相关语言，并注意录音
+				            </td>
+				        </tr>
+				        <tr>
+				            <td width="3%" bgcolor="#FFFFFF">H16.&nbsp;</td>
+				            <td width="24%" align="left" bgcolor="#FFFFFF">
+				                <p> 服务顾问是否询问客人有无保留旧件的需要?</p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="H16" value="A1">
+				                </p>
+				            </td>
+				            <td width="4%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="H16" value="A2">
+				                </p>
+				            </td>
+				            <td width="5%" bgcolor="#FFFFFF">
+				                <p align="center">
+				                    <input type="radio" name="H16" value="A3">
+				                </p>
+				            </td>
+				            <td width="25%" align="left" bgcolor="#FFFFFF">
+				                <p>
+				                    "否/不涉及"原因：<br>
+									<input name="H16__open" type="text" class="input11" value="{% ifnotequal answers.H16.0 'A1' %}{{answers.H16.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+				                    <br>
+				                    "否/不涉及"原因_EN：<br>
+									<input name="H16__open__EN" type="text" class="input11" value="{% ifnotequal answers.H16.0 'A1' %}{{trans_contents.H16|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+				                </p>
+				            </td>
+				            <td width="16%" align="left" bgcolor="#FFFFFF">
+				            	服务顾问必须在“接车过程”（即B9-B23题这一时间段内）中提出此问题。
+				            </td>
+				            <td width="19%" align="left" bgcolor="#FFFFFF"></td>
+				        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                H17.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>是否正确获取客人姓名和地址信息并在有必要时更新数据库里的信息？ </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H17" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H17" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H17" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="H17__open" type="text" class="input11" value="{% ifnotequal answers.H17.0 'A1' %}{{answers.H17.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="H17__open__EN" type="text" class="input11" value="{% ifnotequal answers.H17.0 'A1' %}{{trans_contents.H17|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                当神秘顾客收到账单时所有的信息都必须正确。个人信息是正确的，答“是”，否则答“否”。
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+                                请在最后结账时，查看结账单上是否更新为预约时留下的神秘客的信息（手机号）。
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                H21.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    是否向客人介绍/解释预约快修通道和SRP项目?
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H21" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H21" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H21" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="H21__open" type="text" class="input11" value="{% ifnotequal answers.H21.0 'A1' %}{{answers.H21.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="H21__open__EN" type="text" class="input11" value="{% ifnotequal answers.H21.0 'A1' %}{{trans_contents.H21|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                1、预约快修通道和SRP项目两项都需要介绍； 
+                                <br>
+                                2、需要介绍这两个项目是什么，以及有什么好处。 
+                                <br>
+                                3、任何人向客人介绍这两个项目均可； 
+                                <br>
+                                4、以任何形式介绍均可，如口头介绍或给客人宣传单…
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+                                1、任何维修SRP项目的神秘顾客,在此次访问中要被告知什么是预约快修通道服务和SRP项目及其优势。服务顾问要主动介绍什么是预约快修通道和SRP项目。而且要大概向客人介绍两个项目的好处。
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                H27.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    维修结束后，服务顾问或服务顾问助理是否通知客人可来提车？ 
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H27" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H27" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H27" value="A3">
+                                </p>
+                            </td>
+                            <td width="25%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br><input name="H27__open" type="text" class="input11" value="{% ifnotequal answers.H27.0 'A1' %}{{answers.H27.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br><input name="H27__open__EN" type="text" class="input11" value="{% ifnotequal answers.H27.0 'A1' %}{{trans_contents.H27|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                1、应在承诺的完工时限前通知客人提车。 
+                                <br>
+                                2、如果由于客人原因没有及时接听到电话，而且未接来电的时间在之前承诺的时间以内，也算做“是”。
+                            </td>
+                            <td width="19%" align="left" bgcolor="#FFFFFF">
+                                请不要提前到服务顾问的桌前等待，先在休息区里等电话。
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                H36.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>服务顾问是否向维修SRP项目的客户解释车间已经检查并调整其车辆的胎压？</p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H36" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H36" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H36" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="H36__open" type="text" class="input11" value="{% ifnotequal answers.H36.0 'A1' %}{{answers.H36.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="H36__open__EN" type="text" class="input11" value="{% ifnotequal answers.H36.0 'A1' %}{{trans_contents.H36|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	规定必须为任何代有SRP工项的车辆检查胎压,且此胎压需要与门柱上的标示一致.<br>
+								在“提车过程”中客人需被告知已根据轮胎型号把其车辆的胎压调整到标准的范围之内。
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF"></td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                H43.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                	出纳人员是否向客人说出“谢谢”及“再见”?
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H43" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H43" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H43" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="H43__open" type="text" class="input11" value="{% ifnotequal answers.H43.0 'A1' %}{{answers.H43.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="H43__open__EN" type="text" class="input11" value="{% ifnotequal answers.H43.0 'A1' %}{{trans_contents.H43|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	出纳人员只需要说出与“谢谢”及“再见”意思相近的词语即可
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                H46.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                	在车辆交接过程中，服务顾问是否提醒/帮助客人调整座椅和后视镜位置？
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H46" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H46" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H46" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="H46__open" type="text" class="input11" value="{% ifnotequal answers.H46.0 'A1' %}{{answers.H46.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="H46__open__EN" type="text" class="input11" value="{% ifnotequal answers.H46.0 'A1' %}{{trans_contents.H46|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                            	在“提车过程”或“车辆交接过程”（指从D30-H46题这一时间段）中，服务顾问需要提醒客户检查座椅和后视镜的位置
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                            	评估员注意服务顾问需要有提醒客户检查座椅和后视镜这样类似的话语，并注意录音
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="3%" bgcolor="#FFFFFF">
+                                H47.&nbsp;
+                            </td>
+                            <td width="24%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    车辆是否清洗吸尘干净？ 
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H47" value="A1">
+                                </p>
+                            </td>
+                            <td width="4%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H47" value="A2">
+                                </p>
+                            </td>
+                            <td width="5%" bgcolor="#FFFFFF">
+                                <p align="center">
+                                    <input type="radio" name="H47" value="A3">
+                                </p>
+                            </td>
+                            <td width="31%" align="left" bgcolor="#FFFFFF">
+                                <p>
+                                    "否/不涉及"原因：<br>
+									<input name="H47__open" type="text" class="input11" value="{% ifnotequal answers.H47.0 'A1' %}{{answers.H47.1|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="250">
+                                    <br>
+                                    "否/不涉及"原因_EN：<br>
+									<input name="H47__open__EN" type="text" class="input11" value="{% ifnotequal answers.H47.0 'A1' %}{{trans_contents.H47|default_if_none:''}}{% endifnotequal %}" size="30" maxlength="500" readonly="" style="background-color:#E6E6E6;">
+                                </p>
+                            </td>
+                            <td width="13%" align="left" bgcolor="#FFFFFF">
+                                1、如果客人自己要求不洗车，则为未涉及。 
+                                <br>
+                                2、清洁考核标准： 
+                                <br>
+                                <li>
+                                    无油污印记 
+                                </li>
+                                <li>
+                                    吸尘车内地板和脚垫 
+                                </li>
+                                <li>
+                                    清洗和擦干车辆 
+                                </li>
+                                <li>
+                                    清理烟灰缸 
+                                </li>
+                                <li>
+                                    摘除所有塑料防护罩/纸制脚垫
+                                </li>
+                            </td>
+                            <td width="16%" align="left" bgcolor="#FFFFFF">
+                                1、外观必须清洁无污物，但是如大量的油污手印则视为不清洁。 
+                                <br>
+                                2、车内烟灰缸清洁，主要是无维修遗留下的手印，脚印，如果客人进店前车辆有需要特殊清洗剂或设备才能洗掉的污迹，则不算在考核范围内。
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<input type="hidden" name="p" value="G"/>
+<script language="JavaScript">
+    var form = document.getElementById('paper_form');
+	set_radio(form.H12, "{{answers.H12.0}}");
+	set_radio(form.H15, "{{answers.H15.0}}");
+	set_radio(form.H16, "{{answers.H16.0}}");
+	set_radio(form.H17, "{{answers.H17.0}}");
+	set_radio(form.H21, "{{answers.H21.0}}");
+	set_radio(form.H27, "{{answers.H27.0}}");
+	set_radio(form.H36, "{{answers.H36.0}}");
+	set_radio(form.H43, "{{answers.H43.0}}");
+    set_radio(form.H46, "{{answers.H46.0}}");
+    set_radio(form.H47, "{{answers.H47.0}}");
+	if ({{tran_perm}}){
+		$(':input:not([name$="__EN"])').attr('readonly',true);
+		$(':input[name$="__EN"]').attr('readonly',false);
+		$(':input[name^="input_"]').attr('readonly',false);
+		$(':input[name$="__open"]').attr('readonly',false);
+	    $(":radio").attr('disabled', 'disabled');
+	    $(":checkbox").attr('disabled', 'disabled');
+	}else{
+		$(':input[name$="__EN"]').attr('readonly',true);
+		$(':input:not([name$="__EN"])').attr('readonly',false);
+		if ({{manage_perm}}){
+			$(':input[name$="__EN"]').attr('readonly',false);
+		}
+	}
+</script>
+{% endblock %}
