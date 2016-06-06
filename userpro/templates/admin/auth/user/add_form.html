@@ -1,0 +1,32 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block form_top %}
+  {% if not is_popup %}
+    <p>{% trans "First, enter a username and password. Then, you'll be able to edit more user options." %}</p>
+  {% else %}
+    <p>{% trans "Enter a username and password." %}</p>
+  {% endif %}
+{% endblock %}
+
+{% block after_field_sets %}
+<script type="text/javascript">document.getElementById("id_username").focus();</script>
+{% endblock %}
+
+{% block after_related_objects %}
+<div style="padding-left:20px;padding-top:10px;">
+<span style="font-size:14px; font-weight:bold;">用户权限说明：
+    <br /><br />
+</span> 
+<span class="STYLE2"> </span>
+<li>在线数据录入：可以录入问卷，问卷初审前可以修改问卷(除翻译部分)，如果已经存在初审则不可以修改(除翻译部分)；只允许查看自己录入的问卷，且不能删除问卷<br><br></li>
+	<li>问卷初审：  不可以录入问卷，问卷最终审核前都可以修改问卷(除翻译部分)，即使已经存在其他初审也可以修改问卷(除翻译部分)；可以查看所有问卷，但不能删除问卷<br><br></li>
+	<li>QC审核：权限与"问卷初审"相同<br><br></li>
+	<li>区域经理审核：权限与"问卷初审"相同<br><br></li>
+	<li>终审确认：不可以录入问卷，最终审核前都可以修改问卷(除翻译部分)，即使已经存在其他初审也可以修改(除翻译部分)；可以查看所有问卷，但不能删除问卷<br><br></li>
+	<li>问卷翻译：不可以录入问卷，问卷最终审核前都可以修改(仅修改翻译部分)，即使已经存在初审也允许修改(仅修改翻译部分)；可以查看所有问卷，但不能删除问卷
+<br><br></li>
+	<li>问卷管理员：可以录入问卷、进行问卷的各种审核，任何时候均可修改和删除问卷<br><br></li>
+    
+</div>
+{% endblock %}
