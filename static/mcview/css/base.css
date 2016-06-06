@@ -1,0 +1,364 @@
+@charset "utf-8";
+/* CSS Document */
+
+html,body {height:100%;}
+
+body,form,menu,div,fieldset,blockquote,p,pre,ul,ol,dl,dd,h1,h2,h3,h4,h5,h6 {padding:0;margin:0; color:#666;}
+div,p {display:block;}
+ul,ol,dl {list-style:none;}
+img {border:0;}
+a{text-decoration:none;color:#454545;}
+a:hover{color:#003299;}
+button {cursor:pointer;}
+
+.c{ clear:both;}
+.loginbody{ background:url("/static/mcview/images/bg01.gif") repeat-x left top !important;}
+.bgstyle{ background:url("/static/mcview/images/bg01.gif") repeat-x left top !important;}
+.login {background: url("/static/mcview/images/loginBg.jpg") no-repeat scroll 0 0 transparent;height: 447px;margin: 0 auto;padding: 165px 0 0 458px;}
+.login .input {border: 1px solid #48615B;height: 14px;padding: 5px;width: 165px;margin-bottom:10px;}
+.login .verifycode {padding: 5px;width: 98px;float:left;}
+.login .vcodeimg {float:left;}
+.login .vcode {margin-top:-15px;}
+.errormsg {font-size:12px;color:#ff0000;}
+.forgot .tip{text-align:center;}
+
+.topBg{ background:url(/static/mcview/images/top.jpg) no-repeat center top; width:1002px; margin:0 auto; position:relative; }
+.loginbody .topBg{ background:none;width:1002px; margin:0 auto; position:relative; }
+.logo{position:absolute;left: 799px;top: -1px;}
+.menu{ clear:both; padding:175px 0 0 0; position:relative;}
+.menu p{padding:8px 0 10px;position:absolute;left: 728px;top: 135px;font-size:12px;}
+.menu p a{ color:#003299;font: normal 12px "Arial",sans-serif;}
+.menu p a:hover{ text-decoration:underline;}
+.menu ul{ padding-left:21px; }
+.menu li{ background:#808080; float:left; text-align:left; margin-right:12px;margin-top: 5px; width:149px; }
+.menu li a{color:#fff; font: bolder 12px Arial; padding:5px 14px; display:block;}
+.menu li a:hover{ background:#003299;color:#fff;}
+.menu ul li .ad{ background:#003299;}
+.main01{ clear:both; margin:12px auto 21px auto; width:954px; border:1px solid #ccc; background:#fff; text-align: left; }
+.main01 h3{ background:#666 url(/static/mcview/images/icon01.gif) no-repeat 7px 11px; font: 14px "Arial",sans-serif; padding:9px 0 10px 32px; color:#fff;}
+.main01 h3 strong{ font-weight:bolder; font-size:14px;}
+.main01 h3 span{ float:right; margin-right:15px;}
+.main01 .box{padding:8px 16px 16px; font-size:12px;}
+.main01 .box h5{ clear:both; display:block; font:bolder 14px Arial; padding:10px 0 15px 10px; color:#333;}
+
+.main02{ padding:20px 0 0 10px;}
+.main02L{float:left;width:128px;border:solid #ccc;border-width:1px 0 0 1px;}
+.main02L td{border:solid #ccc; border-width:0 1px 1px 0; padding:5px 10px; font:normal 12px/14px Arial;}
+.main02L td strong{font-weight:bolder;}
+.main02L td.td01{ background:#f2f2f2;height: 95px;}
+
+.main02R{float:left;width:780px; height:360px;border:solid #ccc;border-width:1px 0 0 0px;overflow: auto;
+scrollbar-3dlight-color:#98d3e1; /*- 最外左 -*/
+scrollbar-highlight-color:#caffff; /*- 左二 -*/
+scrollbar-face-color:#dbeef2; /*- 面子 -*/
+scrollbar-arrow-color:#333; /*- 箭头 -*/
+scrollbar-shadow-color:#caffff; /*- 右二 -*/
+scrollbar-darkshadow-color:#98d3e1; /*- 右一 -*/
+scrollbar-base-color:#bae7ff; /*- 基色 -*/
+scrollbar-track-color:#f7f7f7;/*- 滑道 -*/}
+.main02R tr.td01{ background:#f2f2f2;font:normal 12px/14px Arial;height:47.5px;}
+.main02R .mainTable td{}
+.main02R .mainTable td.td02{ padding:0;}
+.main02R .mainTable01 td{border:solid #ccc; border-width:0 1px 1px 0;  padding:5px 10px; font:normal 12px/14px Arial;}
+.main02R .mainTable02 td{border:solid #ccc; border-width:0 1px 1px 0;  padding:5px 10px; font:normal 12px/14px Arial;}
+
+.main02R td strong{font-weight:bolder;}
+
+.box02{ border:1px solid #ccc; background:#f7f7f7; padding:10px;}
+.main03{ padding:10px 0 0 39px; height:83px;}
+.main03 li{ float:left; width:365px; padding:5px 0;}
+.main03 li img{ margin-right:8px; }
+
+
+.containerL{ float:left; width:446px; }
+.containerW li{ width:946px; font:normal 14px/24px Arial;color:#666; background:url(/static/mcview/images/icon02.gif) no-repeat 0 15px; padding:3px 0 3px 13px; }
+.containerL table{ font:normal 14px/24px Arial; color:#666;padding:8px 0;}
+.containerL p{ font:normal 14px/24px Arial; color:#666;padding:8px 0;}
+.containerR p{ font:normal 14px/24px Arial; color:#666;} 
+.containerR{ float:right; width:426px; border-left:1px solid #999; padding:0 0 0 25px; margin-top:8px;}
+.containerR h5{ font:normal 14px/24px Arial;color:#666; padding:0px 0 6px 0;}
+.containerR h5 strong{font:bolder 14px/24px Arial; color:#666;}
+.containerR li{ font:normal 14px/24px Arial;color:#666; background:url(/static/mcview/images/icon02.gif) no-repeat 0 15px; padding:3px 0 3px 13px; }
+
+.forgot{ width:400px; margin:0 auto; clear:both; padding:50px 0 150px;font: normal 12px "Arial",sans-serif;}
+.forgot h3{ background:url(/static/mcview/images/ion_Vertical.gif) no-repeat; font:bolder 14px Arial; padding:0 0 10px 17px; margin-bottom:15px; border-bottom:1px dashed #eee;}
+.forgot p{ padding:6px 0; clear:both;}
+.forgot strong{ width:100px; padding-top:7px; text-align:right; display:block; float:left;}
+.forgot span{ width:300px; text-align:left; display:block; float:left;}
+.forgot span.span{ font: bolder 16px "宋体"; padding-top:2px;}
+.forgot .in{ color:#fff; border:none; font-weight:bolder; padding:3px 0 0 0; background:url(/static/mcview/images/btuBg.gif) no-repeat; width:56px; height:25px;}
+.forgot .in01{ height:20px; width:160px; padding:2px 0 0 2px;border:1px  solid #48615b;}
+
+.mapbox{position:static;}
+#map{ position:relative; height:409px; width:789px; margin:8px auto 0;}
+.mapRegional{position:absolute;width: 267px;height: 31px;}
+.mapRegional a{ font:normal 12px Arial;}
+.mapRegional a:hover{ font:bolder 14px Arial;}
+
+.mapeast{margin-left: 654px; margin-top: -190px;}
+.mapsouth{margin-left: 655px; margin-top: -70px;}
+.mapwest{margin-left: 16px; margin-top: -210px;}
+.mapnorth{margin-left: 654px; margin-top: -325px;}
+
+
+.select{ float:left; width:377px;}
+.selectMain{ padding:8px 0; clear:both;}
+
+.select01{ width:377px;border:1px solid #ccc; font-family:Arial, Helvetica, sans-serif; line-height:30px; padding:5px;}
+.select01 option{ }
+
+.selectH{height: 100px;}
+.CK{float:left;margin-left: 10px; width: 620px !important; height: 200px;}
+.FL{float:left;margin-left: 10px; width: 220px !important;}
+.FR{float:left;margin-left: 50px; width: 220px !important;}
+.search{margin-left: 50px;}
+
+.selectMainInL{ float:left; width:170px;border:1px solid #ccc;height:25px; padding:5px; line-height:14px; font-family:Arial, Helvetica, sans-serif;}
+
+.selectMainInL strong{ font-weight:bolder;}
+
+.selectMainInR{ float:left; width:45px;cursor:pointer;}
+
+.arrow{ float:left; padding:55px  23px 0;}
+.arrow02{ float:left; padding:0px  23px 0;}
+
+/*.forms{ float:left; width:592px;}*/
+.forms{width:442px;font: normal 12px "Arial",sans-serif; }
+.forms02{ float:left; width:235px;}
+.forms table,
+.forms02 table,
+.forms05 table{border:solid #ccc; border-width:1px 0 0 1px;}
+.forms td,
+.forms02 td,
+.forms05 td{border:solid #ccc; border-width:0 1px 1px 0; padding:5px 10px; font:normal 12px/14px Arial;}
+.forms td a{color:#003299;}
+.forms td a:hover{color:#003299; text-decoration:underline;}
+.forms td .div{position:relative;}
+.forms td strong,
+.forms02 td strong,
+.forms05 td strong{font-weight:bolder;}
+.forms tr.td01,
+.forms td.td01,
+.forms02 tr.td01,
+.forms02 td.td01,
+.forms05 tr.td01,
+.forms05 td.td01{ background:#f2f2f2;}
+.forms td.td03,
+.forms02 td.td03{ background:#d8ddff;}
+.forms td.td02,
+.forms02 td.td02,
+.forms05 td.td02{ border-bottom:none;}
+.tu{position:absolute;left: 110px;top: 8px;}
+
+.makingcomparison{ text-align:right; padding:20px 0;}
+
+.basicscoreL{ float:left; width:611px; padding-left:10px;font-weight:bold}
+.basicscoreR{ float:left; background:url(../imgages/icon10.gif) no-repeat 0 4px; padding-left:15px;}
+.basicscoreR a{ color:#003299;}
+.basicscoreR a:hover{ text-decoration:underline;}
+
+.download{cursor:pointer;}
+.hisdownland input {margin-bottom:15px;}
+#DivQuestion a {color:#003299;}
+#DivQuestion a:hover{ text-decoration:underline;}
+
+#example td,th{
+			height:30px;
+			white-space: nowrap;
+			border-style:solid;
+			border-width:0 1px 1px 0;
+			border-color: #CCCCCC; 
+			word-wrap:normal;
+}
+#example thead td, th{
+			background: #E6E6E6;
+}
+#example td{
+			text-align: left;
+}
+
+.tdBc td,th{
+			height:30px;
+			white-space: nowrap;
+			word-wrap:normal;
+			border-style:solid;
+			border-width:0 1px 1px 0;
+			border-color: #CCCCCC; 
+}
+.tdBc thead td, th{
+			background: #E6E6E6 !important;
+}
+.dataContent{
+	width: 98%;
+	overflow-x: auto;
+	overflow-y:hidden; 
+	margin-top: 10px; 
+	position: relative; 
+	margin:0 auto;
+} 
+		
+#mask_e2{float:right;}
+#mask_e{float:left;}
+/* 除IE6浏览器的通用方法 */
+#mask_L{display:none;position:fixed;left:0;top:0}
+#mask_R{display:none;position:fixed;right:0;top:0}
+/* IE6浏览器的特有方法 */
+/* 修正IE6振动bug */
+* html, * html body{
+background-image:url(about:blank);
+background-attachment:fixed;
+}
+* html .fixedHeader{
+position:absolute;
+left:expression(eval(document.documentElement.scrollLeft)) !important;
+top:expression(eval(document.body.scrollTop)) !important;
+}	
+* html #mask_L{
+position:absolute;
+left:0;
+top:expression(eval(document.body.scrollTop)) !important;
+}
+* html #mask_R{
+position:absolute;
+right:0;
+top:expression(eval(document.body.scrollTop)) !important;
+}
+.return_back{
+  bottom: 20px;
+  left: 50%;
+  margin-left: 480px;
+  position: fixed;
+  z-index: 1000;
+}
+
+* html .return_back{
+position: absolute;
+top:expression(eval(document.documentElement.scrollTop+document.documentElement.clientHeight-this.offsetHeight-(parseInt(this.currentStyle.marginTop,10)||0)-(parseInt(this.currentStyle.marginBottom,10)||0)));
+}	
+
+#return_back_bg {
+  background-color: #aaa;
+  clear: both;
+  cursor: pointer;
+  text-align: center;
+  width: 23px;
+}
+
+#go_up {
+	clear: both;
+	cursor: pointer;
+	text-align: center;
+}
+
+#go_up a {
+	display: block;
+	width:23px;
+	height:23px;
+	background:url("/static/mcview/images/returnback.gif");
+	background-repeat:no-repeat;
+	background-position:0 -207px;
+}
+
+#go_up a:hover {
+	background-position:0 -230px;
+}
+
+#go_up a:active {
+	background-position:0 -253px;
+}
+
+#go_down {
+	clear: both;
+	cursor: pointer;
+	text-align: center;
+}
+
+#go_down a {
+	display: block;
+	width:23px;
+	height:23px;
+	background:url("/static/mcview/images/returnback.gif");
+	background-repeat:no-repeat;
+	background-position:0 -276px;
+}
+
+#go_down a:hover {
+	background-position:0 -299px;
+}
+
+#go_down a:active {
+	background-position:0 -322px;
+}
+
+
+#go_left {
+	clear: both;
+	cursor: pointer;
+	text-align: center;
+}
+
+#go_left a {
+	display: block;
+	width:23px;
+	height:23px;
+	background:url("/static/mcview/images/returnback.gif");
+	background-repeat:no-repeat;
+	background-position:0 -69px;
+}
+
+#go_left a:hover {
+	background-position:0 -92px;
+}
+
+#go_left a:active {
+	background-position:0 -115px;
+}
+
+#go_right {
+	clear: both;
+	cursor: pointer;
+	text-align: center;
+}
+
+#go_right a {
+	display: block;
+	width:23px;
+	height:23px;
+	background:url("/static/mcview/images/returnback.gif");
+	background-repeat:no-repeat;
+	background-position:0 0;
+}
+
+#go_right a:hover {
+	background-position:0 -23px;
+}
+
+#go_right a:active {
+	background-position:0 -46px;
+}
+
+#go_back a {
+	display: block;
+	width:23px;
+	height:23px;
+	background:url("/static/mcview/images/returnback.gif");
+	background-repeat:no-repeat;
+	background-position:0 -138px;
+}
+
+#go_back a:hover {
+	background-position:0 -161px;
+}
+
+#go_back a:active {
+	background-position:0 -184px;
+}
+.return_back_bg a:link, .return_back_bg a:visited, .return_back_bg a:hover, .return_back_bg a:active {color:#fff;}
+
+.button{ color:#fff; border:none; font-weight:bolder; padding: 4px 0; background:url(/static/mcview/images/button56.gif) no-repeat;display: block;width:56px; height:25px;}
+.loginbutton{ color:#fff; border:none; font-weight:bolder; padding: 4px 0; background:url(/static/mcview/images/loginbutton.gif) no-repeat;display: block;width:96px; height:25px;}
+.left {float: left;}
+.right {float: right;}
+.dataTables_wrapper{
+	margin-top: 10px;
+}
