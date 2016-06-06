@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/jquery.dataTables.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/FixedColumns.js"></script>
+{% endblock %}
+
+{% block body %}
+  <div class="main01">
+    <h3><strong>进店人数数据对比</strong>&nbsp;&nbsp;&nbsp;No. of visitor Data Comparison</h3>
+    <div class="box"> 
+		<form id="filterform" action="{% url DealerReport/ajaxvisitorfilter %}" method="post">
+			{% csrf_token %}
+		<div class="selectMain">
+          <select name="Term" size="1" class="select01 FL">
+            <option value="">选择期次please select term</option>
+            {% for term in terms %}
+            <option value="{{term.id}}">{{term.name_cn}}</option>
+            {% endfor %}
+          </select>
+          <select name="Wave" size="1" class="select01 FR">
+			<option value="">选择品牌 please select wave</option>
+			{% for type in dealertypes %}
+			<option value="{{type.id}}">{{type.name_cn}}</option>
+			{% endfor %}
+        </select>
+        <img class="search" src="/static/mcview/images/butSearch.gif" width="100" height="30" onclick="return ajaxFilter($('#filterform'),'filter_result');" style="cursor:pointer;"/>
+        </div>
+		</form>
+    </div>
+    <center><div id="filter_result" style="width: 98%;overflow: auto;"></div></center>
+    <br>
+  </div>
+{% endblock %}

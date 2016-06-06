@@ -1,0 +1,82 @@
+{% extends "admin/base_site.html" %}
+{% load adminmedia admin_list i18n %}
+
+{% block breadcrumbs %}
+<script type="text/javascript" src="/admin/jsi18n/"></script>
+<script type="text/javascript" src="/media/js/core.js"></script>
+  <script type="text/javascript" src="/media/js/calendar.js"></script>
+  <script type="text/javascript" src="/media/js/admin/DateTimeShortcuts.js"></script>
+  <script type="text/javascript">
+  </script>
+  <div class="breadcrumbs">
+    <a href="/admin">
+        首页
+    </a>
+     &rsaquo; 
+    <a href="/admin/mc">
+        Mc
+    </a>
+    &rsaquo; 
+    <a href="/admin/mc/paper">
+        问卷列表
+    </a>
+    &rsaquo;
+        高级功能
+  </div>
+{% endblock %}
+
+{% block content %}
+<p style="color: red;">
+	此页面所有功能，务必等待前1个操作完成后，再继续操作！
+</p>
+<p>
+    1. <a  href="/aggregatereport" class="addlink">
+      统计2011-2012年区域、小区、省份、城市、集团、品牌得分; 统计2012年访问员、进店人数、新老店得分
+      <span style="color: red;" >注: 此功能仅在每期数据最终完成时运行.(由于统计量大, 很费时...)</span>
+    </a>
+    </p>
+    <p> 
+    2. {{cur_term.name_cn}} 翻译导出
+    <br />
+    <a href="/trans_export_all" class="addlink">
+    	{{cur_term.name_cn}}导出翻译所有的题目
+    </a>
+    <br/>
+    <a href="/trans_export_need" class="addlink">
+    	{{cur_term.name_cn}}导出需要翻译的题目
+    </a>
+    <br/>
+    </p>
+    <p>
+    	3. {{cur_term.name_cn}} 翻译导入
+    	<br>
+    <form method="post" action="/trans_import/" enctype="multipart/form-data">  
+    	{% csrf_token %}
+		<div style="padding-left: 20px;" align="left"id="upload">
+		    <span>翻译好的EXCEL</span>
+		    <span style="color: red;">(注:此Excel只能是翻译导出的EXCEL格式)</span>
+		    <br><input type="file" name="file" /><br>
+		    <input type="submit" value="上传翻译"/>
+		    <label id="return" style="color:red">{{label}}</label>
+		</div>
+	</form>
+    </p>
+    
+    <p>4. 原始数据大表
+    	<br/>
+    	{%for term in terms_2012%}
+	    	<a href="/orignial_export/{{term.id}}" class="addlink">导出{{term.name_cn}}原始数据大表(含否选项)</a>
+	    	<br/>
+    	{%endfor%}
+    </p>
+    <p>5. 得分数据大表
+    	<br/>
+    	{%for term in terms_2012%}
+    	 <a href="/score_export/{{term.id}}" class="addlink">导出{{term.name_cn}}得分数据大表 </a>
+    	 <br />
+    	 {%endfor%}
+    </p>
+    
+    
+    
+{% endblock %}

@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+
+<script type="text/javascript" src="/static/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+<script type="text/javascript">
+$(document).ready(function (){
+	$('.verifycode').keydown(enter_submit);
+});
+</script>
+<link rel="stylesheet" href="/static/mcview/css/base.css" type="text/css" />
+<title>{{ project_title }}</title>
+</head>
+
+<<<<<<< local
+<<<<<<< local
+=======
+>>>>>>> other
+<body class="loginbody">
+<<<<<<< local
+<div class="topBg" style="border:1px #59d solid;">
+=======
+<body>
+<div class="topBg">
+>>>>>>> other
+=======
+<div class="topBg" style="border:1px #59d solid">
+>>>>>>> other
+	<form action='' method=post name="loginForm">
+	{% csrf_token %}
+	<div class="login">
+	<input name="username" type="text" class="input" value="{{username}}" /><br>
+	<input name="password" type="password" class="input" value="{{password}}"/><br>
+	<span class="vcode">
+		<input name="VerifyCode" type="text" class="input verifycode"  maxlength=4 />
+		<input name="fstamp" type="hidden" value="{{register_pic}}"/>
+		<img src="{{register_pic}}" class="vcodeimg">
+	</span><br><br>
+	{% if errormsg %}
+	<span class="errormsg">{{errormsg}}</span><br>
+	{% endif %}
+	<input name="button" type="button" class="loginbutton" id="loginbutton" value="Login" onclick="javascript:form_onsubmit(loginForm);"/>
+	</div>
+	</form>
+</div>
+</body>
+</html>

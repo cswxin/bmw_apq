@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/js/jquery-ui-1.8.9.custom.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/jquery.dataTables.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/ZeroClipboard.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/TableTools.js"></script>
+{% endblock %}
+{% block css %}
+	<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+	<link rel="stylesheet" href="/static/data_table/css/demo_table_smk.css" type="text/css" />
+	<link rel="stylesheet" href="/static/data_table/css/TableTools.css" type="text/css" />
+{% endblock %}
+{% block doc_ready %}
+function _int(t){return parseInt(t);}  //将字符串转为int
+$(document).ready( function () {
+				$('#example').dataTable( {
+					"sDom": 'T<"clear">lfrtip',
+					"bJQueryUI": true,
+					"oTableTools": {
+						"aButtons": [
+							"copy",
+						]
+					},
+					"sScrollX": "100%",
+<<<<<<< local
+					"bPaginate": false
+=======
+					"bPaginate": false,
+>>>>>>> other
+					"oLanguage":{
+						"sUrl": "/static/data_table/cn/jquery.dataTable.cn.txt"
+					}
+				} );
+			} );
+{% endblock %}
+{% block body %}
+ 
+<div class="main01">
+	<h3><strong>经销商登陆查�</strong>&nbsp;&nbsp;&nbsp; Dealer Login&nbsp;&nbsp;&nbsp; {{current_term.name}}</h3>
+    <div class="box forms05">
+    	<div class="box" style="width: 98%;">
+		<table cellpadding="0" cellspacing="0" border="0" class="display" id="example" width="100%" style="text-align: center;">
+			<thead>
+				<tr>
+					<th width="30%"><strong>经销�/strong><br/>Dealer</th>
+					<th width="20%"><strong>经销商ID</strong><br/>Dealer ID</th>
+					<th width="20%"><strong>登录次数</strong><br/>Login Times </th>
+					<th width="30%"><strong>最后登录时�/strong><br/>Last Login Time </th>
+				</th>
+			</thead>
+			<tbody>
+				 
+			</tbody>
+		</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	
+	       var trs = "";
+           var dealer_infos = "";
+           dealer_infos ='{{dealer_login_info}}';
+           dealer_info = dealer_infos.replace(/(u&#39;)|(&#39;)|(datetime.datetime\()/g,'"');  
+           dealer_info = dealer_info.replace(/(\()/g,'[');
+           dealer_info = dealer_info.replace(/(\)\))/g,'"]');
+           
+           dealer_info =eval(dealer_info);               
+           var len = dealer_info.length;
+           
+           if(len>0){
+           	 for(var i=0;i<len;i++){
+           	 	var date = dealer_info[i][3].split(",");                  
+           	 	var time = new Date(_int(date[0]),_int(date[1]),_int(date[2]),_int(date[3]),_int(date[4]),_int(date[5]));
+           	 	trs +="<tr><td width='30%'>"+dealer_info[i][0]+"</td><td width='20%'>"+dealer_info[i][1]+"</td><td width='20%'>"+dealer_info[i][2]+"</td><td width='30%'>"+time.toLocaleString()+"</td></tr>";
+           	 }
+           }
+           $("tbody").empty().append(trs);
+</script>
+ 
+{% endblock %}
+			
+			

@@ -1,0 +1,13 @@
+{% extends "admin/change_list.html" %}
+{% load admin_list i18n %}
+
+{% block content_title %}{% if title %}<h1>问题差异</h1>{% endif %}{% endblock %}
+{% block object-tools %}
+{% endblock %}
+
+{% block search %}
+{% search_form cl %}
+<div class="jqmWindow" id="desc_dialog">
+</div>
+
+{% endblock %}

@@ -1,0 +1,106 @@
+<script type="text/javascript">
+
+$(document).ready(function(){
+	$('#go_left').css("display","block");
+	$('#go_right').css("display","block");
+	var oTable = $('#example').dataTable({
+		"sDom": 'T<"clear">lifrtp',
+		"oTableTools": {
+				"aButtons": [
+					"copy", "xls"
+				]
+			},
+		"bFilter" : true,
+		"bJQueryUI": true,
+		'bPaginate': false,
+		"bProcessing": true,
+		"sPaginationType": "full_numbers",
+		"aoColumnDefs": [       { "bSortable": false, "aTargets": [ 0 ] }    ],
+		"aaSorting": [[ 2, "desc" ]]
+	}); 
+	$("thead th").each( function ( i ) {
+		if(i>=1){
+			$(this).css('width','');
+		}
+		})
+	$('#example tr').click( function() {
+	        $(this).toggleClass('row_selected');
+	} );
+	oTable.$('td').hover( function() {
+        var iCol = $('td', this.parentNode).index(this) % 17;
+        $('td:nth-child('+(iCol+1)+')', oTable.$('tr')).addClass( 'highlighted' );
+    }, function() {
+        oTable.$('td.highlighted').removeClass('highlighted');
+    } );
+});
+
+$("#checkall").click(
+	function(){
+		$("input[name='item']").attr("checked",$(this).attr("checked"));
+	}
+)
+function compareItems(){
+	select = $("input[name='item']");
+	count = 0;
+	for (var i=0; i < select.length; i++) {
+		if(select[i].checked){
+			count++;
+		}
+	}
+	if(count<2){
+		alert("请至少选择2个区域\n\rplease select 2 at least");
+	}else{
+		$("#item_compare").submit();
+	}
+}
+</script>
+<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+<link rel="stylesheet" href="/static/data_table/css/demo_table_smk.css" type="text/css" />
+<form name="item_compare" id="item_compare" action="/DealerReport/itemscompare" method="post"  target="_blank">
+{% csrf_token %}
+<input type="hidden" name="project" value="{{project_id}}" />
+<input type="hidden" name="kind" value="{{kind}}" />
+<table cellpadding="0" cellspacing="0" border="0"  id="example" class="display tdBc" style="font-size:13px;border-left:1px #ccc solid;">
+	<thead>
+	<tr>
+		<th width="20px"><input type="checkbox"  class="action-select" id="checkall" /></th>
+		<th><strong> 大区</strong><br>Region</th>
+		<th><strong> {{item_name}}</strong><br>{{item_name_en}}</th>
+		<th><strong>历史/现在/未来数据</strong><br>History & Current & Future Data</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for rep in reports %}
+		<tr>
+			<td>
+				{% if rep.ready%}
+				<input type="checkbox" name="item" value="{{rep.id}}" />
+				{% endif %}
+				</td>
+			<td>{{rep.dealer.name_cn}}
+			<br>{{rep.dealer.name_en}}</td>
+			<td>{{rep.dealertype.name_cn}}  
+			<br>{{rep.dealertype.name_en}}</td>
+			
+			
+			<td>{% if rep.ready%}
+				<a href="/DealerReport/HNFTrendReport/{{kind}}/{{rep.id}}" target="_blank">点击查看数据<br>Click here for data</a>
+				{% else %}
+				-
+				{% endif %}
+				</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+	<div class="selectMain selectH " style="height: 200px">
+          <select name="cplist" class="select01 CK" multiple="multiple">
+            <option value="all" selected="selected">全部</option>
+            {% for cp in cp_list %}
+            <option value="{{cp.name}}">{{cp.name_abbr}}. {{cp.desc}} {{cp.desc_en}}</option>
+            {% endfor %}
+          </select>
+	<img class="makingcomparison" src="/static/mcview/images/butPK.gif" width="182" height="43" onclick="javascript:compareItems();" style="cursor:pointer;"/>
+    </div>
+<br>
+</form>

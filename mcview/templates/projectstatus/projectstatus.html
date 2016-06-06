@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block body %}
+  <div class="main01">
+    <h3><strong>全国执行进度</strong>&nbsp;&nbsp;&nbsp; National Fieldwork Status &nbsp;&nbsp;&nbsp; {{current_term.name}}</h3>
+    <div class="box forms05">
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
+			<tr>
+				<td></td>
+				<td>总体样本量<br>Sample Size</td>
+				<td>已完成样本量<br>Completed Sample</td>
+				<td>未完成样本量<br>Un-finished Sample</td>
+				<td>完成率<br>Fulfillment Ratio(%)</td>
+			</tr>
+			{% for dealer_type in dealertypes %}
+			<tr>
+				<td><strong>{{dealer_type.name_cn}}经销店</strong><br>{{dealer_type.name_en}}  Dealer Shop</td>
+				<td>{{dealer_type.sum_data.total}}</td>
+				<td>{{dealer_type.sum_data.done}}</td>
+				<td>{{dealer_type.sum_data.remain}}</td>
+				<td>{{dealer_type.sum_data.percent|floatformat:1}}%</td>
+			</tr>			
+			{% endfor %}
+		</table>
+    </div>
+  </div>
+  
+  
+  <div class="main01">
+    <h3><strong>区域执行进度</strong>&nbsp;&nbsp;&nbsp; Regional Fieldwork Status&nbsp;&nbsp;&nbsp; {{current_term.name}}</h3>
+    <div class="box forms05">
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
+			<tr>
+				<td></td>
+				<td>总体样本量<br>Sample Size</td>
+				<td>已完成样本量<br>Completed Sample</td>
+				<td>未完成样本量<br>Un-finished Sample</td>
+				<td>完成率<br>Fulfillment Ratio(%)</td>
+			</tr>
+			{% for region in region_list %}
+			<tr>
+				<td><strong>{{region.name}}</strong></td>
+				<td>{{region.sum_data.total}}</td>
+				<td>{{region.sum_data.done}}</td>
+				<td>{{region.sum_data.remain}}</td>
+				<td>{{region.sum_data.percent|floatformat:1}}%</td>
+			</tr>			
+			{% endfor %}
+		</table>
+	</div>
+  </div>
+  
+	<div class="main01">
+		<h3><strong>本期单店执行情况汇总</strong>&nbsp;&nbsp;&nbsp;Current Wave Detailed Fieldwork Status&nbsp;&nbsp;&nbsp; {{current_term.name}}</h3>
+			<div class="box">
+				<div class="forms" style="width:920px;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tbody>
+							<tr class="td01">
+								<td width="7%"><strong>序号</strong><br />No</td>
+								<td width="9%"><strong>经销商代码</strong><br />Dealer No. (CBU)</td>
+								<td width="7%"><strong>城市</strong><br />City </td>
+								<td width="7%"><strong>省份</strong><br />Province </td>
+								<td width="22%"><strong>经销商名称</strong><br />Aftersales Company Name</td>
+								<td width="17%"><strong>经销商邮箱</strong><br />Dealer Email</td>
+								<td width="13%"><strong>访问日期</strong><br />Visit date</td>
+								<td width:="7"><strong>得分</strong><br />Score</td>
+								<td width="15%"><strong>查看报告</strong><br />Check for report</td>
+							</tr>
+							{% for dealer in dealer_list_bm %}
+							<tr>
+								<td>{{forloop.counter}}</td>
+								<td>{{dealer.name}}</td>
+								<td>{{dealer.city_cn}}<br>{{dealer.city_en}}</td>
+								<td>{{dealer.province_cn}}<br>{{dealer.province_en}}</td>
+								<td>{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+								<td>
+									<div class="div">{{dealer.paper_status}}
+										<div class="tu" style="padding-left:5px;">
+											<img src="/static/mcview/images/{% ifequal dealer.p_status 0 %}iconRed.gif{% else %}{% if dealer.report_ready %}iconGreen.gif{% else %}iconYellow.gif{% endif %}{% endifequal %}" width="11" height="11">
+										</div>
+									</div>
+								</td>
+								<td>{{dealer.visite_date|date|default:"&nbsp;"}}</td>
+								<td>{{dealer.score|floatformat:2}}</td>
+								<td>
+								{% if dealer.report_ready %}
+								<a href="/DetailDealerReport/{{dealer.paperid}}/">
+								点击查看报告<br />click here for report
+								</a>
+								{% else %}
+								报告未生成<br />report not available now
+								{% endif %}
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			<div class="c"></div>
+			</div>
+		<div class="c"></div>
+	</div>
+	
+	
+	<div class="main01">
+		<h3><strong>本期竞品执行情况汇总</strong>&nbsp;&nbsp;&nbsp;Current Wave Detailed Fieldwork Status&nbsp;&nbsp;&nbsp; {{current_term.name}}</h3>
+			<div class="box">
+				<div class="forms" style="width:920px;">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tbody>
+							<tr class="td01">
+								<td width="7%"><strong>序号</strong><br />No</td>
+								<td width="9%"><strong>经销商代码</strong><br />Dealer No. (CBU)</td>
+								<td width="7%"><strong>城市</strong><br />City </td>
+								<td width="7%"><strong>省份</strong><br />Province </td>
+								<td width="22%"><strong>经销商名称</strong><br />Aftersales Company Name</td>
+								<td width="17%"><strong>访问状态</strong><br />Fieldwork Status</td>
+								<td width="10%"><strong>访问日期</strong><br />Visit date</td>
+								<td width:="7"><strong>得分</strong><br />Score</td>
+								<td width="18%"><strong>查看报告</strong><br />Check for report</td>
+							</tr>
+							{% for dealer in dealer_list_other %}
+							<tr>
+								<td>{{forloop.counter}}</td>
+								<td>{{dealer.name}}</td>
+								<td>{{dealer.city_cn}}<br>{{dealer.city_en}}</td>
+								<td>{{dealer.province_cn}}<br>{{dealer.province_en}}</td>
+								<td>{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+								<td>
+									<div class="div">{{dealer.paper_status}}
+										<div class="tu" style="padding-left:5px;">
+											<img src="/static/mcview/images/{% ifequal dealer.p_status 0 %}iconRed.gif{% else %}{% if dealer.report_ready %}iconGreen.gif{% else %}iconYellow.gif{% endif %}{% endifequal %}" width="11" height="11">
+										</div>
+									</div>
+								</td>
+								<td>{{dealer.visite_date|date|default:"&nbsp;"}}</td>
+								<td>{{dealer.score|floatformat:2}}</td>
+								<td>
+								{% if dealer.report_ready %}
+								<a href="/DetailDealerReport/{{dealer.paperid}}/">
+								点击查看报告<br />click here for report
+								</a>
+								{% else %}
+								报告未生成<br />report not available now
+								{% endif %}
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			<div class="c"></div>
+			</div>
+		<div class="c"></div>
+	</div>
+{% endblock %}

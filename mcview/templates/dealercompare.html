@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block js %}
+<script type="text/javascript" src="/static/mcview/js/mcview.js">
+</script>
+{% endblock %}
+{% block body %}
+<div class="main01">
+    <h3><strong>对比查看经销商售后服务表现 </strong>&nbsp;&nbsp;&nbsp;Dealer after-sales service performance comparison</h3>
+    <div class="box">
+        <h5>总分及各环节得分&nbsp;&nbsp; Total Score &amp; Basic Scores <span style="padding-left:250px"><a href="" style="font-size:14px;font-weight:bold;color:#0033FF" onclick="">【下载报告 download comparison report】</a></span></h5>
+        <div class="forms" style="width:920px; float:none;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr class="td01">
+                        <td width="6%" valign="top">
+                            <strong>序号</strong>
+                            <br>
+                            No.
+                        </td>
+                        <td width="26%" valign="top">
+                            <strong>经销商名称</strong>
+                            <br>
+                            Aftersales Company Name 
+                        </td>
+                        {% for group in checkpoint_group_list %}
+                        <td width="10%" valign="top">
+                            <strong>{{group}}</strong>
+                            <br>
+                            {{group}}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% for dealer,dealer_score in dealer_group_score_dict.items %}
+                    <tr>
+                        <td>
+                            <strong>{{forloop.counter}}</strong>
+                        </td>
+                        <td>
+                            {{dealer.name_cn}}
+                            <br>
+                            {{dealer.name_en}}
+                        </td>
+                        {% for score in dealer_score %}
+                        <td align="center">
+                            {{score|floatformat:1}}
+                        </td>
+                        {% endfor %z}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <h5>详细评估点得分   Detailed Results by Questions</h5>
+        <div class="forms05">
+            <table width="1046" border="0" cellspacing="0" cellpadding="0"> 
+                <tbody>
+                    <tr class="td01">
+                        <td width="446" valign="top">
+                            &nbsp;
+                        </td>
+                        {% for dealer in dealer_list %}
+                        <td width="300" valign="top">
+                            <strong>{{dealer.name_cn}}</strong>
+                            <br>
+                            {{dealer.name_en}}
+                        </td>
+                        {% endfor %}
+                    </tr>
+					{% for cp,result in dealer_sub_score_dict.items %}
+	                    <tr>
+	                        <td align="right" class="td02">
+	                            <div style=" float:right; width:20px;">
+	                            </div>
+	                            <div class="p5 w502 l">
+	                            	<strong>{{cp.name}}.</strong>
+	                            	{{cp.desc}}<br>{{cp.desc_en}}
+	                            </div>
+	                        </td>
+							{% for r in result %}
+	                        <td align="center" valign="top">
+	                            <div style="padding:10px 0;">
+	                                {{r.score}}
+	                            </div>
+	                        </td>
+							{% endfor %}
+	                    </tr>
+	                    <tr>
+	                        <td align="right">
+	                            <div style=" float:right; width:20px;">
+	                                <img src="/static/mcview/images/icon06.gif" width="20" height="14">
+	                            </div>
+	                            <div class="p5 c003299 w502 l"> 选择“否/不涉及”的原因<br>Comments for "No/not relevant" 
+	                            </div>
+	                        </td>
+							{% for r in result %}
+		                        <td valign="top" class="td01">
+		                        	{{r.zero_reason}}<br>
+									{{r.zero_reason_en|default_if_none:''}}
+		                        </td>
+							{% endfor %}
+	                    </tr>
+					{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

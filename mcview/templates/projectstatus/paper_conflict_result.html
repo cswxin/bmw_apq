@@ -1,0 +1,69 @@
+<script type="text/javascript">
+$(document).ready(function(){
+	$('#go_left').css("display","block");
+	$('#go_right').css("display","block");
+	var oTable=$('#example').dataTable({
+		"sDom": 'RC<"clear">lifrtp',
+		"bFilter" : true,
+		"bJQueryUI": true,
+		'bPaginate': false,
+		"bProcessing": true,
+		"sPaginationType": "full_numbers"
+		//"oLanguage":{
+		//	"sUrl": "/static/data_table/cn/jquery.dataTable.cn.txt"
+		//}
+	});  
+	$("thead th").each( function ( i ) {
+		if(i>=1){
+			$(this).css('width','');
+		}
+		})
+	$('#example tr').click( function() {
+	        $(this).toggleClass('row_selected');
+	} );
+    oTable.$('td').hover( function() {
+        var iCol = $('td', this.parentNode).index(this) % 17;
+        $('td:nth-child('+(iCol+1)+')', oTable.$('tr')).addClass( 'highlighted' );
+    }, function() {
+        oTable.$('td.highlighted').removeClass('highlighted');
+    } );
+});
+</script>
+<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+<link rel="stylesheet" href="/static/data_table/css/demo_table_smk.css" type="text/css" />
+<table cellpadding="0" cellspacing="0" border="0" id="example"  class="display tdBc" style="font-size:13px;border-left:1px #ccc solid;">
+	<thead>
+	<tr>
+		<th></th>
+		<th><strong>经销商编号</strong> <br>Dealer No. (CBU)</th>
+		<th><strong>城市</strong> <br>City</th>
+		<th><strong>省份</strong> <br>Province</th>
+		<th><strong>经销商名称</strong> <br>Aftersales Company Name</th>
+		<th><strong>进店人数</strong> <br>No. of Visitor</th>
+		<th><strong>评估员ID</strong> <br>Auditor ID</th>
+		<th><strong>访问日期</strong> <br>Visit date</th>
+		<th><strong>经销商得分</strong> <br>FW团队</th>
+		<th><strong>经销商得分</strong> <br>独立复核团队</th>
+		<th><strong>区别查询</strong> <br>Details</th>
+		<th><strong>最终判决得分</strong> <br>BMW APQ</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for dealer in dealers %}
+		<tr>
+			<td>{{forloop.counter}}</td>
+			<td>{{dealer.name}}</td>
+			<td>{{dealer.city_cn}}<br>{{dealer.city_en}}</td>
+			<td>{{dealer.province_cn}}<br>{{dealer.province_en}}</td>
+			<td>{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+			<td>{{dealer.visitor_num|safe|default:"&nbsp;"}}</td>
+			<td>{{dealer.user_id|safe|default:"&nbsp;"}}</td>
+			<td>{{dealer.visitor_date|safe|default:"&nbsp;"}}</td>
+			<td>{{dealer.fw_score|safe|default:"&nbsp;"}}</td>
+			<td>{{dealer.fh_score|safe|default:"&nbsp;"}}</td>
+			<td><a href="{% url ProjectStatus/paperconflictdetail dealer.diff_id  %}" target="_blank">点击进入详情</a></td>
+			<td>{{dealer.bmw_score|safe|default:"-"}}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>

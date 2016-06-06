@@ -1,0 +1,751 @@
+#encoding:utf-8
+from django.shortcuts import HttpResponseRedirect, Http404, HttpResponse, render_to_response
+from django.http import HttpResponseNotFound
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+from django.template import RequestContext
+from django.utils import simplejson
+from mcview.decorator import render_to
+import copy, os
+from mcview.chart_utils import create_multi_xychart, create_simple_xychart, create_history_now_future_xychart
+from django.views.decorators.csrf import csrf_exempt
+from service.core import _term, _user, _paper, _dealer, _checkpoint, _question, _report, _project
+from mc import enums
+from mc.models import Dealer, PaperDiff, Report
+from survey.models import CheckPoint
+import mc
+import settings
+import constant
+from userpro.models import UserProfile
+from lxml.html.formfill import _check
+  
+
+
+@login_required
+def dealer_analysis(request):
+    user = request.user
+    dealer = _dealer.get_dealer_by_username(user.username)
+    term = _term.get_cur_term()
+    if dealer:
+        paper = _paper.get_paper(dealer=dealer, term=term, paper_type=enums.BMW_PAPER_TYPE)
+        if paper:
+            return report(request, paper.id)
+    return locals()
+
+@login_required
+def advanced_filter(request):
+    regional_name = constant.data_compare_regional_name
+    province_name = constant.data_compare_province_name
+    city_name = constant.data_compare_city_name
+    subdistrict_name = constant.data_compare_subdistrict_name
+    dealergroup_name = constant.data_compare_dealergroup_name
+<<<<<<< local
+    brand_name = constant.data_compare_brand_name
+=======
+    user_name = constant.data_compare_user_name
+    num_name = constant.data_compare_num_name
+    newold_name = constant.data_compare_newold_name
+    
+>>>>>>> other
+    return locals()
+
+@login_required
+def advanced_analysis(request):
+    return locals()
+
+@login_required
+def dealer_filter(request):
+    terms = _term.get_list_terms(_term.get_cur_term())
+    dealertypes = _dealer.get_dealer_types()
+    return locals()
+
+@login_required
+def ajax_filter(request):
+    term = int(request.POST.get('Term', 0))
+    type = int(request.POST.get('Wave', 0))
+    project_id = constant.dealertype_id_to_project_id(type)
+    papers = _paper.get_papers_by_term_project_Dealer(term, project_id, type)
+    return locals()
+
+@login_required
+def report(request, paper_id):
+    paper = _paper.get_paper(id=int(paper_id))
+    if paper is None:
+        return locals()
+    images = []
+    sounds = []
+    dealer = paper.dealer
+    current_term = paper.term
+    has_full_perm = _user.has_all_page_perm(request.user) or _user.has_run_page_perm(request.user)
+    #current_term = mc.get_cur_term()
+    #dealer = mc.get_dealer(pk=dealer_id)
+    #paper = mc.get_paper(dealer=dealer,term=current_term)
+    customer_feedback = mc.get_customer_feedback(paper)
+    if has_full_perm:
+        if paper.paper_type == enums.BMW_PAPER_TYPE:
+            paperdiff = PaperDiff.objects.get(final_paper=paper)
+            images = mc.get_paper_images(paper=paperdiff.fw_paper)
+        else:
+            images = mc.get_paper_images(paper=paper)
+        if paper.paper_type == enums.BMW_PAPER_TYPE:
+            paperdiff = PaperDiff.objects.get(final_paper=paper)
+            sounds = mc.get_paper_sounds(paper=paperdiff.fw_paper)
+        else:
+            sounds = mc.get_paper_sounds(paper=paper)
+        for i in images:
+            i.shortname = os.path.basename(i.image.name)
+        for i in sounds:
+            i.shortname = os.path.basename(i.sound.name)
+    
+    if paper.visit_end and paper.visit_begin:
+        paper.visit_minutes = (paper.visit_end - paper.visit_begin).seconds / 60
+    else:
+        paper.visit_minutes = 0
+    
+    term_list = map(copy.copy, _term.get_list_terms(current_term))
+    for term in term_list:
+        score_list = _report.get_dealer_score(term, dealer, paper.project, dealer.dealertype, paper.paper_type)
+        if score_list:
+            term.dealer_score = score_list[0]
+        else:
+            term.dealer_score = 0
+    
+    term = current_term
+    if len(term_list) > 1:
+        first_half_score = '%.1f' % ((term_list[0].dealer_score + term_list[1].dealer_score) / 2)
+        if dealer.id == 78:
+            first_half_score = '%.1f' % (term_list[1].dealer_score)
+    else:
+        first_half_score = '-'
+    if len(term_list) > 3:
+        second_half_score = '%.1f' % ((term_list[2].dealer_score + term_list[3].dealer_score) / 2)
+    else:
+        second_half_score = '-'
+    
+    term_compare_chart_img = make_term_compare_chart(term_list, dealer)
+    
+    cp_group_list = make_dealer_charts(term_list, paper)
+    cp_total = cp_group_list[0]
+    cp_group_list = cp_group_list[1:]
+    
+    sub_cp_list = map(copy.copy, _checkpoint.get_sub_checkpoint_list(paper.project.id))
+    
+    dealer_sub_score_list = _report.get_dealer_sub_score(term, dealer, paper.project, dealer.dealertype, paper.paper_type)    #经销�
+    region_sub_score_list = _report.get_region_sub_score(term, dealer, paper.project, dealer.dealertype, paper.paper_type)    #大区
+    nation_sub_score_list = _report.get_national_sub_score(term, dealer, paper.project, dealer.dealertype, paper.paper_type)  #全国
+    xq_sub_score_list = _report.get_xq_sub_score(term, dealer, paper.project, dealer.dealertype, paper.paper_type)            #小区
+    city_sub_score_list = _report.get_city_sub_score(term, dealer, paper.project, dealer.dealertype, paper.paper_type)        #城市
+    province_sub_score_list = _report.get_province_sub_score(term, dealer, paper.project, dealer.dealertype, paper.paper_type)#省份
+    jt_sub_score_list = _report.get_jt_sub_score(term, dealer, paper.project, dealer.dealertype, paper.paper_type)            #经销商集�
+    
+    
+    for i, sub_cp in enumerate(sub_cp_list):
+        if dealer_sub_score_list:
+            s = dealer_sub_score_list[i]
+        else:
+            s = 0
+        sub_cp.dealer_score = s
+        #print sub_cp.name,sub_cp.dealer_score
+        sub_cp.region_score = region_sub_score_list[i] if region_sub_score_list is not None else region_sub_score_list
+        sub_cp.nation_score = nation_sub_score_list[i] if nation_sub_score_list is not None else nation_sub_score_list
+        sub_cp.xq_score = xq_sub_score_list[i] if xq_sub_score_list is not None else xq_sub_score_list
+        sub_cp.city_score = city_sub_score_list[i] if city_sub_score_list is not None else city_sub_score_list
+        sub_cp.province_score = province_sub_score_list[i] if province_sub_score_list is not None else province_sub_score_list
+        sub_cp.jt_score = jt_sub_score_list[i] if jt_sub_score_list is not None else jt_sub_score_list
+        
+        if sub_cp.dealer_score is None:
+            sub_cp.dealer_score = '不适用'
+            sub_cp.zero_reason, sub_cp.zero_reason_en = _question.get_zero_reason(paper, sub_cp)
+            sub_cp.compare_region = '-'
+            sub_cp.compare_nation = '-'
+            if sub_cp.region_score is None:
+                sub_cp.region_score = '-'
+            else:
+                sub_cp.region_score = '%.1f' % (sub_cp.region_score or 0)
+            
+            if sub_cp.nation_score is None:
+                sub_cp.nation_score = '-'
+            else:
+                sub_cp.nation_score = '%.1f' % (sub_cp.nation_score or 0)
+                
+            if sub_cp.xq_score is None:
+                sub_cp.xq_score = '-'
+            else:
+                sub_cp.xq_score = '%.1f' % (sub_cp.xq_score or 0)
+                
+            if sub_cp.city_score is None:
+                sub_cp.city_score = '-'
+            else:
+                sub_cp.city_score = '%.1f' % (sub_cp.city_score or 0)
+                
+            if sub_cp.province_score is None:
+                sub_cp.province_score = '-'
+            else:
+                sub_cp.province_score = '%.1f' % (sub_cp.province_score or 0)
+                
+            if sub_cp.jt_score is None:
+                sub_cp.jt_score = '-'
+            else:
+                sub_cp.jt_score = '%.1f' % (sub_cp.jt_score or 0)
+        else:
+            if sub_cp.dealer_score == 0:
+                sub_cp.zero_reason, sub_cp.zero_reason_en = _question.get_zero_reason(paper, sub_cp)
+            else:
+                sub_cp.zero_reason = '-'
+            
+            if sub_cp.region_score is not None:
+                sub_cp.compare_region = sub_cp.dealer_score - (sub_cp.region_score or 0)
+                sub_cp.region_score = '%.1f' % (sub_cp.region_score or 0)
+                sub_cp.compare_region = '%.1f' % sub_cp.compare_region
+            else:
+                sub_cp.compare_region = '-'
+                sub_cp.region_score = '-'
+            
+            if sub_cp.nation_score is not None:
+                sub_cp.compare_nation = sub_cp.dealer_score - (sub_cp.nation_score or 0)
+                sub_cp.nation_score = '%.1f' % (sub_cp.nation_score or 0)
+                sub_cp.compare_nation = '%.1f' % sub_cp.compare_nation
+            else:
+                sub_cp.nation_score = '-'
+                
+            if sub_cp.xq_score is not None:
+                sub_cp.compare_xq = sub_cp.dealer_score - (sub_cp.xq_score or 0)
+                sub_cp.xq_score = '%.1f' % (sub_cp.xq_score or 0)
+                sub_cp.compare_xq = '%.1f' % sub_cp.compare_xq
+            else:
+                sub_cp.compare_xq = '-'
+                sub_cp.xq_score = '-'
+                
+            if sub_cp.city_score is not None:
+                sub_cp.compare_city = sub_cp.dealer_score - (sub_cp.city_score or 0)
+                sub_cp.city_score = '%.1f' % (sub_cp.city_score or 0)
+                sub_cp.compare_city = '%.1f' % sub_cp.compare_city
+            else:
+                sub_cp.compare_city = '-'
+                sub_cp.city_score = '-'
+                
+            if sub_cp.province_score is not None:
+                sub_cp.compare_province = sub_cp.dealer_score - (sub_cp.province_score or 0)
+                sub_cp.province_score = '%.1f' % (sub_cp.province_score or 0)
+                sub_cp.compare_province = '%.1f' % sub_cp.compare_province
+            else:
+                sub_cp.compare_province = '-'
+                sub_cp.province_score = '-'
+                
+            if sub_cp.jt_score is not None:
+                sub_cp.compare_jt = sub_cp.dealer_score - (sub_cp.jt_score or 0)
+                sub_cp.jt_score = '%.1f' % (sub_cp.jt_score or 0)
+                sub_cp.compare_jt = '%.1f' % sub_cp.compare_jt
+            else:
+                sub_cp.compare_jt = '-'
+                sub_cp.jt_score = '-'
+        
+            sub_cp.dealer_score = '%.1f' % sub_cp.dealer_score
+            
+    _checkpoint.sort_list_by_nameabbr(sub_cp_list)
+    
+    return locals()
+
+@login_required
+def history_now_future_report(request, paper_id):
+    paper = _paper.get_paper(id=int(paper_id))
+    term = paper.term
+    if paper is None:
+        return locals()
+    dealer = paper.dealer
+    term_list = map(copy.copy, _term.get_all_terms())
+    if paper.visit_end and paper.visit_begin:
+        paper.visit_minutes = (paper.visit_end - paper.visit_begin).seconds / 60
+    else:
+        paper.visit_minutes = 0
+    cp_group_list, cp_total = make_hnf_dealer_charts(term_list, paper.project.id, dealer, dealer.dealertype, paper.paper_type)
+    
+    return locals()
+
+def sort_by_name(cp):
+    """A2 return A02"""
+    return '%s%s' % (cp.name_abbr[0], cp.name_abbr[1:].zfill(2))
+
+def make_term_compare_chart(term_list, dealer):
+    title = u'各期次得分对比'
+    labels = [u'%s/%s' % (term.name_cn, term.name_en) for term in term_list]
+    data = [term.dealer_score for term in term_list]
+    
+    img_name = 'chart_compare_%s.png' % (dealer.id)
+    save_as = os.path.join(settings.SITE_ROOT, 'static', 'mcview', 'images', 'chart', img_name)
+    data = create_simple_xychart(title, labels, data)
+    file(save_as, 'wb').write(data)
+    return img_name
+
+def make_hnf_dealer_charts(term_list, project_id, dealer, dealertype, paper_type):
+    title = '经销商最终得分Overall Score'
+    labels = ['2011', '2012', ]
+    
+    project = _project.get_project_id_map()[project_id]
+    paper_type = enums.BMW_PAPER_TYPE
+    if project_id == constant.competition_project_id:
+        paper_type = enums.FW_PAPER_TYPE
+    for term in term_list:
+        #labels.append(' % s /% s' % (term.name_cn, term.name_en))
+        #~ print term.id,dealer.name_cn
+        tmp_project_id = project_id
+        if term.id <= 4:
+            tmp_project_id = 1
+        protmp = _project.get_project_id_map()[tmp_project_id]
+        term.score_list_dealer = _report.get_dealer_score(term, dealer, protmp, dealertype, paper_type)
+    
+    cp_group_list = map(copy.copy, _checkpoint.get_project_cp_list_with_total(project))
+    #cp_group_list.remove(cp_group_list[len(cp_group_list) - 1])
+    remove_cp = []
+    for i, cp_group in enumerate(cp_group_list):
+        if 'G' in cp_group.name_abbr:
+            remove_cp.append(cp_group)
+            continue
+        if cp_group.desc_en and cp_group.has_child:
+            title = u'%s%s' % (cp_group.desc.replace('\n', ''), cp_group.desc_en)
+        else:
+            title = u'%s' % (cp_group.desc.replace('\n', ''))
+            
+        W1_list = []
+        W2_list = []
+        W3_list = []
+        W4_list = []
+        
+        cur_term = _term.get_all_terms().order_by('-id')[0]
+        for tid in range(cur_term.id):
+            w = tid % 4
+            if w == 0:
+                if term_list[tid]:
+                    if term_list[tid].score_list_dealer:
+                        try:
+                            W1_list.append(term_list[tid].score_list_dealer[i])
+                        except:
+                            W1_list.append(-1)
+                    else:
+                        W1_list.append(-1)
+            elif w == 1:
+                if term_list[tid]:
+                    if term_list[tid].score_list_dealer:
+                        try:
+                            W2_list.append(term_list[tid].score_list_dealer[i])
+                        except:
+                            W2_list.append(-1)
+                    else:
+                        W2_list.append(-1)
+            elif w == 2:
+                if term_list[tid]:
+                    if term_list[tid].score_list_dealer:
+                        try:
+                            W3_list.append(term_list[tid].score_list_dealer[i])
+                        except:
+                            W3_list.append(-1)
+                    else:
+                        W3_list.append(-1)
+            elif w == 3:
+                if term_list[tid]:
+                    if term_list[tid].score_list_dealer:
+                        try:
+                            W4_list.append(term_list[tid].score_list_dealer[i])
+                        except:
+                            W4_list.append(-1)
+                    else:
+                        W4_list.append(-1)
+            else:
+                pass
+        
+        series_list = []
+        
+        img_name = 'chart_hnf_%s_%s.png' % (i, dealer.id)
+        save_as = '%s/static/mcview/images/chart/%s' % (settings.SITE_ROOT, img_name)
+        
+        
+        series_list.append(dict(name=u'W1', value=W1_list))
+        series_list.append(dict(name=u'W2', value=W2_list))
+        series_list.append(dict(name=u'W3', value=W3_list))
+        series_list.append(dict(name=u'W4', value=W4_list))
+        
+        series_top = {}
+        
+        data = create_history_now_future_xychart(title, labels, series_list, series_top)
+        file(save_as, 'wb').write(data)
+        cp_group.chart_img = img_name
+    for rem in remove_cp:
+        cp_group_list.remove(rem)
+    cp_total = cp_group_list[0]
+    cp_group_list = cp_group_list[1:]
+    return cp_group_list, cp_total
+
+def make_dealer_charts(term_list, paper):
+    score_dealer_list = []
+    score_region_list = []
+    score_nation_list = []
+    score_top_list = []
+    
+    labels = []
+    
+    dealer = paper.dealer
+    project = paper.project
+    dealertype = dealer.dealertype
+    paper_type = paper.paper_type
+    for term in term_list:
+        labels.append('%s/%s' % (term.name_cn, term.name_en))
+        #~ print term.id,dealer.name_cn
+        term.score_list_dealer = _report.get_dealer_score(term, dealer, project, dealertype, paper_type)
+        term.score_list_region = _report.get_region_score(term, dealer, project, dealertype, paper_type)
+        term.score_list_nation = _report.get_national_score(term, dealer, project, dealertype, paper_type)
+        term.score_list_xq = _report.get_xq_score(term, dealer, project, dealertype, paper_type)
+        term.score_list_city = _report.get_city_score(term, dealer, project, dealertype, paper_type)
+        term.score_list_province = _report.get_province_score(term, dealer, project, dealertype, paper_type)
+        term.score_list_jt = _report.get_jt_score(term, dealer, project, dealertype, paper_type)
+    
+    cp_group_list = map(copy.copy, _checkpoint.get_checkpoint_group_list_with_total(project.id))
+    
+    for i, cp_group in enumerate(cp_group_list):
+        if cp_group.desc_en:
+            title = u'%s%s' % (cp_group.desc, cp_group.desc_en)
+        else:
+            title = u'%s' % (cp_group.desc)
+        score_dealer_list = []
+        score_region_list = []
+        score_nation_list = []
+        
+        score_xq_list = []
+        score_city_list = []
+        score_province_list = []
+        score_jt_list = []
+        
+        score_top_list = []
+        for term_index, term in enumerate(term_list):
+            if None in [term.score_list_region, term.score_list_nation, term.score_list_xq, term.score_list_city, term.score_list_province, term.score_list_jt]:
+                if term.score_list_dealer:
+                    s = term.score_list_dealer[i]
+                else:
+                    s = 0
+                score_dealer_list.append(s)
+            else:
+                if term.score_list_dealer:
+                    score_dealer_list.append(term.score_list_dealer[i])
+                else:
+                    score_dealer_list.append(0)
+                
+                #~ print term.score_list_region
+                score_region_list.append(term.score_list_region[i])
+                score_nation_list.append(term.score_list_nation[i])
+                score_xq_list.append(term.score_list_xq[i])
+                score_city_list.append(term.score_list_city[i])
+                score_province_list.append(term.score_list_province[i])
+                score_jt_list.append(term.score_list_jt[i])
+            
+            score = _report.get_bmw_top_score(term, paper, cp_group)
+            #print 'score',score
+            score_top_list.append(score)
+        
+        series_list = []
+        
+        img_name = 'chart_%s_%s.png' % (i, dealer.id)
+        save_as = '%s/static/mcview/images/chart/%s' % (settings.SITE_ROOT, img_name)
+        
+        #if [] in [score_region_list,score_nation_list,score_top_list]:
+        #    series_list.append(dict(name=u'当前经销商得分', value = score_dealer_list))
+        #    series_top = None
+        #else:
+        
+        series_list.append(dict(name=u'当前经销商得分 Dealer score', value=score_dealer_list))
+        series_list.append(dict(name=u'全国平均得分 National average score', value=score_nation_list))
+        series_list.append(dict(name=u'所属区域平均得分 Regional average score', value=score_region_list))
+        series_list.append(dict(name=u'所属小区平均得分 Sub district average score', value=score_xq_list))
+        series_list.append(dict(name=u'所属省份平均得分 Province average score', value=score_province_list))
+        series_list.append(dict(name=u'所属城市平均得分 City average score', value=score_city_list))
+        series_list.append(dict(name=u'所属经销商集团平均得分 Dealer group average score', value=score_jt_list))
+        
+        #series_list.append(dict(name=u'全国最佳经销商得�,value=score_top_list))
+        series_top = dict(name=u'全国最佳经销商得分', value=score_top_list)
+        series_top = {}
+        
+        data = create_multi_xychart(title, labels, series_list, series_top)
+        file(save_as, 'wb').write(data)
+        cp_group.chart_img = img_name
+    return cp_group_list
+
+#为第三期增加4道题
+def _add_four_question(sub_cp_list, current_term, dealer, paper):
+    from survey.models import Question, CheckPoint
+    q1 = Question.objects.get(cid='A52')
+    q1.title_en = 'Did the appointment staff inform the estimated time for SRP job and the quotation when making appointment?'
+    
+    q2 = Question.objects.get(cid='B53')
+    q2.title_en = 'Did the SA introduce the benefit of appointment booking to you?'
+    
+    q3 = Question.objects.get(cid='C54')
+    q3.title_en = 'Was the customer offerred internet service while waiting?'
+    
+    q4 = Question.objects.get(cid='E55')
+    q4.title_en = 'Was the customer served by no more than 2 SA/SAA during the whole process?'
+    
+    qs = [q1, q2, q3, q4]
+    for q in qs:
+        ck1 = CheckPoint(question=q)
+        ck1.name = q.cid
+        ck1.desc = q.title
+        ck1.desc_en = q.title_en
+        pos = mc.get_pos(sub_cp_list, q.cid)
+        sub_cp_list.insert(pos, ck1)
+        
+        mc.get_dealer_score_info(dealer, current_term, ck1, paper)
+
+@login_required
+def download_report(request, dealer_id, term_id):
+    if _user.has_dealer_page_perm(request.user):
+        return HttpResponseRedirect(reverse('DetailDealerReport', args=[dealer_id]))
+    from mc.models import Term
+    current_term = Term.objects.get(id=term_id)
+    dealer = mc.get_dealer(id=dealer_id)
+    if dealer.dealertype.id == 1 or dealer.dealertype.id == 5:
+        paper = mc.get_paper(term=current_term, dealer=dealer, paper_type=enums.BMW_PAPER_TYPE, status=enums.PAPER_STATUS_FINISH)
+    else:
+        paper = mc.get_paper(term=current_term, dealer=dealer, paper_type=enums.FW_PAPER_TYPE, status=enums.PAPER_STATUS_FINISH)
+        
+    xls = mc.get_paper_xls(paper=paper)
+    
+    try:
+        import zipfile, os, cStringIO
+        file = cStringIO.StringIO()
+        data = zipfile.ZipFile(file, 'w', zipfile.ZIP_DEFLATED)
+        path = xls.xslfile.path
+        arcname = os.path.basename(unicode(xls.xslfile))
+        arcname = '%s_%s_W%d' % (dealer.name_cn, dealer.name, current_term.id % 4)
+        if current_term.is_finished:
+            from datetime import datetime
+            nowday = datetime.today()
+            arcname += '_%d%d%d' % (nowday.year, nowday.month, nowday.day)
+        arcname += '.xls'
+        
+        data.write(path, arcname.encode('gb18030'))
+        data.close()
+    except:
+        return HttpResponse('找不到文件！')
+    
+    if data:
+        response = HttpResponse(file.getvalue(), mimetype='application/x-zip-compressed')
+        data.close()
+        response['Content-Disposition'] = (u'attachment; filename=report.zip').encode('utf-8')
+        return response
+
+@login_required
+def dealerLogin(request):
+    current_term = _term.get_cur_input_term()
+    
+    import DbUtils   #自定义了一个封装connection的models
+    c, db = DbUtils.cursor()
+    sql = 'select d.name_cn,username,p.login_count,last_login  from auth_user_groups a,auth_user u,mc_dealer d,userpro_userprofile p,userpro_userprofile_user_permissions pp where p.user_id=u.id and a.user_id=u.id and a.group_id=%d and u.username=d.name and pp.userpermission_id=%d  and pp.userprofile_id = p.id' % (1, 16)
+    c.execute(sql)
+    dealer_login_info = c.fetchall()
+    if db:
+        db.close()
+    return locals()
+
+@login_required
+def papers_compare(request):
+    paper_ids = request.POST.getlist('paper')
+    papers = []
+    dealer_group_score_dict = {}
+    dealer_list = []
+    ds_score_dict = {}
+    dealer_paper_dict = {}
+    dealer_sub_score_dict = {}
+    for id in paper_ids:
+        papers.append(_paper.get_paper(id=int(id)))
+    
+    if papers:
+        project = papers[0].project
+        for paper in papers:
+            dealer_list.append(paper.dealer)
+            dealer_group_score_dict[paper.dealer] = _report.get_dealer_group_score(paper.term, paper.dealer, paper.project, paper.dealer.dealertype, paper.paper_type)
+            dealer_sub_score = _report.get_dealer_sub_score(paper.term, paper.dealer, paper.project, paper.dealer.dealertype, paper.paper_type)
+            ds_score_dict[paper.dealer] = dealer_sub_score
+            dealer_paper_dict[paper.dealer] = paper
+        checkpoint_group_list = _report.get_main_group_score_column_str(project)
+        checkpoint_group_list = checkpoint_group_list.split(',')
+        
+        sub_checkpoint_list = map(copy.copy, _checkpoint.get_sub_checkpoint_list(paper.project.id))
+        for i, sub_cp in enumerate(sub_checkpoint_list):
+            dealer_sub_score_dict[sub_cp] = []
+            for dealer in dealer_list:
+                score = ds_score_dict[dealer][i]
+                paper = dealer_paper_dict[dealer]
+                if score == 0:
+                    zero_reason, zero_reason_en = _question.get_zero_reason(paper, sub_cp)
+                elif score is None:
+                    score = '不适用'
+                    zero_reason = '-'
+                    zero_reason_en = '-'
+                    zero_reason, zero_reason_en = _question.get_zero_reason(paper, sub_cp)
+                else:
+                    score = '%.1f' % score
+                    zero_reason = '-'
+                    zero_reason_en = '-'
+                dealer_sub_score_dict[sub_cp].append({'score':score, 'zero_reason':zero_reason, 'zero_reason_en':zero_reason_en})
+    
+    return locals()
+
+
+
+
+
+
+@login_required
+def all_filter(request, kind):
+    terms = _term.get_list_terms(_term.get_cur_term())
+    dealertypes = _dealer.get_dealer_types()
+    kind_id = kind
+    item_cn = constant.data_compare_dict[kind_id]
+    item_en = constant.data_compare_en_dict[kind_id]
+    return locals()
+
+@login_required
+def ajax_all_filter(request):
+    term = int(request.POST.get('Term', 0))
+    stype = int(request.POST.get('Wave', 0))
+    if stype == 1:
+        project_id = 2
+    elif stype == 5:
+        project_id = 3
+    else:
+        project_id = 4
+    
+    kind = request.POST.get('kind', None)
+    if kind:
+        if kind == 'user':
+            col1 = u'访问员ID<br>Auditor ID'
+            col2 = u'走访经销商数量<br>No. of Dealers'
+            users = list(_user.getUsers())
+            for u in users:
+                if 'gfk' in u.username:
+                    users.remove(u)
+            items = _paper.get_papers_info(term, project_id, users, stype)
+        if kind == 'num':
+            col1 = u'进店人数<br>No. of visitor'
+            col2 = u'经销商数量<br>No. of Dealers'
+            papers = _paper.get_papers(dealer__dealertype__id=stype, term__id=term)
+            visitor_list = []
+            for paper in papers:
+                visitor_list.append(paper.visitor_num)
+            visitor_list = list(set(visitor_list))
+            items = _paper.get_papers_info(term, project_id, visitor_list, stype)
+        if kind == 'newold':
+            col1 = u'新店和老店<br>Old & new dealer'
+            col2 = u'经销商数量<br>No. of Dealers'
+            new_old = ['new', 'old']
+            items = _paper.get_papers_info(term, project_id, new_old, stype)
+    return locals()
+
+@login_required
+def details(request, search_type, term_id, project_id, search_item, dealer_type):
+    stype = search_type
+    dtype = dealer_type
+    item = search_item
+    term = _term.get_term_by_id(term_id)
+    project = _project.get_project_by_id(project_id)
+    cp_list = _checkpoint.get_project_cp_list_with_total(project)
+    cp_list = sort_cp_list(cp_list)
+    return locals()
+
+def sort_cp_list(cp_list):
+    temp_list = []
+    for cp in cp_list:
+        if cp.has_child:
+            temp_list.append(cp)
+    for cp in cp_list:
+        if not cp.has_child:
+            temp_list.append(cp)
+    return temp_list
+
+@login_required
+def ajax_get_details(request):
+    stype = request.POST.get('search_type', None)
+    item = request.POST.get('search_item', None)
+    project_id = request.POST.get('project_id', None)
+    term_id = request.POST.get('term_id', None)
+    dealer_type = request.POST.get('dealer_type', None)
+    project = _project.get_project_by_id(project_id)
+    term = _term.get_term_by_id(term_id)
+    cplist = request.POST.getlist('cplist')
+    if 'all' in cplist:
+        cp_list = _checkpoint.get_project_cp_list_with_total(project)
+        cp_list = sort_cp_list(cp_list)
+    else:
+        cp_list = _checkpoint.get_cp_list_by_name(cplist, project)
+    
+    #根据类型和数据获得不同的问卷
+    papers = _paper.get_papers_by_items(stype, item, project, term, dealer_type)
+    
+    _report.set_score_in_papers(cp_list, papers)
+    
+    return locals()
+
+@login_required
+def advanced_search(request, kind):
+    terms = _term.get_list_terms(_term.get_cur_term())
+    dealertypes = _dealer.get_dealer_types()
+    kind_id = kind
+    item_name = constant.data_compare_dict[kind]
+    item_name_en = constant.data_compare_en_dict[kind]
+    return locals()
+@login_required
+def ajax_dealer_group_result(request):
+    term_id = int(request.POST.get('Term', 0))
+    dealertype_id = int(request.POST.get('Wave', 0))
+    kind = request.POST.get('kind', constant.data_compare_regional_name) 
+    project_id = constant.dealertype_id_to_project_id(dealertype_id)
+    dealer_level_id = constant.data_compare_kind_dict[kind]
+    reports = Report.objects.filter(dealer__level=dealer_level_id, dealertype__id=dealertype_id, project__id=project_id, term__id=term_id)
+    for rep in reports:
+        rep.ready = False
+        if rep.score != None:
+            rep.ready = True
+    return locals()
+@login_required
+def advanced_brand(request):
+    terms = _term.get_list_terms(_term.get_cur_term())
+    kind_id = constant.data_compare_brand_name
+    item_name = constant.data_compare_dict[kind_id]
+    item_name_en = constant.data_compare_en_dict[kind_id]
+    return locals()
+
+@login_required
+def ajax_brand_result(request):
+    term_id = int(request.POST.get('Term', 0))
+    kind = request.POST.get('kind', constant.data_compare_regional_name) 
+    dealer_level_id = constant.data_compare_kind_dict[kind]
+    reports = Report.objects.filter(dealer__level=dealer_level_id, term__id=term_id)
+    for rep in reports:
+        rep.ready = False
+        if rep.score != None:
+            rep.ready = True
+    return locals()
+
+@login_required
+def history_now_future_group_report(request, kind, report_id):
+    rep = Report.objects.get(pk=report_id)
+    if rep is None:
+        return locals()
+    term = rep.term
+    dealer = rep.dealer
+    dealertype = rep.dealertype
+    project = rep.project
+    paper_type = rep.paper_type
+    term_list = map(copy.copy, _term.get_all_terms())
+    item_name = constant.data_compare_dict[kind]
+    item_name_en = constant.data_compare_en_dict[kind]
+    cp_group_list, cp_total = make_hnf_dealer_charts(term_list, project.id, dealer, dealertype, paper_type)
+    return locals()
+
+@login_required
+def items_compare(request):
+    rep_ids = request.POST.getlist('item')
+    cp_ids = request.POST.getlist('checkpoint')
+    
+    
+    return locals()

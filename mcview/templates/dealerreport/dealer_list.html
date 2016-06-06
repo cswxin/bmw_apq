@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/jquery.dataTables.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/FixedColumns.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/ZeroClipboard.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/TableTools.js"></script>
+{% endblock %}
+
+{% block body %}
+  <div class="main01">
+    <h3><strong>数据筛选</strong>&nbsp;&nbsp;&nbsp;Data Filter</h3>
+    <center><div id="filter_result" class="forms05 dataContent " style="width: 98%;">
+    	<script type="text/javascript">
+
+(function($) {
+/*
+ * Function: fnGetColumnData
+ * Purpose:  Return an array of table values from a particular column.
+ * Returns:  array string: 1d data array
+ * Inputs:   object:oSettings - dataTable settings object. This is always the last argument past to the function
+ *           int:iColumn - the id of the column to extract the data from
+ *           bool:bUnique - optional - if set to false duplicated values are not filtered out
+ *           bool:bFiltered - optional - if set to false all the table data is used (not only the filtered)
+ *           bool:bIgnoreEmpty - optional - if set to false empty values are not filtered from the result array
+ * Author:   Benedikt Forchhammer <b.forchhammer /AT\ mind2.de>
+ */
+$.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique, bFiltered, bIgnoreEmpty ) {
+    // check that we have a column id
+    if ( typeof iColumn == "undefined" ) return new Array();
+     
+    // by default we only wany unique data
+    if ( typeof bUnique == "undefined" ) bUnique = true;
+     
+    // by default we do want to only look at filtered data
+    if ( typeof bFiltered == "undefined" ) bFiltered = true;
+     
+    // by default we do not wany to include empty values
+    if ( typeof bIgnoreEmpty == "undefined" ) bIgnoreEmpty = true;
+     
+    // list of rows which we're going to loop through
+    var aiRows;
+     
+    // use only filtered rows
+    if (bFiltered == true) aiRows = oSettings.aiDisplay;
+    // use all rows
+    else aiRows = oSettings.aiDisplayMaster; // all row numbers
+ 
+    // set up data array   
+    var asResultData = new Array();
+     
+    for (var i=0,c=aiRows.length; i<c; i++) {
+        iRow = aiRows[i];
+        var aData = this.fnGetData(iRow);
+        var sValue = aData[iColumn];
+         
+        // ignore empty values?
+        if (bIgnoreEmpty == true && sValue.length == 0) continue;
+ 
+        var dt = sValue;
+    	dt = dt.replace('<br>', '').replace('<br/>', '').replace('<BR>', '').replace('<BR/>', '')
+    	
+        // ignore unique values?
+        if (bUnique == true && jQuery.inArray(dt, asResultData) > -1) continue;
+         
+        // else push the value onto the result data array
+        else asResultData.push(dt);
+    }
+     
+    return asResultData;
+}}(jQuery));
+ 
+ 
+function fnCreateSelect( aData )
+{
+    var r='<select  style="width: 90px"><option value="">--all--</option>', i, iLen=aData.length;
+    for ( i=0 ; i<iLen ; i++ )
+    {
+        r += '<option value="'+aData[i]+'">'+aData[i]+'</option>';
+    }
+    return r+'</select>';
+}
+
+$(document).ready(function(){
+	$('#go_left').css("display","block");
+	$('#go_right').css("display","block");
+	var oTable = $('#example').dataTable({
+		"sDom": 'T<"clear">lifrtp',
+		"bFilter" : true,
+		"bJQueryUI": true,
+		'bPaginate': false,
+		"bProcessing": true,
+		"oTableTools": {
+				"aButtons": [
+					"copy", "xls"
+				]
+			},
+		"sPaginationType": "full_numbers"
+	}); 
+	
+	
+	    
+    /* Add a select menu for each TH element in the table footer */
+    $("thead td").each( function ( i ) {
+    	if(i!=0 && (i<4||i>6)){
+    		this.innerHTML = fnCreateSelect( oTable.fnGetColumnData(i) );
+	        $(this).find('select').bind('change', function () {
+	            oTable.fnFilter( $(this).val(), i );
+	        });
+    	}
+    } ); 
+   
+   $("thead th").each( function ( i ) {
+		$(this).css('width','');
+	})
+	
+	$('#example tr').click( function() {
+	        $(this).toggleClass('row_selected');
+	} );
+    oTable.$('td').hover( function() {
+        var iCol = $('td', this.parentNode).index(this) % 11;
+        $('td:nth-child('+(iCol+1)+')', oTable.$('tr')).addClass( 'highlighted' );
+    }, function() {
+        oTable.$('td.highlighted').removeClass('highlighted');
+    } );
+    $('#min').keyup( function() { oTable.fnDraw(); } );
+    $('#max').keyup( function() { oTable.fnDraw(); } );
+});
+
+</script>
+<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+<link rel="stylesheet" href="/static/data_table/css/demo_table_smk.css" type="text/css" />
+<table id="example" class="display tdBc" style="font-size:13px;border-left:1px #ccc solid;">
+	<thead>
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<th><strong>经销商</strong> <br>Dealer</th>
+		<th><strong>经销商代码</strong> <br>Dealer Code</th>
+		<th><strong>总得分</strong> <br>Total Score</th>
+		<th><strong>当期单店报告</strong> <br>Current wave Dealer report</th>
+		<th><strong>历史单店报告</strong> <br>History Dealer report</th>
+		<th><strong>大区</strong> <br>Brand</th>
+		<th><strong>城市</strong> <br>City</th>
+		<th><strong>新店和老店</strong> <br>Old & new dealer</th>
+		<th><strong>经销商集团</strong> <br>Dealer Group</th>
+		<th><strong>与上期得分波动</strong> <br>Compared with last wave</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for dealer in dealerList %}
+		<tr>
+			<td>{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+			<td>{{dealer.name}}</td>
+			<td>{{dealer.report.score|floatformat}}</td>
+			<td>
+				{% if dealer.report.score %}
+				<a href="/DealerReport/DetailDealerReport/{{dealer.report.id}}" target="_blank">点击查看报告<br>Click here for report</a>
+				{%endif%}
+				</td>
+			<td>
+				{% if dealer.report.score %}
+				<a href="/DealerReport/downloadhistoryreport/{{dealer.id}}/{{dealer.report.term.id}}" target="_blank">点击下载历史报告<br>Download history report</a>
+				{%endif%}
+			</td>
+			<td>{{dealer.parent.parent.name_cn}}<br>{{dealer.parent.parent.name_en}}</td>
+			<td>{{dealer.city_cn}}<br>{{dealer.city_en}}</td>
+			<td>{{dealer.new_old|safe}}</td>
+			<td>{{dealer.jt_parent.name_cn}}<br>{{dealer.jt_parent.name_en}}</td>
+			
+			<td>{{dealer.paper.diffscore|floatformat}}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+<br>
+    </div></center>
+    <br>
+  </div>
+{% endblock %}

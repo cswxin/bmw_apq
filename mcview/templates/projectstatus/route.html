@@ -1,0 +1,84 @@
+   {% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/js/jquery-ui-1.8.9.custom.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/jquery.dataTables.js"></script>
+ <script type="text/javascript">
+ //根据期数和品牌搜索经销商和问卷信息
+function myajaxSubmit(form, divOrHandler) {
+    form = form[0];
+    $.ajax({
+       type: form.method,
+       url: form.action,
+       data: $(form).serialize(),
+       success: function(msg){
+            if (typeof(divOrHandler) == "undefined") {
+                alert(msg);
+            }
+            else if (typeof(divOrHandler) == "string") {
+            	$("#"+divOrHandler).empty();
+                $("#"+divOrHandler).html(msg);
+            }
+            else if (typeof(divOrHandler) == "function") {
+                divOrHandler(msg,btn);
+            }
+       }
+    });
+    return false;
+};
+        
+ 
+    
+  
+function fcompleted(form) {
+    form = form[0];
+     //alert($(form).serialize());
+    //var ok = true;
+    
+    $.ajax({
+       type: form.method,
+       url: '{% url ProjectStatus/ajaxdbroute %}',
+       data: $(form).serialize(),
+       dataType:'json',
+       success: function(data){
+		location.href='/ProjectStatus/route?r='+Math.random();
+	   },
+	   error:function(re,status){
+	   }
+    });
+    
+    // if(!ok){
+    	// alert("您的修改无效，已有人录入了！");
+    // }
+    //location.href = '{% url ProjectStatus/route %}';
+}
+
+ $(function(){
+ 	$("#term_name option:first-child").attr("selected","selected"); //选定当前期数
+ });
+ </script>
+  {%endblock%}
+ {% block body %}
+  <div class="main01">
+    <h3><strong>访问路线 </strong>&nbsp;&nbsp;&nbsp; Visit Route&nbsp;&nbsp;&nbsp; {{current_term.name}}</h3>
+    <center>
+      <form action="{% url ProjectStatus/ajaxroute %}" method="POST" id="myform">{% csrf_token %}
+    	<div  class="box" style="text-align: left; padding-left: 20px; padding-top: 10px;">
+    	<label>期数<br>Wave</label>
+    	<select name="term" onchange="myajaxSubmit($('#myform'),'routerDiv')" id="term_name">
+    	{%for term in terms_list %}
+    	  <option value="{{term.id}}">{{term.name}}</option>
+    	{% endfor %}
+       </select>
+    	</div>
+    	                       
+    <div id ='routerDiv' class="box forms05 " >
+      		
+        {% include "projectstatus/routeDiv.html"%}
+    </div>
+	  </form>	
+		<br>
+    </center>
+  </div>
+ 
+{% endblock %}

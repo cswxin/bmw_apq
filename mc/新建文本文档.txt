@@ -1,0 +1,2 @@
+#image = models.ImageField(verbose_name=u'Í¼Æ¬', upload_to=upload_image_path)
+ image = models.CharField(verbose_name=u'ÏßÂ·', max_length=200)

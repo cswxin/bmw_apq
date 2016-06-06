@@ -1,0 +1,63 @@
+<script type="text/javascript">
+
+$(document).ready(function(){
+	$('#go_left').css("display","block");
+	$('#go_right').css("display","block");
+	var oTable = $('#example').dataTable({
+		"sDom": 'T<"clear">lifrtp',
+		"oTableTools": {
+				"aButtons": [
+					"copy", "xls"
+				]
+			},
+		"bFilter" : true,
+		"bJQueryUI": true,
+		'bPaginate': false,
+		"bProcessing": true,
+		"sPaginationType": "full_numbers"
+	}); 
+});
+
+</script>
+<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+<link rel="stylesheet" href="/static/data_table/css/demo_table_smk.css" type="text/css" />
+<form name="paper_compare" id="paper_compare" action="/DealerReport/paperscompare" method="post">
+{% csrf_token %}
+<table id="example" class="display tdBc" style="font-size:13px;border-left:1px #ccc solid;">
+	<thead>
+	<tr>
+		<th><strong>序号</strong><br>No.</th>
+		<th><strong>经销商代码</strong><br>Dealer No.<br>(CBU)</th>
+		<th><strong>城市</strong><br>City</th>
+		<th><strong>省份</strong><br>Province</th>
+		<th><strong>经销商名称</strong><br>Aftersales Company Name</th>
+		<th><strong>进店人数</strong><br>No. of Visitor</th>
+		<th><strong>评估员ID</strong><br>Auditor ID</th>
+		<th><strong>访问日期</strong><br>Visit date</th>
+		
+		{% for cp in cp_list %}
+		<th><strong>{% if 'total' != cp.name_abbr %}{{cp.name_abbr}}{% endif %}{{cp.desc}}</strong><br>{{cp.desc_en}}</th>
+		{% endfor %}
+	</tr>
+	</thead>
+	<tbody>
+		{% for paper in papers %}
+		<tr>
+			<td>{{forloop.counter}}</td>
+			<td>{{paper.dealer.name}}</td>
+			<td>{{paper.dealer.city_cn}}<br>{{paper.dealer.city_en}}</td>
+			<td>{{paper.dealer.province_cn}}<br>{{paper.dealer.province_en}}</td>
+			<td>{{paper.dealer.name_cn}}<br>{{paper.dealer.name_en}}</td>
+			<td>{{paper.visitor_num}}人</td>
+			<td>{{paper.user.first_name}}</td>
+			<td>{{paper.visit_begin|date}}</td>
+			
+			{% for score in paper.score_list %}
+			<td>{{score|floatformat}}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+<br>
+</form>

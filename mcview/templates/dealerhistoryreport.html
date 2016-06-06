@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/jquery.boxy.js"></script>
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+{% endblock %}
+{% block css %}
+	<link rel="stylesheet" href="/static/mcview/css/base.css" type="text/css" />
+	<link rel="stylesheet" href="/static/mcview/css/boxy.css" type="text/css" />
+{% endblock %}
+
+{% block body %}
+	<div class="main01">
+		<h3><strong>往期历史数据查询 </strong>&nbsp;&nbsp;&nbsp; History Data Check</h3>
+		<div class="box">
+			<h5>{{region.name_cn}} &nbsp;&nbsp;{{region.name_en}}</h5>
+			<div class="forms" style="width:920px;">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr class="td01">
+						<td width="7%"><strong>序号</strong><br />No</td>
+						<td width="8%"><strong>经销商代码</strong><br />Dealer No. (CBU)</td>
+						<td width="7%"><strong>城市</strong><br />City </td>
+						<td width="24%"><strong>经销商名称</strong><br />Aftersales Company Name</td>
+						<td width="5%"><strong>2010年第一期</strong><br /></td>
+						<td width="5%"><strong>2010年第二期</strong><br /></td>
+						<td width="5%"><strong>2010年第三期</strong><br /></td>
+						<td width="5%"><strong>2010年第四期</strong><br /></td>
+						<td width="5%"><strong>2010年第五期</strong><br /></td>
+					</tr>
+					{% for dealer in dealer_list_bm %}
+						<tr>
+							<td><strong>{{forloop.counter}}</strong></td>
+							<td>{{dealer.name}}</td>
+							<td>{{dealer.city_cn}}<br>{{dealer.city_en}}</td>
+							<td>{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+							{% for report in dealer.reports %}
+								<td>
+									{% if report %}
+										<a href="{{report.xlsfile.url}}" style="cursor:pointer;">{{report.score|floatformat:1|default:"&nbsp;"}}</a>
+									{% else %}
+										&nbsp;
+									{% endif %}
+								</td>
+							{% endfor %}
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+			<div class="c"></div>
+		</div>
+		<div class="c"></div>
+	</div>
+
+	<div class="main01">
+		<h3><strong>往期竞品历史数据查询 </strong>&nbsp;&nbsp;&nbsp; Competitor Dealer History Data Check</h3>
+		<div class="box">
+			<h5>{{region.name_cn}} &nbsp;&nbsp;{{region.name_en}}</h5>
+			<div class="forms" style="width:920px;">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr class="td01">
+						<td width="7%"><strong>序号</strong><br />No</td>
+						<td width="8%"><strong>经销商代码</strong><br />Dealer No. (CBU)</td>
+						<td width="7%"><strong>城市</strong><br />City </td>
+						<td width="24%"><strong>经销商名称</strong><br />Aftersales Company Name</td>
+						<td width="5%"><strong>2010年第一期</strong><br /></td>
+						<td width="5%"><strong>2010年第二期</strong><br /></td>
+						<td width="5%"><strong>2010年第三期</strong><br /></td>
+						<td width="5%"><strong>2010年第四期</strong><br /></td>
+						<td width="5%"><strong>2010年第五期</strong><br /></td>
+					</tr>
+					{% for dealer in dealer_list_other %}
+						<tr>
+							<td><strong>{{forloop.counter}}</strong></td>
+							<td>{{dealer.name}}</td>
+							<td>{{dealer.city_cn}}<br>{{dealer.city_en}}</td>
+							<td>{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+							{% for report in dealer.reports %}
+								<td>
+									{% if report %}
+										<a href="{{report.xlsfile.url}}" style="cursor:pointer;">{{report.score|floatformat:1|default:"&nbsp;"}}</a>
+									{% else %}
+										&nbsp;
+									{% endif %}
+								</td>
+							{% endfor %}
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+			<div class="c"></div>
+		</div>
+		<div class="c"></div>
+	</div>
+	
+<p align="center"><br><a href="javascript:history.back();" style="color:#003299;text-decoration:underline;">【返回上一页面 back to previous page】</a></p>
+
+ <div class="c"></div>
+{% endblock %}

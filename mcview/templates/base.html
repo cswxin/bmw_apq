@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" />
+<title>{{project_title}}</title>
+<link rel="stylesheet" href="/static/mcview/css/base.css" type="text/css" />
+{% block css %}{% endblock%}
+<script type="text/javascript" src="/static/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/static/js/arrow.js"></script>
+{% block js %}{% endblock %}
+<script type="text/javascript">
+{% block doc_ready %}{% endblock %}
+</script>
+
+</head>
+
+<body  class="bgstyle" style="z-index: 0;">
+<div class="topBg">
+  <div class="logo">
+  	
+  </div>
+  <div class="menu" id="menulist">
+    <p>
+    	<span>【&nbsp;帐号 Account】：{{user.username}}</span><br>
+    	<a href="{% url ChangePassword %}">【修改密码 reset password】</a>&nbsp;<a href="{% url logout %}">【退出 log off】</a></p>
+    <ul>
+    	{% for m in menus %}
+        <li style="width:{{menuwidth}}px;"><a href="{{m.url}}"  {% if m.is_active%} class="ad"{%endif%}>{{m.name_cn}}{% if m.name_en%}<br><span>{{m.name_en}}</span>{%endif%}</a></li>
+        {% endfor %}
+    </ul>
+  	<div class="c"></div>
+  </div>	
+	{% block body %}{% endblock %}
+</div>
+<div id="returnback_">
+<div class="return_back" >
+	<div id="go_up">
+		<a href="javascript:void(0)" class="up" title="UP"></a>
+	</div>
+	<div id="go_down">
+		<a href="javascript:void(0)" class="down" title="DOWN"></a>
+	</div>
+	<div id="go_left" style="display: none;">
+		<a href="javascript:void(0)" class="prev" title="LEFT"></a>
+	</div>
+	<div id="go_right" style="display: none;">
+		<a href="javascript:void(0)" class="next" title="RIGHT"></a>
+	</div>
+	<div id="go_back">
+		<a href="javascript:void(0)" onclick="javascript:history.go(-1);return false;" title="BACK"></a>
+	</div>
+</div>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,44 @@
+经销商名称：,"{{dealer.name_cn}}","{{dealer.name_en}}",,,,
+经销商编号：,{{dealer.name}},,,,,
+所在城市：,{{dealer.city_cn}},{{dealer.city_en}},,,,
+所在省：,{{dealer.province_cn}},{{dealer.province_en}},,,,
+所属区域：,{{dealer.region.name_cn}},{{dealer.region.name_en}},,,,
+本期最终得分({{curr_term.name}})：,{{curr_term.score}},,,,,
+进店时间：,{{begin_datetime}},,,,,
+离店时间：,{{end_datetime}},,,,,
+访问时长:,{{visit_time}},,,,,
+,,,,,,
+by basic,,,,,,{% for cp in cp_list %}
+{{cp.desc}},,,,,,
+英文,,,,,
+,"第1期
+1st Wave","第2期
+2nd Wave","第3期
+3rd Wave","第4期
+4th Wave",,
+{{dealer.abbr_cn}}得分 Dealer score,{{cp.score_list.0 or '-'}},{{cp.score_list.1 or '-'}},{{cp.score_list.2 or '-'}},{{cp.score_list.3 or '-'}},,
+全国平均得分 National average score,{{cp.score_list_nation.0 or '-'}},{{cp.score_list_nation.1 or '-'}},{{cp.score_list_nation.2 or '-'}},{{cp.score_list_nation.3 or '-'}},,
+所属区域平均得分 Regional average score,{{cp.score_list_region.0 or '-'}},{{cp.score_list_region.1 or '-'}},{{cp.score_list_region.2 or '-'}},{{cp.score_list_region.3 or '-'}},,
+,,,,,,
+,,,,,,
+全国最佳经销商得分 Best performance dealer score,{{cp.score_list_top.0}},{{cp.score_list_top.1}},{{cp.score_list_top.2}},{{cp.score_list_top.3}},,
+,,,,,,{% endfor %}
+by questions,,,,,,
+,"与区域均值比较
+Difference vs. Regional average ","与全国均值比较
+Difference vs. National average",,经销商得分,所属区域平均得分,全国平均得分{% for cp in question_list %}
+"{{cp.name}}.{{cp.desc}}",{{cp.region_delta}},{{cp.nation_delta}} ,,{{cp.score}},{{cp.score_region}},{{cp.score_nation}}
+,,,,,,{% endfor %}
+,
+,
+客户认为做得比较好的地方,{{good_comments}}\n{{good_comments_en}}
+客户认为有待改进的地方,{{bad_comments}}\n{{bad_comments_en}}
+,
+,
+,
+Detailed Result By Basic,
+{% for cp in cp_list[1:] %}
+"{{cp.name}}",{{cp.score_list.0}},{{cp.score_list.1}},{{cp.score_list.2}},{{cp.score_list.3}}
+{% for sub_cp in cp.sub_cp_list %},{{sub_cp.name}},{{sub_cp.score_list.0}},,{{sub_cp.score_list.1}},,{{sub_cp.score_list.2}},,{{sub_cp.score_list.3}},,"{{sub_cp.zero_reason or '-'}}"
+{% endfor %}
+{% endfor %}

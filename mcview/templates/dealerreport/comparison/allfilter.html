@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/jquery.dataTables.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/FixedColumns.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/ZeroClipboard.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/TableTools.js"></script>
+{% endblock %}
+
+{% block body %}
+  <div class="main01">
+    <h3><strong>{{item_cn}}数据对比</strong>&nbsp;&nbsp;&nbsp;{{item_en}} Data Comparison</h3>
+    <div class="box"> 
+		<form id="filterform" action="{% url DealerReport/ajaxallfilter %}" method="post">
+			{% csrf_token %}
+		<div class="selectMain">
+			<input type="hidden" name="kind" value="{{kind_id}}" />
+          <select name="Term" size="1" class="select01 FL">
+            <option value="">选择期数please select term</option>
+            {% for term in terms %}
+            <option value="{{term.id}}">{{term.name_cn}}</option>
+            {% endfor %}
+          </select>
+          <select name="Wave" size="1" class="select01 FR">
+			<option value="">选择品牌 please select wave</option>
+			{% for type in dealertypes %}
+			<option value="{{type.id}}" {% if kind_id == 'newold' %}selected="selected"{% endif %}>{{type.name_cn}}&nbsp;{{type.name_en}}</option>
+			{% endfor %}
+        </select>
+        <img class="search" src="/static/mcview/images/butSearch.gif" width="100" height="30" onclick="return ajaxFilter($('#filterform'),'filter_result');" style="cursor:pointer;"/>
+        </div>
+		</form>
+    </div>
+    <center><div id="filter_result" style="width: 98%;overflow: auto;"></div></center>
+    <br>
+  </div>
+{% endblock %}

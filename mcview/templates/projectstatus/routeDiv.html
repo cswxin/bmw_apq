@@ -1,0 +1,178 @@
+<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+<link rel="stylesheet" href="/static/data_table/css/demo_table_smk.css" type="text/css" />
+
+{% csrf_token%}
+<div  class="forms05 dataContent " >
+<table cellspacing="0" cellpadding="0" border="0"  class="display tdBc" width="100%" id='example'>
+	<thead>
+			<tr >
+				<th><strong>序号</strong><br/>No</th>
+				<th><strong>路线</strong><br>Route</td>
+				<th ><strong>城市</strong><br>Citys</td>
+				<th ><strong>访问员</strong><br>Visitor</td>
+			</tr>
+	</thead>	 
+	<tfoot>
+		<tr >
+				<td> </td>
+				<td> </td>
+				<td > </td>
+				<td ><button class="button" type="button" onclick="return fcompleted($('#myform'));" >Submit</button> </td>
+			</tr>
+	</tfoot>
+	<tbody>
+       {% for route_info in routes_info %}
+			<tr  >
+				<td>{{forloop.counter}}</td>
+				<td >{{route_info.name}}</td>				 
+				<td >{{route_info.citys}}</td>
+				<td >
+					   {% if cannot_edit or route_info.user.username %}
+   	                     <p class="userstext" name="{{route_info.user.id}}">{{route_info.user.username}}-{{route_info.user.first_name}}</p>
+   	                   {% else %}
+					     <select name="router{{route_info.id}}" id='users{{route_info.id}}' class='users'  onmouseover="focus()" onchange="changeUser(this,{{route_info.id}})">
+   	                           <option value=''>---请选择访问员---</option>
+   	                     </select>
+                      {% endif %}         
+                 </td>
+			</tr>			
+			{% endfor %} 
+	</tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+	$('#go_left').css("display","block");
+	$('#go_right').css("display","block");
+	var oTable = $('#example').dataTable({
+		"sDom": 'RC<"clear">lifrtp',
+		"bFilter" : true,
+		"bJQueryUI": true,
+		'bPaginate': false,
+		"bProcessing": true,
+		"sPaginationType": "full_numbers"
+	}); 
+	$("thead th").each( function ( i ) {
+		if(i>=1){
+			$(this).css('width','');
+		}
+		})
+	$('#example tr').click( function() {
+	        $(this).toggleClass('row_selected');
+	} );
+	oTable.$('td').hover( function() {
+        var iCol = $('td', this.parentNode).index(this) % 17;
+        $('td:nth-child('+(iCol+1)+')', oTable.$('tr')).addClass( 'highlighted' );
+    }, function() {
+        oTable.$('td.highlighted').removeClass('highlighted');
+    } );
+});
+
+	function selected_val(userstext,users){     
+        var selectedArr = new Array();
+ 	     var k = 0;
+ 	    if(userstext){  
+	 	     var l = $("td .userstext").length;
+	 	     for(var i=0;i< l; i++){
+	 	     	var visitor = $("td .userstext:eq("+i+")").attr("name");    
+	 		    if(visitor!=""){
+	 		        selectedArr[k] = visitor;
+	 		        k++; 	    
+	 		   } 
+	 	     }
+         }
+        if(users){
+	     	 var len = $("td .users").length;
+	 	     for(var j=0;j < len;j++){
+	 		    var visitor = $("td .users:eq("+j+")").val();    
+	 		    if(visitor!=""){
+	 		        selectedArr[k] = visitor;
+	 		        k++; 	    
+	 		   } 
+	 	      }
+ 	     } 
+ 	     
+ 	   return selectedArr;
+     } 
+     
+     function changeUser(sel,router_id){
+  	var option_index = sel.selectedIndex;    //得到下拉框的Index,$(sel)返回的object对象，
+          	//sel返回的HTM标签对象因为selectedIndex为HTML标签的属性所以这里用sel.selectedIndex
+  	  
+  	var user_id = $(sel).children().eq(option_index).attr("value");  //得到选择的访问员ID
+ 	 if(user_id!=""){
+  		$("td .users[name!='router"+router_id+"'] option[value='"+user_id+"']").remove(); 
+       }  
+  }
+  
+$(function(){
+ 	term_name = $("#term_name").val();
+ 	
+ 	function js(id){ return document.getElementById(id); }
+ 	
+ 	$("td .users").each(function(k){ 
+ 	  $(this).focus(function(){
+ 	  	 var selectID = $(this).attr('id');
+ 	  	if(selectID){
+	 	  	 var users = "";
+	 		 var ids = "";
+	 		 var visitors = selected_val(true,true);
+	         users ='{{user_infos}}';
+	         ids = '{{user_ids}}'
+	         users = users.replace(/(u&#39;)|(&#39;)/g,'"');
+	         users = eval(users);
+	         ids = eval(ids);
+	         
+	         var options_html = "";
+	         var selected_option = "---请选择访问员---";
+	         
+	         selected_option_value = $("td .users:eq("+k+")").val();
+	         $(this).empty();                           //清空
+	         
+	          
+	         if(selected_option_value!=''){                                 //如果select当前值不为空时，即不为‘请选择访问员---’时
+	         	  for(var h=0;h<ids.length;h++){
+	         	    if(ids[h]==selected_option_value){
+	         		   break
+	         	    }
+	              }
+	              var p=document.createElement("option");
+				   p.setAttribute("value",ids[h]);
+				   //p.setAttribute("selected","selected");
+				   js(selectID).appendChild(p);
+				   p.appendChild(document.createTextNode(users[h]));
+				  
+	            // selected_option = "<option value='"+ids[h]+"'>"+users[h]+"</option>"+selected_option; 
+	        }
+	         p=document.createElement("option");
+		     p.setAttribute("value",'');
+		     js(selectID).appendChild(p);
+		     p.appendChild(document.createTextNode(selected_option)); 
+		          
+	         for(var i=0;i<ids.length;i++){
+	         	var ok = true;
+	         	for(var j=0;j<visitors.length;j++){
+	         		if(ids[i]==visitors[j]){
+	         			ok = false;
+	         		    break;
+	         		}
+	         	}
+	          if(ok){
+				   p=document.createElement("option");
+				   p.setAttribute("value",ids[i]);
+				   js(selectID).appendChild(p);
+				   p.appendChild(document.createTextNode(users[i])); 
+		  
+	          	 // options_html += "<option value='"+ids[i]+"'>"+users[i]+"</option>";
+	         }
+	        }
+	         // $(this).empty();                           //清空
+	         // options_html = selected_option+options_html;
+	         // $(this).append(options_html);           //加入options	  
+         }
+        });	
+ 	});
+ 	
+ });		
+</script>

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<script type="text/javascript">
+	function mychange(){
+			var type_id = $('#TypeSelect').children('option:selected').val()
+			$('#info').html("载入问卷中...");
+			$('#contentDiv').empty();
+			$.ajax({
+				type:"POST",
+				url:"/QuestionnaireQA/change",
+				data:{type_id:type_id},
+				dataType:"json",
+				error: function (XMLHttpRequest){
+					alert(XMLHttpRequest.responseText);
+					return false;
+				},
+				success: function (data){
+					$('#info').empty();
+					$('#contentDiv').empty();
+					$('#contentDiv').html(data.html);
+				}
+			});
+		}
+</script>
+
+{% autoescape off %}
+
+<div class="main01">
+	<div class="box">
+		<div class="forms" style="width:920px;">	
+			<select id="TypeSelect" name="TypeSelect" size="1" class="select01" onchange="javascript:mychange();">
+			    <option value="3">BMW 售后流程质量（APQ）项目问卷 2015版</option>
+                <option value="4">MINI 售后流程质量（APQ）项目问卷 2015版</option>
+		    	<option value="1">BMW 售后流程质量（APQ）项目问卷 2014版</option>
+            	<option value="2">MINI 售后流程质量（APQ）项目问卷 2014版</option>
+            </select><div style="margin-left: 10px;" id='info' name='info'>&nbsp;</div>
+			<div>&nbsp;</div>
+			
+			<table width="100%" cellspacing="0" cellpadding="0" border="0">
+				<tbody>
+					<tr class="td01" style="white-space: nowrap;">
+						<td><strong>流程质量部分</strong><br />Process Quality Part</td>
+						<td style="background: white;width: 20%;"></td>
+						<td><strong>客户对待部分</strong><br />Customer Treatment Part</td>
+						<td style="background: lightgreen;width: 20%;"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div name='contentDiv' id='contentDiv'>	
+{% for qa in qa_list %}
+<div class="main01">
+	<h3><strong>{{qa.name_cn}} {{qa.name_en}}</strong></h3>
+	<div class="box">
+		<div class="forms" style="width:920px;">
+			<table width="100%" cellspacing="0" cellpadding="0" border="0">
+				<tbody>
+					<tr class="td01" style="white-space: nowrap;">
+						<td><strong>题号</strong><br />No.</td>
+						<td width="25%"><strong>问题</strong><br />Question</td>
+						<td><strong>是/否/未涉及</strong><br />Yes/No/NA</td>
+						<td><strong>分值</strong><br>Points</td>
+						<td width="40%"><strong>题目描述</strong><br>Clarification</td>
+					</tr>
+					{% for cqa in qa.child_list %}
+					<tr style="background-color: {{cqa.color.color}};">
+						<td rowspan="{{cqa.child_length}}" style="text-align: center;">{{cqa.number}}</td>
+						<td rowspan="{{cqa.child_length}}">{{cqa.question_cn|default_if_none:""|safe}}<br />{{cqa.question_en|default_if_none:""|safe}}</td>
+						<td>{{cqa.child_list.0.option_cn|default_if_none:""}}<br />{{cqa.child_list.0.option_en|default_if_none:""}}</td>
+						<td style="text-align: center;">{{cqa.child_list.0.point|default_if_none:""}}</td>
+						
+						{% if cqa.qid in cp_score_list %}
+						<td rowspan="{{cqa.rowspan}}">{{cqa.desc_cn|default_if_none:""|safe}}<br />{{cqa.desc_en|default_if_none:""|safe}}</td>
+						{% else %}
+						{% if cqa.qid in cp_no_score_list %}
+						
+						{% else %}
+						<td rowspan="{{cqa.child_length}}">{{cqa.desc_cn|default_if_none:""|safe}}<br />{{cqa.desc_en|default_if_none:""|safe}}</td>
+						{% endif %}
+						{% endif %}
+					</tr>
+						{% for oqa in cqa.child_list %}
+						{% if not forloop.first %}
+						<tr style="background-color: {{cqa.color.color}};">
+							<td>{{oqa.option_cn|default_if_none:""}}<br />{{oqa.option_en|default_if_none:""}}</td>
+							<td style="text-align: center;">{{oqa.point|default_if_none:""}}</td>
+						</tr>
+						{% endif %}
+						{% endfor %}
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="c"></div>
+	</div>
+</div>
+{% endfor %}
+</div>
+{% endautoescape %}
+
+{% endblock %}

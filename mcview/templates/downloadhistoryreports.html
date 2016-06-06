@@ -1,0 +1,7 @@
+<form class="hisdownland" action="{% url DownloadHistoryReports dealer_id=dealer_id %}" method="post" width=600;>
+	{% csrf_token %}
+	{% for report in reports %}
+		<input name="report" type="checkbox" value="{{report.id}}">2010年 第{{report.term_index}}期<br/>
+	{% endfor %}
+	<input id="dl" type="button" value="下载 Download" onclick="return downloadfile(this);"/>
+</form>

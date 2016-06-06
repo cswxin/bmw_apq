@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+	<script type="text/javascript" src="/static/js/jquery-ui-1.8.9.custom.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/jquery.dataTables.js"></script>
+
+<script type="text/javascript">
+
+	function emptySelector(type) {
+		switch(type){
+		case "region":
+			var select = $('#Province');
+			if(select) {
+				select.children().filter('option[value!=""]').remove();
+			}
+			var select = $('#City');
+			if(select) {
+				select.children().filter('option[value!=""]').remove();
+			}
+			var select = $('#Area');
+			if(select) {
+				select.children().filter('option[value!=""]').remove();
+			}
+			var select = $('#Group');
+			if(select) {
+				select.children().filter('option[value!=""]').remove();
+			}
+			break
+		case "province":
+			var select = $('#City');
+			if(select) {
+				select.children().filter('option[value!=""]').remove();
+			}
+			break
+		}
+	}
+	
+	function checkSelector(type) {
+		switch(type){
+		case "region":
+			break
+		case "province":
+			value = $("#Region").val();
+			if(!value && value=="") {
+				alert("请选择大区！");
+				return;
+			}
+			break
+		case "city":
+			value = $("#Region").val();
+			if(!value && value=="") {
+				alert("请选择大区！");
+				return;
+			}
+			value = $("#Province").val();
+			if(!value && value=="") {
+				alert("请选择省份！");
+				return;
+			}
+			break
+		case "area":
+			value = $("#Region").val();
+			if(!value && value=="") {
+				alert("请选择大区！");
+				return;
+			}
+			break
+		case "group":
+			value = $("#Region").val();
+			if(!value && value=="") {
+				alert("请选择大区！");
+				return;
+			}
+			break
+		}
+	}
+	
+	function loadSelector(type,select) {
+		if (select.length != 1){
+			return false;
+		}
+		region = 0;
+		province = 0;
+		city = 0;
+		switch(type){
+			case "province":
+				region = $("#Region").val();
+				if(!region && region=="") {
+					return
+				}
+				var select = $('#Province');
+				break
+			case "city":
+				region = $("#Region").val();
+				if(!region && region=="") {
+					return;
+				}
+				province = $("#Province").val();
+				if(!province && province=="") {
+					return;
+				}
+				var select = $('#City');
+				break
+			case "area":
+				region = $("#Region").val();
+				if(!region && region=="") {
+					return
+				}
+				var select = $('#Area');
+				break
+			case "group":
+				region = $("#Region").val();
+				if(!region && region=="") {
+					return
+				}
+				var select = $('#Group');
+				break
+		}
+		$.ajax({
+			type:"POST",
+			url:"/DealerReport/ajaxgetoption",
+			data:{type:type,region:region,province:province},
+			dataType:"json",
+			error: function (XMLHttpRequest){
+				alert(XMLHttpRequest.responseText);
+				return false;
+			},
+			success: function (data){
+				makeoption(select,data);
+			}
+		});
+	}
+	
+	function makeoption(select,data){
+		var opt = select.children();
+		opt.filter('option[value!=""]').remove();
+		var add_opt = [];
+		for (var i=0;i<data.length;i++){
+			add_opt.push('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
+		}
+		var a_opt = add_opt.join('\n');
+		select.append(a_opt);
+	}
+	
+	function delCookie(name){//为了删除指定名称的cookie，可以将其过期时间设定为一个过去的时间  
+		var date = new Date();  
+		date.setTime(date.getTime() - 10000);  
+		document.cookie = name + "=a; expires=" + date.toGMTString();  
+	} 
+	
+	function myfilter(){
+		delCookie('checks');
+		$('#mybutton').removeAttr('style');
+		ajaxFilter($('#filterform'),'filter_result');
+		return false;
+	}
+
+</script>
+
+{% endblock %}
+
+{% block body %}
+  <div class="main01">
+    <h3><strong>数据筛选</strong>&nbsp;&nbsp;&nbsp;Data Filter</h3>
+    <div class="box"> 
+		<form id="filterform" action="{% url DealerReport/ajaxfilter %}" method="post">
+			{% csrf_token %}
+		<div class="selectMain">
+		<table>
+			{% if man_dealer.has_child %}
+			<tr>
+				<td>
+					<select id="Term" name="Term" size="1" class="select01 FR">
+			            <option value="">选择期数please select term</option>
+			            {% for term in terms %}
+			            <option value="{{term.id}}">{{term.name_cn}}</option>
+			            {% endfor %}
+			          </select>
+				</td>
+				<td>
+					<select id="Type" name="Type" size="1" class="select01 FR">
+						<option value="">选择品牌 please select type</option>
+						{% for type in dealertypes %}
+						<option value="{{type.id}}">{{type.name_cn}}</option>
+						{% endfor %}
+					  </select>
+				</td>
+				<td>
+					
+					<select id="Region" name="Region" size="1" class="select01 FR" onchange="javascript:emptySelector('region');" onclick="javascript:checkSelector('region');">
+			            <option value="">选择大区please select region</option>
+			            {% for region in regions %}
+			            <option value="{{region.id}}">{{region.name_cn}}</option>
+			            {% endfor %}
+			         </select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<select id="Province" name="Province" size="1" class="select01 FR" onchange="javascript:emptySelector('province');" onclick="javascript:checkSelector('province');" onmouseover="javascript:loadSelector('province',this);">
+						<option value="">选择省份 please select province</option>
+						{% for province in provinces %}
+						<option value="{{province.id}}">{{province.name_cn}}</option>
+						{% endfor %}
+			          </select>
+				</td>
+				<td>
+					<select id="City" name="City" size="1" class="select01 FR" onchange="javascript:emptySelector('city');" onclick="javascript:checkSelector('city');" onmouseover="javascript:loadSelector('city',this);">
+						<option value="">选择城市 please select city</option>
+						{% for city in citys %}
+						<option value="{{city.id}}">{{city.name_cn}}</option>
+						{% endfor %}
+			          </select>
+				</td>
+				<!-- <td>
+					<select id="Area" name="Area" size="1" class="select01 FR" onchange="javascript:emptySelector('area');" onclick="javascript:checkSelector('area');" onmouseover="javascript:loadSelector('area',this);">
+						<option value="">选择小区 please select area</option>
+						{% for area in areas %}
+						<option value="{{area.id}}">{{area.name_cn}}</option>
+						{% endfor %}
+			          </select>
+				</td> -->
+			</tr>
+			
+			<tr>
+				<td>
+					<select id="Group" name="Group" size="1" class="select01 FR" onchange="javascript:emptySelector('group');" onclick="javascript:checkSelector('group');" onmouseover="javascript:loadSelector('group',this);">
+			            <option value="">选择集团please select group</option>
+			            {% for group in groups %}
+			            <option value="{{group.id}}">{{group.name_cn}}</option>
+			            {% endfor %}
+			          </select>
+				</td>
+				<td>
+				</td>
+				<td align="center">
+					<img class="search" src="/static/mcview/images/butSearch.gif" width="100" height="30" onclick="javascript:myfilter();" style="cursor:pointer;"/>
+				</td>	
+			</tr>
+			{% else %}
+			<tr>
+				<td>
+					<select id="Term" name="Term" size="1" class="select01 FR">
+			            <option value="">选择期数please select term</option>
+			            {% for term in terms %}
+			            <option value="{{term.id}}">{{term.name_cn}}</option>
+			            {% endfor %}
+			          </select>
+				</td>
+				<td>
+					<select id="Type" name="Type" size="1" class="select01 FR">
+						<option value="">选择品牌 please select type</option>
+						{% for type in dealertypes %}
+						<option value="{{type.id}}">{{type.name_cn}}</option>
+						{% endfor %}
+					  </select>
+				</td>
+				<td align="center">
+					<img class="search" src="/static/mcview/images/butSearch.gif" width="100" height="30" onclick="javascript:myfilter();" style="cursor:pointer;"/>
+				</td>
+			</tr>
+			
+			{% endif %}
+		</table>
+		</div>
+
+          </form>
+    </div>
+    <div align="center" id="filter_result" class="forms05 dataContent " style="width: 98%;"></div>
+    <br>
+    <div align="center" id="mybutton" style="display: none">
+    <img class="makingcomparison" src="/static/mcview/images/butPK.gif" width="182" height="43" onclick="javascript:CompPaper();" style="cursor:pointer;"/>
+	<img class="makingcomparison" src="/static/mcview/images/butBD.jpg" width="182" height="43" onclick="javascript:downloadreports();" style="cursor:pointer;"/>
+  	</div>
+  </div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+{% endblock %}
+
+{% block body %}
+<div class="main01">
+    <h3><strong>{{item_name}}数据对比和历史/现在/未来</strong>&nbsp;&nbsp;&nbsp; {{item_name_en}} Data Comparison And History/Current/Future </h3>
+    <div class="box">
+	    {% if fileurl %}
+	    <a style="float: right;margin-top: 10px;margin-right: 10px;color: blue;" href="{{fileurl|safe}}">下载报告</a>
+	    {% else %}
+	    <label style="float: right;margin-top: 10px;margin-right: 10px;color: gray;">报告尚未生成</label>
+	    {% endif %}
+    </div>
+    <div class="box">
+      <div class="forms" style="width:920px; float:none; margin-top:8px;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tbody><tr>
+        <td width="15%" class="td01"><strong>{{item_name}}名称：</strong><br>Dealar Name</td>
+        <td width="35%" >{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+        <td width="15%" class="td01"><strong>本期最终得分（{{term.name_cn}}）：</strong><br>Overall score of&nbsp;&nbsp;{{term.name_en}}&nbsp;&nbsp;wave </td>
+        <td id="TD_Dealer_Cent">{{rep.score|floatformat:1}}</td>
+      </tr>
+        </tbody></table>
+      </div>
+    </div>    
+</div>
+
+<div class="main01">
+    <h3><span><a href="#" onclick="top()"><img src="/static/mcview/images/icon08.gif" width="16" height="15" id="imgBASIC"></a></span><strong>按基本点查看历史/现在/未来信息 </strong>&nbsp;&nbsp;&nbsp; by basic </h3>
+    <div class="box" id="DivBasic" style="display: block; ">
+      <h5>{{item_name}}最终得分  &nbsp;&nbsp; Total Score</h5>
+      <div class="box02">
+        <img src="/static/mcview/images/chart/{{cp_total.chart_img}}?ver={{data_version}}"></img>
+      </div>
+      <h5>按环节查看详细评估结果    &nbsp;&nbsp; by Processes/ Timeline</h5>
+      
+      {% for check_group in cp_group_list %}
+      <div class="">
+        <table width="100%">
+            <tr>
+                <td><strong>{{check_group.name_abbr}}.{{check_group.desc}}&nbsp;<br>{{check_group.name_abbr}}.{{check_group.desc_en}}</strong></td>
+                <td align="right">&nbsp;</td>
+            </tr>
+        </table>
+      </div>
+      <div class="box02">
+        <img src="/static/mcview/images/chart/{{check_group.chart_img}}?ver={{data_version}}" ></img>
+      </div>
+      <div style="height:20px;">&nbsp;
+      </div>
+      {% endfor %}
+	</div>
+</div>
+{% endblock %}

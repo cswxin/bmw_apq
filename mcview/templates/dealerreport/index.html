@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+{% endblock %}
+
+{% block body %}
+  <div class="main01">
+    <h3><strong>数据分析</strong>&nbsp;&nbsp;&nbsp;Data Analysis</h3>
+    <div class="box forms05">
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
+			
+			{% if not dealerPagePerm%}
+			<tr>
+				<td><a href='{% url DealerReport/dealerfilter %}'>经销商单店分析 <br>Dealer Analysis</a></td>
+			</tr>
+			<!--
+			<tr>
+				<td><a href='{% url DealerReport/advancedfilter %}'>其他高级分析 <br>Other Advanced Analysis</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url DealerReport/dealerlogin %}'>经销商登陆查询 <br>Dealer Login</a></td>
+			</tr>
+			-->
+			{%else%}
+			<tr>
+				<td><a href='{% url DealerReport/dealerlist %}'>经销商单店分析 <br>Dealer Analysis</a></td>
+			</tr>
+			{%endif%}
+		</table>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/js/jquery-ui-1.8.9.custom.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/jquery.dataTables.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/ZeroClipboard.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/TableTools.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/FixedHeader.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/bgiframe.js"></script>	
+{% endblock %}
+{% block css %}
+	<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+	<link rel="stylesheet" href="/static/data_table/css/demo_table_smk.css" type="text/css" />
+{% endblock %}
+{% block doc_ready %}
+	{% include "projectstatus/jshandle.html"%}
+{% endblock %}
+{% block body %}
+<div class="main01">
+	<h3><strong>本期MINI执行情况汇总</strong>&nbsp;&nbsp;&nbsp; Current Wave MINI Detailed Fieldwork Status&nbsp;&nbsp;&nbsp; {{current_term.name}}</h3>
+    <center>
+    <div class="forms05 dataContent" onscroll="tableScroll()">
+		<table cellpadding="0" cellspacing="0" border="0"  id="example" class="display tdBc" id="example" style="font-size:13px;border-left:1px #ccc solid;">
+			<thead>
+				<tr>
+					<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td ></td>
+						<td ></td>
+						<td ></td>
+						<td ></td>
+						<td ></td>
+						 <td ></td>
+						 <td ></td>
+						 <td ></td>
+						 <td ></td>
+						 <td ></td>
+						 <td ></td>
+						 <td ></td>
+						 <td ></td>
+						 <td></td>
+						 <td></td>
+						 <td></td>
+						 <td></td>
+						 <td></td>
+						 <td></td>
+						 <td></td>
+				</tr>
+				<tr>
+					<th rowspan="3"><strong>序号</strong><br/>No</th>
+					<th rowspan="3"><strong>经销商代码</strong><br/>Dealer No. (CBU)</th>
+					<th rowspan="3"><strong>经销商名称</strong><br/>Aftersales Company Name</th>
+					<th rowspan="3"><strong>得分</strong><br/>Score</th>
+					<th rowspan="3"><strong>查看报告</strong><br/>Check for report</th>
+					<th rowspan="3"><strong>城市</strong><br/>City </th>
+					<th rowspan="3"><strong>省份</strong><br/>Province </th>
+					<th rowspan="3"><strong>进店人数</strong><br/>No. of Visitor</th>
+					<th colspan="14"><strong>执行状态－FW团队</strong><br/>FW Progress</th>
+					<th colspan="3"><strong>执行状态－独立复核团队</strong><br/>Independent team Progress</th>
+					<th colspan="2"><strong>BMW审核</strong><br/>BMW Audit</th>
+					
+				</tr>
+				<tr>
+					<th rowspan="2"><strong>访问日期</strong><br/>Visit date</th>
+					<th colspan="2"><strong>评估员QC</strong><br/>Auditor QC </th>
+					<th colspan="2"><strong>QC一审</strong><br/>QC1 </th>
+					<th colspan="2"><strong>QC二审</strong><br/>QC2 </th>
+					<th colspan="2"><strong>QC三审</strong><br/>QC3 </th>
+					<th colspan="2"><strong>督导审核</strong><br/>Superviser </th>
+					<th colspan="2"><strong>研究审核 </strong><br/>Research </th>
+					<th rowspan="2"><br>
+					<strong>FW团队终审完成日期</strong><br/>
+					FW Finalize date</th>
+					<th rowspan="2"><strong>独立复核团队审核日期</strong><br/>
+					Independent team QC  date</th>
+					<th rowspan="2"><strong>独立复核团队审核员ID</strong><br/>QC ID</th>
+					<th rowspan="2"><strong>独立复核审核完成日期</strong><br/>
+				    Independent team Finalize date</th>
+					<th rowspan="2"><strong>BMW审核日期</strong><br/>BMW date</th>
+					<th rowspan="2"><strong>BMW审核ID</strong><br/>BMW ID</th>
+				</tr>
+				<tr>
+				  <th><strong>日期</strong><br/>Date</th>
+				  <th><strong>帐号</strong><br>ID</th>
+			      <th><strong>日期</strong><br/>Date</th>
+			      <th><strong>帐号</strong><br>ID</th>
+			      <th><strong>日期</strong><br/>Date</th>
+			      <th><strong>帐号</strong><br>ID</th>
+			     <th><strong>日期</strong><br/>Date</th>
+			      <th><strong>帐号</strong><br>ID</th>
+			      <th><strong>日期</strong><br/>Date</th>
+			      <th><strong>帐号</strong><br>ID</th>
+			      <th><strong>日期</strong><br/>Date</th>
+			      <th><strong>帐号</strong><br>ID</th>
+			  </tr>
+			</thead>
+			<tbody>
+				{% for dealer in dealer_list %}
+					<tr>
+						<td>{{forloop.counter}}</td>
+						<td>{{dealer.name}}</td>
+						<td>{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+						<td>{{dealer.score}}</td>
+						 <td> 
+								{% if dealer.report_ready %}
+								<a href="/DealerReport/DetailDealerReport/{{dealer.paperid}}/" target="_blank">
+								点击查看报告<br/>click here for report</a>
+								{% else %}
+								报告未生成<br/>report not available now
+								{% endif %}</td>
+						<td>{{dealer.city_cn}}<br>{{dealer.city_en}}</td>
+						<td>{{dealer.province_cn}}<br>{{dealer.province_en}}</td>
+						<td>{{dealer.visitor_num}}</td>
+						<td>{{dealer.visite_date|date|default:""}}</td>
+						<td>{{dealer.fw_input_date|safe|default:""}}</td>
+						<td>{{dealer.fw_input_id|safe|default:""}}</td>
+						<td>{{dealer.qc1_date|safe|default:""}}</td>
+						<td>{{dealer.qc1_id|safe|default:""}}</td>
+						<td>{{dealer.qc2_date|safe|default:""}}</td>
+						 <td>{{dealer.qc2_id|safe|default:""}}</td>
+						 <td>{{dealer.qc3_date|safe|default:""}}</td>
+						 <td>{{dealer.qc3_id|safe|default:""}}</td>
+						 <td>{{dealer.dd_date|safe|default:""}}</td>
+						 <td>{{dealer.dd_id|safe|default:""}}</td>
+						 <td>{{dealer.yj_date|safe|default:""}}</td>
+						 <td>{{dealer.yj_id|safe|default:""}}</td>
+						 <td>{{dealer.fw_end_date|safe|default:""}}</td>
+						 <td>{{dealer.fh_input_date|safe|default:""}}</td>
+						 <td>{{dealer.fh_end_id|safe|default:""}}</td>
+						 <td>{{dealer.fh_end_date|safe|default:""}}</td>
+						 <td>{{dealer.bmw_date|safe|default:""}}</td>
+						 <td>{{dealer.bmw_id|safe|default:""}}</td>
+						 
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+		<br/>
+	</div>
+		<br>
+		</center>
+</div>
+{% endblock %}
+			
+			

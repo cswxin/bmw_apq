@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/jquery.dataTables.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/FixedColumns.js"></script>
+{% endblock %}
+
+{% block body %}
+  <div class="main01">
+    <h3><strong>评估员数据对比</strong>&nbsp;&nbsp;&nbsp;Auditor Data Comparison</h3>
+    <div class="box"> 
+		<form id="filterform" action="{% url DealerReport/ajaxdetails %}" method="post">
+			{% csrf_token %}
+			<input type="hidden" name="project_id" value="{{project.id}}" />
+			<input type="hidden" name="search_type" value="{{stype}}" />
+			<input type="hidden" name="search_item" value="{{item}}" />
+			<input type="hidden" name="term_id" value="{{term.id}}" />
+			<input type="hidden" name="dealer_type" value="{{dtype}}" />
+		<div class="selectMain selectH">
+          <select name="cplist" class="select01 CK" multiple="multiple">
+            <option value="all" selected="selected">全部</option>
+            {% for cp in cp_list %}
+            <option value="{{cp.name}}">{{cp.name_abbr}}{{cp.desc}}</option>
+            {% endfor %}
+          </select>
+          <img class="search" src="/static/mcview/images/butSearch.gif" width="100" height="30" onclick="return ajaxSubmit($('#filterform'),'filter_result');" style="cursor:pointer;"/>
+        </div>
+		</form>
+    </div>
+    <center><div id="filter_result" style="width: 98%;overflow: auto;"></div></center>
+    <br>
+  </div>
+{% endblock %}

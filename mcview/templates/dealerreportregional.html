@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/jquery.boxy.js"></script>
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+{% endblock %}
+{% block css %}
+	<link rel="stylesheet" href="/static/mcview/css/base.css" type="text/css" />
+	<link rel="stylesheet" href="/static/mcview/css/boxy.css" type="text/css" />
+{% endblock %}
+
+{% block body %}
+	<div class="main01">
+		<h3><strong>查看历史报告 </strong>&nbsp;&nbsp;&nbsp;Check for history dealer report</h3>
+		<div class="box">
+			
+			<h5>{{region.name_cn}} &nbsp;&nbsp;{{region.name_en}}
+			<a href='{% url RegionalHistoryReport region.name %}' style='color:#003299;text-decoration:underline;line-height:24px;padding-left:20px;' target='_blank'>往期历史数据查询 History Data Check</a>
+			</h5>
+			
+			<div class="forms" style="width:920px;">				  
+				{% for report in reports %}
+				  <a href='{{report.document}}' style='color:#003299;text-decoration:underline;line-height:24px;' target='_blank'>{{report.title}}</a><br>
+				{% endfor %}
+			</div>
+			<div class="c"></div>
+		</div>
+		<div class="c"></div>
+	</div>
+
+
+	<div class="main01">
+		<h3><strong>查看经销商访问情况及报告 </strong>&nbsp;&nbsp;&nbsp;Dealer visit status & check for dealer report&nbsp;&nbsp;&nbsp; </h3>
+		<div class="box">
+			<h5>{{region.name_cn}} &nbsp;&nbsp;{{region.name_en}}</h5>
+			<div class="forms" style="width:920px;">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr class="td01">
+						<td width="7%"><strong>序号</strong><br />No</td>
+						<td width="8%"><strong>经销商代码</strong><br />Dealer No. (CBU)</td>
+						<td width="7%"><strong>城市</strong><br />City </td>
+						<td width="5%"><strong>省份</strong><br />Province </td>
+						<td width="24%"><strong>经销商名称</strong><br />Aftersales Company Name</td>
+						<td width="15%">
+							<a href="javascript:Sort('DESC','ASC','West','BMW')" class="Section" Name="BMW" style="color:#666" >
+								<strong>经销商本期最终得分</strong><br />Dealer Total Score of Current Wave
+							</a>
+						</td>
+						<td width="18%"><strong>查看报告</strong><br />Check for report</td>
+						<td width="18%"><strong>历史报告</strong><br />History report</td>
+					</tr>
+					{% for dealer in dealer_list_bm %}
+						<tr>
+							<td><strong>{{forloop.counter}}</strong></td>
+							<td>{{dealer.name}}</td>
+							<td>{{dealer.city_cn}}<br>{{dealer.city_en}}</td>
+							<td>{{dealer.province_cn}}<br>{{dealer.province_en}}</td>
+							<td>{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+							<td>{{dealer.score|floatformat:1|default:"&nbsp;"}}</td>
+							<td>
+							{% if dealer.is_public %}
+							<a href="/DetailDealerReport/{{dealer.paperid}}/" target="_blank">
+							点击查看报告<br />click here for report</a>
+							{% else %}
+							报告未生成<br />report not available now
+							{% endif %}
+							</td>
+							<td>
+								<a class="download" name="{{dealer.id}}" onclick="return download(this);">点击下载历史报告<br />Download history report</a>
+							</td>
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+			<div class="c"></div>
+		</div>
+		<div class="c"></div>
+	</div>
+
+
+	<div class="main01">
+		<h3><strong>查看竞品访问情况及报告 </strong>&nbsp;&nbsp;&nbsp;Competitor shop visit status & check for competitor dealer report&nbsp;&nbsp;&nbsp; </h3>
+		<div class="box">
+			<h5>{{region.name_cn}} &nbsp;&nbsp;{{region.name_en}}</h5>
+			<div class="forms" style="width:920px;">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr class="td01">
+						<td width="7%"><strong>序号</strong><br />No</td>
+						<td width="8%"><strong>经销商代码</strong><br />Dealer No. (CBU)</td>
+						<td width="7%"><strong>城市</strong><br />City </td>
+						<td width="5%"><strong>省份</strong><br />Province </td>
+						<td width="24%"><strong>经销商名称</strong><br />Aftersales Company Name</td>
+						<td width="15%">
+							<a href="javascript:Sort('ASC','DESC','West','UNBMW')" class="Section" Name="UNBMW" style="color:#666" >
+								<strong>经销商本期最终得分</strong><br />Dealer Total Score of Current Wave
+							</a>↑
+						</td>
+						<td width="18%"><strong>查看报告</strong><br />Check for report</td>
+						<td width="18%"><strong>历史报告</strong><br />History report</td>
+					</tr>
+					{% for dealer in dealer_list_other %}
+						<tr>
+							<td><strong>{{forloop.counter}}</strong></td>
+							<td>{{dealer.name}}</td>
+							<td>{{dealer.city_cn}}<br>{{dealer.city_en}}</td>
+							<td>{{dealer.province_cn}}<br>{{dealer.province_en}}</td>
+							<td>{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+							<td>{{dealer.score|floatformat:1|default:"&nbsp;"}}</td>
+							<td>
+							{% if dealer.report_ready %}
+							<a href="/DetailDealerReport/{{dealer.paperid}}/" target="_blank">点击查看报告<br />click here for report</a>
+							{% else %}
+							报告未生成<br />report not available now
+							{% endif %}
+							</td>
+							<td>
+								<a class="download" name="{{dealer.id}}" onclick="return download(this);">点击下载历史报告<br />Download history report</a>
+							</td>
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+			<div class="c"></div>
+		</div>
+		<div class="c"></div>
+	</div>
+
+
+
+<p align="center"><br><a href="javascript:history.back();" style="color:#003299;text-decoration:underline;">【返回上一页面 back to previous page】</a></p>
+
+ <div class="c"></div>
+{% endblock %}

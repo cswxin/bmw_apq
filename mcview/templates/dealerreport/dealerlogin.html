@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/js/jquery-ui-1.8.9.custom.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/jquery.dataTables.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/ZeroClipboard.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/TableTools.js"></script>
+{% endblock %}
+{% block css %}
+	<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+	<link rel="stylesheet" href="/static/data_table/css/demo_table_smk.css" type="text/css" />
+{% endblock %}
+{% block doc_ready %}
+$(document).ready( function () {
+	$('#go_left').css("display","block");
+	$('#go_right').css("display","block");
+	var oTable= $('#example').dataTable( {
+		"sDom": 'T<"clear">lifrtp',
+		"bJQueryUI": true,
+		"oTableTools": {
+			"aButtons": [
+				"copy",
+			]
+		},
+		"bPaginate": false
+		} );
+	} );
+	$("thead th").each( function ( i ) {
+		if(i>=1){
+			$(this).css('width','');
+		}
+		})
+	$('#example tr').click( function() {
+	        $(this).toggleClass('row_selected');
+	} );
+	oTable.$('td').hover( function() {
+        var iCol = $('td', this.parentNode).index(this) % 17;
+        $('td:nth-child('+(iCol+1)+')', oTable.$('tr')).addClass( 'highlighted' );
+    }, function() {
+        oTable.$('td.highlighted').removeClass('highlighted');
+    } );
+{% endblock %}
+{% block body %}
+ 
+<div class="main01">
+	<h3><strong>经销商登陆查询</strong>&nbsp;&nbsp;&nbsp; Dealer Login&nbsp;&nbsp;&nbsp; {{current_term.name}}</h3>
+    <center>
+    <div class="forms05 dataContent" style="width: 98%;overflow: auto; margin-top: 10px;">
+		<table cellpadding="0" cellspacing="0" border="0" class="display" id="example" class="display tdBc" style="font-size:13px;border-left:1px #ccc solid;">
+			<thead>
+				<tr>
+					<th><strong>序号</strong><br/>No</th>
+					<th><strong>经销商名称</strong><br/>Dealer</th>
+					<th><strong>经销商ID</strong><br/>Dealer ID</th>
+					<th><strong>登录次数</strong><br/>Login Times </th>
+					<th><strong>最后登录时间</strong><br/>Last Login Time </th>
+				</th>
+			</thead>
+			<tbody>
+				{% for item in dealer_login_info %}
+				<tr>
+					<td>{{forloop.counter}}</td>
+					<td>{{item.0}}<br>{{item.1}}</td>
+					<td>{{item.2}}</td>
+					<td>{{item.3}}</td>
+					<td>{{item.4}}</td>
+				</tr>
+				 {% endfor %}
+			</tbody>
+		</table>
+	</div>
+	</center>
+</div>
+{% endblock %}
+			
+			

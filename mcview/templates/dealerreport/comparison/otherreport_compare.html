@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" href="/static/mcview/css/base.css" type="text/css" />
+{% endblock %}
+
+{% block body %}
+<script type="text/javascript">
+	var rep_ids = {{rep_ids|safe}};
+	var rep_str = '';
+	for (var i=0; i < rep_ids.length; i++) {
+	  	rep_str += rep_ids[i];
+	  	if (i != rep_ids.length - 1){
+	  		rep_str += ',';
+	  	}
+	};
+	var cplist = {{cplist|safe}};
+	var cp_str = '';
+	for (var i=0; i < cplist.length; i++) {
+	  	cp_str += cplist[i];
+	  	if (i != cplist.length - 1){
+	  		cp_str += ',';
+	  	}
+	};
+	var kind = '{{kind|safe}}';
+	var project_id = {{project_id|default:0}};
+
+	function ajax_gen_other_compare_excel(){
+		$.ajax({
+			type:"POST",
+			url:"/DealerReport/ajax_gen_other_compare_excel",
+			data:{rep_ids:rep_str,
+				cplist:cp_str,
+				kind:kind,
+				project_id:project_id},
+			dataType:"json",
+			success: function (data){
+				$("#excel_file_url").html('<a href="'+data.url+'">下载报告</a>');
+				alert('报告已经生成，请点击“下载报告”');
+			}
+		});
+	}
+
+
+</script>
+<div class="main01">
+    <h3><strong>{{item_name}}数据对比</strong>&nbsp;&nbsp;&nbsp;{{item_name_en}} Data Comparison</h3>
+    <a id="gen_compare_excel" style="float: right;margin-top: 10px;margin-right: 10px;color: blue;" href="#" onclick="javascript:ajax_gen_other_compare_excel();">生成对比报告</a>
+    <span id="excel_file_url" style="float: right;margin-top: 10px;margin-right: 10px;color: blue;">&nbsp;</span>
+    <div class="box">
+        <h5>总分及各环节得分&nbsp;&nbsp; Total Score &amp; Basic Scores </h5>
+        <div class="forms" style="width:920px; float:none;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr class="td01">
+                        <td width="6%" valign="top">
+                            <strong>序号</strong>
+                            <br>
+                            No.
+                        </td>
+                        <td width="26%" valign="top">
+                            <strong>{{item_name}}</strong>
+                            <br>
+                            {{item_name_en}}
+                        </td>
+                        {% for group in checkpoint_group_list %}
+                        <td width="10%" valign="top">
+                            <strong>{{group.name_abbr|default:""}} {{group.desc}}</strong>
+                            <br>
+                            {{group.desc_en}}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% for item,item_score in item_group_score_dict %}
+                    <tr>
+                        <td>
+                            <strong>{{forloop.counter}}</strong>
+                        </td>
+                        <td>
+                            {{item|safe}}
+                        </td>
+                        {% for score in item_score %}
+                        <td align="center">
+                            {{score|floatformat:1}}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if has_sub_checkpoint %}
+        <h5>详细评估点得分  Detailed Results by Questions</h5>
+        <div class="forms05" style="overflow-x: auto;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0"> 
+                <tbody>
+                    <tr class="td01">
+                        <td width="446px" valign="top">
+                            &nbsp;
+                        </td>
+                        {% for item in item_list %}
+                        <td align="middle">
+                            {{item|safe}}
+                        </td>
+                        {% endfor %}
+                    </tr>
+					{% for cp,result in item_sub_score_dict.items %}
+	                    <tr>
+	                        <td align="right" >
+	                            <div style=" float:right; width:20px;">
+	                            </div>
+	                            <div class="p5 w502 l">
+	                            	<strong>{{cp.name_abbr}}.</strong>
+	                            	{{cp.desc}}<br>{{cp.desc_en}}
+	                            </div>
+	                        </td>
+							{% for score in result %}
+	                        <td align="center" valign="top">
+	                            <div style="padding:10px 0;">
+	                                {{score}}{%if cp.name_abbr == 'G51'%}%（Yes）{%endif%}
+	                            </div>
+	                        </td>
+							{% endfor %}
+	                    </tr>
+					{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    	{%endif%}
+    </div>
+</div>
+{% endblock %}

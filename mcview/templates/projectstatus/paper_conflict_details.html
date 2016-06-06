@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+	<script type="text/javascript" src="/static/js/jquery-ui-1.8.9.custom.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/jquery.dataTables.js"></script>
+{% endblock %}
+{% block css %}
+	<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+	<link rel="stylesheet" href="/static/data_table/css/demo_table_smk.css" type="text/css" />
+{% endblock %}
+{% block doc_ready %}
+function update_question_conflict_score(qdid){
+	alt_cid = $("#"+qdid+"_alt").val();
+	comments = $("#"+qdid+"_comments").val();
+	if(alt_cid==''){
+		alert('未选择答案\n\rno answers');
+		$("#"+qdid+"_alt").focus();
+		return false;
+	}else{
+		if(alt_cid == 'A3' && comments==''){
+			alert('请填写原因\n\rplease comment');
+			$("#"+qdid+"_comments").focus();
+			return false;
+		}else if(alt_cid == 'A1'){
+			$("#"+qdid+"_comments").val('');
+		}
+	}
+	$.ajax({
+          type: 'POST',
+          url: '{% url ProjectStatus/ajaxbmwupdatequestion %}',
+          data: {qdid:qdid,acid:alt_cid,comments:comments},
+          dataType:'json',
+          error: function (XMLHttpRequest){
+			return false;
+		 },  
+		 success: function(msg){
+			 
+			if (msg.result == 1)
+			{
+				score = '';
+				
+				if(alt_cid == 'A1'){
+					score = '100.0';
+				}else if(alt_cid == 'A3'){
+					score = '';
+				}else{
+					score = '0.0';
+				}
+				scorepane = $("#score_"+qdid);//得分无法再编�
+				scorepane.empty();
+				scorepane.append(score);
+				
+				$("#comm_"+qdid).empty(); //原因无法再编�
+				commpane = $("#comm_"+qdid);
+				commpane.empty();
+				commpane.html(msg.comments);
+			}
+			return false;
+		   }
+         });
+}
+$(document).ready( function () {
+	$('#go_left').css("display","block");
+	$('#go_right').css("display","block");
+	var oTable=$('#example').dataTable({
+		"sDom": 'RC<"clear">lifrtp',
+		"bFilter" : true,
+		"bJQueryUI": true,
+		'bPaginate': false,
+		"bProcessing": true,
+		"sPaginationType": "full_numbers"
+	});  
+	$("thead th").each( function ( i ) {
+			$(this).css('width','');
+		})
+	$('#example tr').click( function() {
+	        $(this).toggleClass('row_selected');
+	} );
+    oTable.$('td').hover( function() {
+        var iCol = $('td', this.parentNode).index(this) % 17;
+        $('td:nth-child('+(iCol+1)+')', oTable.$('tr')).addClass( 'highlighted' );
+    }, function() {
+        oTable.$('td.highlighted').removeClass('highlighted');
+    } );
+} );
+{% endblock %}
+{% block body %}
+  <div class="main01">
+    <h3><strong>在线比对结果</strong>&nbsp;&nbsp;&nbsp;Data Comparison</h3>
+    <center>
+    	<div  id="filter_result" class="forms05 dataContent "  style="width: 98%; margin-top: 10px;">
+    	<table cellpadding="0" cellspacing="0" border="0" id="example"  class="display tdBc" style="font-size:13px;border-left:1px #ccc solid;">
+			<thead>
+				<tr>
+					<th><strong>题号</strong><br/>No.</th>
+					<th><strong>问题</strong><br/>Questions.</th>
+					<th><strong>经销商得分</strong><br/>FW团队<br/></th>
+					<th><strong>经销商得分</strong><br/>独立复核团队</th>
+					<th ><strong>最终判决</strong><br/>BMW APQ</th>
+				</tr>
+			</thead>
+			<tbody>
+			{% for question in questions %}
+			  		<tr>
+						<td >{{question.name}}</td>
+						<td >{{question.desc|default:"&nbsp;"}}<br>{{question.desc_en|default:"&nbsp;"}}</td>
+						<td >{{question.fw_score|default:"&nbsp;"}}</td>
+						<td >{{question.fh_score|default:"&nbsp;"}}</td>
+						<td ><span id="score_{{question.qdid}}">{% if question.fixed %}{{question.bmw_score|default:"&nbsp;"}}
+							 {% else %}
+							 	<select name="{{question.qdid}}_alt" style="width:180px"  id="{{question.qdid}}_alt" class="inputbox">
+                                <option value="">-</option>
+                                {% for alt in question.alts %}
+									 <option value="{{alt.cid}}">{{alt.title}}</option>
+								{% endfor %}
+								</select>
+							 {% endif %}
+							 </span>
+						</td>
+					</tr>
+					 {% if question.a3 %}
+					<tr>
+						<td >{{question.name}}</td>
+					  <td >本期评估选择“否/不涉及”的原因<br>Comments for &quot;No/not relevant&quot; for current wave evaluation result</td>
+			          <td >{{question.fw_comments|safe|default:"&nbsp;"}}</td>
+			          <td >{{question.fh_comments|safe|default:"&nbsp;"}}</td>
+			          <td ><span id="comm_{{question.qdid}}">
+							{% if question.fixed or read_only %}{{question.bmw_comments|safe|default:"&nbsp;"}}
+							 {% else %}
+							 	<input id="{{question.qdid}}_comments" name="{{question.qdid}}_comments" style="width:100px"/>&nbsp;<input class ="button right" type="button" value="Submit" onclick="javascript:update_question_conflict_score({{question.qdid}})"/>
+							 {% endif %}</span></td>
+			  		</tr>
+			  	{% endif %}
+			{% endfor %}
+			
+			</tbody>
+			<tfoot>
+				<tr>
+						<td  colspan="5"> <br/></td>
+					</tr>
+			</tfoot>
+		</table>
+    </div>
+    </center>
+  </div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block body %}
+  <div class="main01">
+    <h3><strong>区域执行进度</strong>&nbsp;&nbsp;&nbsp; Regional Fieldwork Status&nbsp;&nbsp;&nbsp; {{current_term.name}}</h3>
+    <div class="box forms05">
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
+			<tr>
+				<td>BMW 大区 <br>BMW Region</td>
+				<td>总体样本量<br>Sample Size</td>
+				<td>已完成样本量<br>Completed Sample</td>
+				<td>未完成样本量<br>Un-finished Sample</td>
+				<td>完成率<br>Fulfillment Ratio(%)</td>
+			</tr>
+			{% for region in region_list %}
+			<tr>
+				<td><strong>{{region.name_cn}}</strong><br>{{region.name}}</td>
+				<td>{{region.sum_data.total}}</td>
+				<td>{{region.sum_data.done}}</td>
+				<td>{{region.sum_data.remain}}</td>
+				<td>{{region.sum_data.percent|floatformat:1}}%</td>
+			</tr>			
+			{% endfor %}
+		</table>
+		<br>
+	</div>
+  </div>
+  
+{% endblock %}

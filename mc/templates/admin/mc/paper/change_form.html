@@ -1,0 +1,52 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_modify adminmedia %}
+
+{% block content %}
+<div id="content-main">
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools"><li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+  {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+  </ul>
+{% endif %}{% endif %}
+{% endblock %}
+
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% csrf_token %}{% block form_top %}{% endblock %}
+<div>
+{% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+{% if save_on_top %}{% submit_row %}{% endif %}
+{% if errors %}
+    <p class="errornote">
+    {% blocktrans count errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+    </p>
+    {{ adminform.form.non_field_errors }}
+{% endif %}
+
+<!--
+{% for fieldset in adminform %}
+  {% include "admin/includes/fieldset.html" %}
+{% endfor %}
+-->
+
+{{paperhtml}}
+
+<table width="96%" border="0" cellpadding="1" cellspacing="1" bgcolor="#555555" style="text-align:center;margin-top:10px;">                    
+<tbody>
+    <tr align="center" bgcolor="#CCCCCC"> 
+    <td height="22" colspan="2">
+    <input name="save" type="submit" class="input5" value="保 存"> &nbsp;&nbsp;&nbsp;&nbsp;<input type="hidden" name="send" value="true">
+	{% if next_part %}
+		<input name="_saveandtonext" type="submit" class="input5" value="保存并进入{{next_part}}部分"> &nbsp;&nbsp;&nbsp;&nbsp;
+	{% endif %}
+	<input name="cancel" type="button" class="input5" value="取 消" onclick="window.location.href='../'"> &nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="hidden" name="Survey_ID" value="{DA29DA7E-19A3-4CA9-9BCC-F3B748F9E918}"><input type="hidden" name="QuestionnaireNO" value="71333172801101118">            </td>
+    </tr>
+</tbody>
+</table>
+
+</div>
+
+</form>
+</div>
+{% endblock %}
+

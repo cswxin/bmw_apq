@@ -1,0 +1,361 @@
+   {% extends "base.html" %}
+  {% block css %}
+    <style type="text/css">
+      #backId{width:954px;text-align:center;height:20px;}
+      .first,.second{display: block;width:100px;}
+      .first{float:left;margin-left:400px;}
+      .second{float: right;margin-right:183px!important;margin-right:170px;}	
+    </style>
+  {% endblock%}
+  {% block body %}
+  {%block js%}
+ <script type="text/javascript">
+<<<<<<< local
+=======
+ //根据期数和品牌搜索经销商和问卷信息
+function myajaxSubmit(form, divOrHandler) {
+    form = form[0];
+    $.ajax({
+       type: form.method,
+       url: form.action,
+       data: $(form).serialize(),
+       success: function(msg){
+            if (typeof(divOrHandler) == "undefined") {
+                alert(msg);
+            }
+            else if (typeof(divOrHandler) == "string") {
+            	$("#"+divOrHandler).empty();
+                $("#"+divOrHandler).html(msg);
+            }
+            else if (typeof(divOrHandler) == "function") {
+                divOrHandler(msg,btn);
+            }
+       }
+    });
+    return false;
+};
+        
+ 
+    
+>>>>>>> other
+  
+<<<<<<< local
+  function ajaxRoute(sel){
+  	    var option_index = sel.selectedIndex;
+  	    
+ 		var term_name = $(sel).val();  //得到选择的期数
+	    
+ 		$.ajax({
+          type: 'POST',
+          url: '{% url ProjectStatus/ajaxroute %}',
+          data: {termName:term_name},
+          dataType:'json',
+          error: function (XMLHttpRequest){
+			alert('请再次选择！');
+			return false;
+		 },
+		 context:$('#terms_info'),  
+		 success: function(data){
+			var html="<tr><td colspan='3' style='text-align:center'>数据还没有加载</td></tr>";
+			var select='<option value="">---请选择访问员---</option>';
+			var html="<tr  width='100%'><td  width='20%'><strong>路线</strong></td><td width='50%'><strong>城市</strong></td><td width='30%'><strong>访问员</strong></td></tr>";
+			if(data!="" && data!="undefined"){
+			  function xuanDing(userName,firstName){       //用一个函数形式，来在下个for中接受一个参数
+			     for(var j=0;j<data.user_list.length;j++){
+			   		var tmp = data.user_list[j] 
+			   		var selected=""
+			   		if(option_index==0){  //当前期
+			   		    if(userName){ //通过ROuter中的user.username是否等于option中的username的，在这里判断是否选中
+			   		    	select +="<option value='"+tmp[0]+"' selected='selected'>"+userName-firstName+"</option>"; 
+			   		    	} 
+			   		     select +="<option value='"+tmp[0]+"'>"+tmp[1]+"</option>";		
+			   		}else{   //使得非当前期的路线访问者， text形式显示
+			   			if(tmp[2]==userName){select = tmp[1];}
+			   		}
+			   		
+			   	}
+			   	if(option_index==0){    
+			   		select = "<select name='"+tmp[0]+"' id='users' class='users"+tmp[0]+"' onchange='changeUser(this,"+tmp[0]+")'>"+select+"</select>";
+			   		}  
+			   	return select;		
+			  }  
+			   		   	    	
+			   for (var i=0;i<data.routes_info.length;i++){
+			   		var tmp = data.routes_info[i]
+			   		
+			   		html += ("<tr width='100%'><td width='20%'>"+tmp[1]+"</td><td width='50%'>"+tmp[2]+"</td><td width='30%'>"+xuanDing(tmp[3],tmp[4])+"</td></tr>");	
+			   	}   
+			  $(this).empty();
+			  $(this).append(html);
+		    }else{
+		      $(this).append(html);
+		    }
+		   }
+			          
+         });
+       }
+       /**
+        *userstext,users的值为boolean
+        * userstext为true，得到text显示值的用户的id
+        * users为true，得到select框中选中用户的id
+        */
+ function selected_val(userstext,users){     
+        var selectedArr = new Array();
+ 	     var k = 0;
+ 	    if(userstext){  
+	 	     var l = $("td .userstext").length;
+	 	     for(var i=0;i< l; i++){
+	 	     	var visitor = $("td .userstext:eq("+i+")").attr("name");    
+	 		    if(visitor!=""){
+	 		        selectedArr[k] = visitor;
+	 		        k++; 	    
+	 		   } 
+	 	     }
+         }
+        if(users){
+	     	 var len = $("td .users").length;
+	 	     for(var j=0;j < len;j++){
+	 		    var visitor = $("td .users:eq("+j+")").val();   //得到的是value的值，见鬼了，还是要前面加个td
+	 		    if(visitor!=""){
+	 		        selectedArr[k] = visitor;
+	 		        k++; 	    
+	 		   } 
+	 	      }
+ 	     } 
+ 	     
+ 	   return selectedArr;
+     }  
+    /**
+     *得到select框中选中用户时，路线的id
+     */
+  function route_ids(){
+  	 var routeIds = new Array();
+  	 var k =0;
+  	 var len = $("td .users").length;
+ 	     for(var j=0;j < len;j++){
+ 		    var routeId = $("td .users:eq("+j+")").attr('name');   
+ 		    var visitor = $("td .users:eq("+j+")").val();    
+	        if(visitor!=""){ 
+ 		        routeIds[k] = routeId;
+ 		        k++; 	    
+ 		   } 
+ 	      }
+ 	     
+ 	   return routeIds;
+  }
+  function fcompleted(){
+ 	  var visitors = selected_val(false,true); 
+ 	  var routeIds = route_ids();
+ 	  var user_id = new Array();     //得到数据中已经存在的访问员id
+ 	  var route_id = new Array();    //得到数据中已经存在的访问员的路线的id
+ 	  var k = 0; 
+      {% for route_info in routes_info %}
+	      {% if route_info.user.username %}
+	        var tmp1 = "{{route_info.user.id}}";
+	        var tmp2 = "{{route_info.id}}";
+		     
+	           user_id[k] = tmp1;  
+	           route_id[k] = tmp2;
+	           k++;
+	            
+		  {% endif %}
+	  {% endfor %} 
+	 var len1 = user_id.length;
+     var len2 = visitors.length; 
+=======
+function fcompleted(form) {
+    form = form[0];
+     //alert($(form).serialize());
+    //var ok = true;
+    
+    $.ajax({
+       type: form.method,
+       url: '{% url ProjectStatus/ajaxdbroute %}',
+       data: $(form).serialize(),
+       dataType:'json',
+       success: function(data){
+		location.href='/ProjectStatus/route?r='+Math.random();
+	   },
+	   error:function(re,status){
+	   }
+    });
+    
+    // if(!ok){
+    	// alert("您的修改无效，已有人录入了！");
+    // }
+    //location.href = '{% url ProjectStatus/route %}';
+}
+>>>>>>> other
+
+<<<<<<< local
+	 for(var j=0;j<len2;j++){
+	 	var ok=true;
+	 	for(var h=0;h<len1;h++){
+	 	  if(routeIds[j]!=route_id[h]&&visitors[j]==user_id[h]){       //在select框中选中的用户，已经被录入数据库了，即被人修改过了，ok=false，不在录入数据库，提示用户修改无效	
+	 	        ok=false;
+	 	        break;
+	 	   }	
+	 	  if(routeIds[j]==route_id[h]&&visitors[j]!=user_id[h]){            //在select框中选中的用户时，对应的路线的用户不同时，ok=false，即有人已经修改了
+	 			ok=false;
+	 			break;
+	 	   }	
+	 	}
+	 	if(ok){
+		 		$.ajax({
+		          type: 'POST',
+		          url: '{% url ProjectStatus/ajaxdbroute %}',
+		          data: {routerID:routeIds[j],userID:visitors[j]}
+		        });
+		  }else{
+		  	   alert("你的修改无效，已有人修改了！");
+		       break; 
+		  }
+	 }  
+ }
+ function changeUser(sel,router_id){
+  	var option_index = sel.selectedIndex;    //得到下拉框的Index,$(sel)返回的object对象，
+          	//sel返回的HTM标签对象因为selectedIndex为HTML标签的属性所以这里用sel.selectedIndex
+  	  
+  	var user_id = $(sel).children().eq(option_index).attr("value");  //得到选择的访问员ID
+ 	 if(user_id!=""){
+  		$("td .users[name!='"+router_id+"'] option[value='"+user_id+"']").remove(); 
+       }  
+  }
+  
+$(function(){
+=======
+ $(function(){
+>>>>>>> other
+ 	$("#term_name option:first-child").attr("selected","selected"); //选定当前期数
+<<<<<<< local
+ 	function js(id){ return document.getElementById(id); }
+ 	
+ 	$("td .users").each(function(k){ 
+ 	  $(this).focus(function(){
+ 	  	 var selectID = $(this).attr('id');
+ 	  	if(selectID){
+	 	  	 var users = "";
+	 		 var ids = "";
+	 		 var visitors = selected_val(true,true);
+	         users ='{{user_infos}}';
+	         ids = '{{user_ids}}'
+	         users = users.replace(/(u&#39;)|(&#39;)/g,'"');
+	         users = eval(users);
+	         ids = eval(ids);
+	         
+	         var options_html = "";
+	         var selected_option = "---请选择访问员---";
+	         
+	         selected_option_value = $("td .users:eq("+k+")").val();
+	         $(this).empty();                           //清空
+	         
+	          
+	         if(selected_option_value!=''){                                 //如果select当前值不为空时，即不为‘请选择访问员---’时
+	         	  for(var h=0;h<ids.length;h++){
+	         	    if(ids[h]==selected_option_value){
+	         		   break
+	         	    }
+	              }
+	              var p=document.createElement("option");
+				   p.setAttribute("value",ids[h]);
+				   //p.setAttribute("selected","selected");
+				   js(selectID).appendChild(p);
+				   p.appendChild(document.createTextNode(users[h]));
+				  
+	            // selected_option = "<option value='"+ids[h]+"'>"+users[h]+"</option>"+selected_option; 
+	        }
+	         p=document.createElement("option");
+		     p.setAttribute("value",'');
+		     js(selectID).appendChild(p);
+		     p.appendChild(document.createTextNode(selected_option)); 
+		          
+	         for(var i=0;i<ids.length;i++){
+	         	var ok = true;
+	         	for(var j=0;j<visitors.length;j++){
+	         		if(ids[i]==visitors[j]){
+	         			ok = false;
+	         		    break;
+	         		}
+	         	}
+	          if(ok){
+				   p=document.createElement("option");
+				   p.setAttribute("value",ids[i]);
+				   js(selectID).appendChild(p);
+				   p.appendChild(document.createTextNode(users[i])); 
+		  
+	          	 // options_html += "<option value='"+ids[i]+"'>"+users[i]+"</option>";
+	         }
+	        }
+	         
+	          
+	         // $(this).empty();                           //清空
+	         // options_html = selected_option+options_html;
+	         // $(this).append(options_html);           //加入options	  
+         }
+        });	
+ 	});
+ 	
+ });		
+=======
+ });
+>>>>>>> other
+ </script>
+  {%endblock%}
+  <div class="main01">
+    <h3><strong>访问路线 </strong>&nbsp;&nbsp;&nbsp; Visit Route&nbsp;&nbsp;&nbsp; {{current_term.name}}</h3>
+    <center>
+      <form action="{% url ProjectStatus/ajaxroute %}" method="POST" id="myform">{% csrf_token %}
+    	<div style="text-align: left; padding-left: 20px; padding-top: 10px;">
+    	<label>期数<br>Wave</label>
+    	<select name="term" onchange="myajaxSubmit($('#myform'),'routerDiv')" id="term_name">
+    	{%for term in terms_list %}
+    	  <option value="{{term.id}}">{{term.name}}</option>
+    	{% endfor %}
+       </select>
+    	</div>
+    	                       
+<<<<<<< local
+    <div class="box forms05" >
+        <table cellspacing="0" cellpadding="0" border="0" width="100%" id='terms_info'>
+			<tr  width="100%">
+				<td  width="20%"><strong>路线</strong></td>
+				<td  width="50%"><strong>城市</strong></td>
+				<td  width="30%"><strong>访问员</strong></td>
+			</tr>
+			 
+			  	{% for route_info in routes_info %}
+			<tr  width="100%">
+				<td width="20%">{{route_info.name}}</td>				 
+				<td width="50%">{{route_info.citys}}</td>
+				<td width="30%">
+					   {% if route_info.user.username %}
+   	                     <p class="userstext" name="{{route_info.user.id}}">{{route_info.user.username}}-{{route_info.user.first_name}}</p>
+   	                   {% else %}
+					     <select name="{{route_info.id}}" id='users{{route_info.id}}' class='users' onchange="changeUser(this,{{route_info.id}})">
+   	                           <option value=''>---请选择访问员---</option>
+   	                     </select>
+                      {% endif %}         
+                 </td>
+			</tr>			
+			{% endfor %} 
+			 
+			
+		</table>
+=======
+    <div id ='routerDiv' class="box forms05" >
+      		
+        {% include "projectstatus/routeDiv.html"%}
+    </div>
+	  </form>	
+>>>>>>> other
+		<br/>
+<<<<<<< local
+		<div id = "backId" > <a href="{% url ProjectStatus %}" class="first">返回</a><a href="{% url ProjectStatus/route %}" onclick="fcompleted()" class="second">确定</a></div>
+    </div>
+=======
+		<div id = "backId" > <a href="{% url ProjectStatus %}" class="first">返回</a><button type="button" onclick="return fcompleted($('#myform'));" class="second">确定</a></div>
+>>>>>>> other
+    </center>
+  </div>
+ 
+{% endblock %}

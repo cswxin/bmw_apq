@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+{% endblock %}
+
+{% block body %}
+  
+{% if paper %}
+	<div class="main01">
+	    <h3><strong>2014年经销商售后服务评估结果</strong>&nbsp;&nbsp;&nbsp; Dealer After-sales Service Evaluation Result </h3>
+	    <div class="box">
+	    {% if fileurl %}
+	    <a style="float: right;margin-top: 10px;margin-right: 10px;color: blue;" href="{{fileurl|safe}}">下载报告</a>
+	    {% else %}
+	    <label style="float: right;margin-top: 10px;margin-right: 10px;color: gray;">报告尚未生成</label>
+	    {% endif %}
+	    </div>
+	    <div class="box">
+	      <div class="forms" style="width:920px; float:none; margin-top:8px;">
+	        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	      <tbody><tr>
+	        <td width="11%" class="td01"><strong>经销商名称：</strong><br>Dealar Name</td>
+	        <td colspan="3">{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+	        <td width="19%" class="td01"><strong>经销商编号：</strong><br>Dealer No. (CBU)</td>
+	        <td width="17%">{{dealer.name}}</td>
+	      </tr>
+	      <tr>
+	        <td class="td01"><strong>所在城市：</strong><br>City </td>
+	        <td colspan="3">{{dealer.city_cn}}<br>{{dealer.city_en}}</td>
+	        <td class="td01"><strong>所在省份：</strong><br>Province </td>
+	        <td>{{dealer.province_cn}}<br>{{dealer.province_en}}</td>
+	      </tr>
+	      <tr>
+	        <td class="td01"><strong>所属区域：</strong><br>Region</td>
+	        <td colspan="3">{{dealer.region.name_cn}}<br>{{dealer.region.name_en}}</td>
+	        <td class="td01"><strong>本期最终得分（{{term.name_cn}}）：</strong><br>Overall score of&nbsp;&nbsp;{{term.name_en}}&nbsp;&nbsp;wave </td>
+	        <td id="TD_Dealer_Cent">{{paper.score|floatformat:1}}</td>
+	      </tr>
+	      <tr>
+	        <td class="td01"><strong>进店时间：</strong><br>
+	          Arrival time</td>
+	        <td width="10%">{{paper.visit_begin|time:"H:i"}}</td>
+	        <td width="15%" class="td01"><strong>离店时间：</strong><br>Departure time</td>
+	        <td width="28%">{{paper.visit_end|time:"H:i"}}</td>
+	        <td class="td01"><strong>访问时长：</strong><br>Visit duration</td>
+	        <td>{{paper.visit_minutes}}分钟<br>unit : min</td>
+	      </tr>
+	        </tbody></table>
+	      </div>
+	    </div>    
+	</div>
+	
+	<div class="main01">
+	    <h3><span><a href="#" onclick="top()"><img src="/static/mcview/images/icon08.gif" width="16" height="15" id="imgBASIC"></a></span><strong>按基本点查看历史/现在/未来信息 </strong>&nbsp;&nbsp;&nbsp; by basic </h3>
+	    <div class="box" id="DivBasic" style="display: block; ">
+	      <h5>经销商最终得分  &nbsp;&nbsp; Total Score</h5>
+	      <div class="box02">
+	        <img src="/static/mcview/images/chart/{{cp_total.chart_img}}?ver={{data_version}}"></img>
+	      </div>
+	      <h5>按环节查看详细评估结果    &nbsp;&nbsp; by Processes/ Timeline</h5>
+	      
+	      {% for check_group in cp_group_list %}
+	      <div class="">
+	        <table width="100%">
+	            <tr>
+	                <td><strong>{{check_group.name_abbr}}.{{check_group.desc}}&nbsp;<br>{{check_group.name_abbr}}.{{check_group.desc_en}}</strong></td>
+	                <td align="right">&nbsp;</td>
+	            </tr>
+	        </table>
+	      </div>
+	      <div class="box02">
+	        <img src="/static/mcview/images/chart/{{check_group.chart_img}}?ver={{data_version}}"></img>
+	      </div>
+	      <div style="height:20px;">&nbsp;
+	      </div>
+	      {% endfor %}
+		</div>
+	</div>
+	
+	<!-- 按考核点查看详细评估结果     by question BEGIN -->
+    <!--
+    <div class="main01">
+        <h3><span><a href="#" onclick="top()"><img src="/static/mcview/images/icon08.gif" width="16" height="15" id="imgQUESTION"></a></span><strong>下载经销店单店报告及访问资料      &nbsp;&nbsp; Download Dealer Report &amp; MS Interview Related Materials </h3>
+        <div class="box" id="DivQuestion" style="display: block; ">
+           <div>
+                <div><h5>下载报告 Download Report</a></h5></div>
+                <div style="padding-left:20px;"><a href="{% url DealerReport/downloadreport dealer.id paper.term.id%}">单店报告 &nbsp;&nbsp;Dealer Report</a></div>
+            </div>
+			{% if has_full_perm %}
+            {% if images %}
+            <div style="padding-top:10px;">
+                <div><h5>图片文件</strong> &nbsp;&nbsp;Image file</h5></div>
+                {% for image in images%}
+                <div style="padding-left:20px;padding-top:5px;"><a href="{{image.image.url}}">图片{{forloop.counter}}. {{image.shortname}}</div>
+                {%endfor %}
+            </div>
+            {%endif%}
+            
+            {% if sounds %}
+            <div style="padding-top:10px;">
+                <div><h5>声音文件</strong> &nbsp;&nbsp;Sound file</h5></div>
+                {% for s in sounds%}
+                <div style="padding-left:20px;padding-top:5px;"><a href="{{s.sound.url}}">声音{{forloop.counter}}. {{s.shortname}}</div>
+                {%endfor %}
+            </div>
+            {%endif%}
+            {%endif%}
+        </div>
+    </div>
+    -->
+{% else %}
+  <div class="main01">
+	  <div class="box">
+		  <div class="forms" style="width:920px;text-align:center;">
+		 	 报告尚未生成  report not available now!
+		  </div>
+		  <div class="c"></div>
+	  </div>
+	  <div class="c"></div>
+  </div>
+  <p align="center">&nbsp;</p>
+  <div class="c"></div>
+	
+{% endif %}
+{% endblock %}

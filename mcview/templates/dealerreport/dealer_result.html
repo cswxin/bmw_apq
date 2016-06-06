@@ -1,0 +1,374 @@
+<script type="text/javascript" charset="utf-8" src="/static/data_table/js/ZeroClipboard.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/data_table/js/TableTools.js"></script>
+<script type="text/javascript">
+
+(function($) {
+/*
+ * Function: fnGetColumnData
+ * Purpose:  Return an array of table values from a particular column.
+ * Returns:  array string: 1d data array
+ * Inputs:   object:oSettings - dataTable settings object. This is always the last argument past to the function
+ *           int:iColumn - the id of the column to extract the data from
+ *           bool:bUnique - optional - if set to false duplicated values are not filtered out
+ *           bool:bFiltered - optional - if set to false all the table data is used (not only the filtered)
+ *           bool:bIgnoreEmpty - optional - if set to false empty values are not filtered from the result array
+ * Author:   Benedikt Forchhammer <b.forchhammer /AT\ mind2.de>
+ */
+$.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique, bFiltered, bIgnoreEmpty ) {
+    // check that we have a column id
+    if ( typeof iColumn == "undefined" ) return new Array();
+     
+    // by default we only wany unique data
+    if ( typeof bUnique == "undefined" ) bUnique = true;
+     
+    // by default we do want to only look at filtered data
+    if ( typeof bFiltered == "undefined" ) bFiltered = true;
+     
+    // by default we do not wany to include empty values
+    if ( typeof bIgnoreEmpty == "undefined" ) bIgnoreEmpty = true;
+     
+    // list of rows which we're going to loop through
+    var aiRows;
+     
+    // use only filtered rows
+    if (bFiltered == true) aiRows = oSettings.aiDisplay;
+    // use all rows
+    else aiRows = oSettings.aiDisplayMaster; // all row numbers
+ 
+    // set up data array   
+    var asResultData = new Array();
+     
+    for (var i=0,c=aiRows.length; i<c; i++) {
+        iRow = aiRows[i];
+        var aData = this.fnGetData(iRow);
+        var sValue = aData[iColumn];
+         
+        // ignore empty values?
+        if (bIgnoreEmpty == true && sValue.length == 0) continue;
+ 
+        var dt = sValue;
+        dt = dt.replace('<br>', '').replace('<br/>', '').replace('<BR>', '').replace('<BR/>', '')
+        
+        // ignore unique values?
+        if (bUnique == true && jQuery.inArray(dt, asResultData) > -1) continue;
+         
+        // else push the value onto the result data array
+        else asResultData.push(dt);
+    }
+    asResultData.sort();
+    return asResultData;
+}}(jQuery));
+ 
+ 
+function fnCreateSelect( aData )
+{
+    var r='<select  style="width: 90px"><option value="">--all--</option>', i, iLen=aData.length;
+    for ( i=0 ; i<iLen ; i++ )
+    {
+        r += '<option value="'+aData[i]+'">'+aData[i]+'</option>';
+    }
+    return r+'</select>';
+}
+
+    function getCheckedValue()
+    {
+    var checks = getCookie('checks');
+    
+    var check_list = checks.split(",");  
+    if(check_list.length<1){
+        alert("请至少选择1家经销商");
+        return false;
+    }else{
+        return true;
+    }
+    }
+    
+    function downloadreports() {
+        
+        if(getCheckedValue())
+        {
+            $("#paper_compare").attr('action',"/DealerReport/downloadreports");
+            $("#paper_compare").submit();
+            
+            return false;
+        }
+    }
+
+$(document).ready(function(){
+    $('#go_left').css("display","block");
+    $('#go_right').css("display","block");
+    var oTable = $('#example').dataTable({
+        "sDom": 'T<"clear">lifrtp',
+        "aoColumnDefs": [{"bSortable": false, "aTargets":[0]}],
+        "oTableTools": {
+                "aButtons": [
+                    "copy", "xls"
+                ]
+            },
+        "bRetrieve":true,
+        "bDestroy":true,
+        "bFilter" : true,
+        "bJQueryUI": true,
+        'bPaginate': true,
+        "bProcessing": true,
+        "sPaginationType": "full_numbers"
+    }); 
+    
+    
+        
+    /* Add a select menu for each TH element in the table footer */
+   disAllowFilterCols=",0,4,6,"
+    $("thead td").each( function ( i ) {
+        idx = ','+i+',';
+        if(disAllowFilterCols.indexOf(idx)==-1){
+            this.innerHTML = fnCreateSelect( oTable.fnGetColumnData(i) );
+            $(this).find('select').bind('change', function () {
+                oTable.fnFilter( $(this).val(), i );
+            });
+        }
+    } ); 
+   
+   $("thead th").each( function ( i ) {
+        $(this).css('width','');
+    })
+    
+    $('#example tr').click( function() {
+            $(this).toggleClass('row_selected');
+    } );
+    oTable.$('td').hover( function() {
+        var iCol = $('td', this.parentNode).index(this) % 12;
+        $('td:nth-child('+(iCol+1)+')', oTable.$('tr')).addClass( 'highlighted' );
+    }, function() {
+        oTable.$('td.highlighted').removeClass('highlighted');
+    } );
+    $('#min').keyup( function() { oTable.fnDraw(); } );
+    $('#max').keyup( function() { oTable.fnDraw(); } );
+});
+
+$("#checkall").click(
+    function(){
+        $("#paper_compare input[name='paper']").attr("checked",$(this).attr("checked"));
+        var f_val = $("#paper_compare input[name='paper']").eq(0).val();
+        console.info(f_val);
+        $("#paper_compare input[name='paper']").each(function(){
+            if ($(this).attr("checked")) {
+                var checks = getCookie('checks');
+                var check_list = checks.split(',');
+                if(checks)
+                var checks = checks+','+$(this).val();
+                else
+                var checks = $(this).val();
+                addCookie('checks',checks,0);
+            } else {
+                var checks = getCookie('checks');
+                var check_list = checks.split(',');
+                var n = check_list.indexOf(String($(this).val()));
+                while (n > 0) {
+                    check_list.splice(n,1);
+                    n = check_list.indexOf(String($(this).val()));
+                }
+                var checks = ''
+                for(i=0;i<check_list.length;i++){
+                    if(i==0)
+                    checks = check_list[0]
+                    else
+                    checks += ','+check_list[i]
+                }
+                addCookie('checks',checks,0);
+            }
+        });
+        
+        
+    }
+)
+
+function addCookie(objName,objValue,objHours){//添加cookie
+    var str = objName + "=" + escape(objValue);
+    if(objHours > 0){//为0时不设定过期时间，浏览器关闭时cookie自动消失
+    var date = new Date();
+    var ms = objHours*3600*1000;
+    date.setTime(date.getTime() + ms);
+    str += "; expires=" + date.toGMTString();
+    }
+    document.cookie = str;
+}
+
+function getCookie(objName){//获取指定名称的cookie的值  
+    var arrStr = document.cookie.split("; ");  
+    for(var i = 0;i < arrStr.length;i ++){  
+    var temp = arrStr[i].split("=");  
+    if(temp[0] == objName) return unescape(temp[1]);  
+    }
+    return '';
+}  
+
+$("input[name='paper']").die().live('click',
+    function(){
+        if($(this).attr("checked")==true){
+            var checks = getCookie('checks');
+            if(checks)
+            var checks = checks+','+$(this).val();
+            else
+            var checks = $(this).val();
+            addCookie('checks',checks,0);
+        }else{
+            var checks = getCookie('checks');
+            var check_list = checks.split(',');
+            var n =check_list.indexOf(String($(this).val()));
+            while (n > 0) {
+                check_list.splice(n,1);
+                n = check_list.indexOf(String($(this).val()));
+            }
+            var checks = ''
+            for(i=0;i<check_list.length;i++){
+                if(i==0)
+                checks = check_list[0]
+                else
+                checks += ','+check_list[i]
+            }
+            addCookie('checks',checks,0);
+        }
+    }
+)
+
+if (!Array.prototype.indexOf)
+{
+  Array.prototype.indexOf = function(elt /*, from*/)
+  {
+    var len = this.length >>> 0;
+    var from = Number(arguments[1]) || 0;
+    from = (from < 0)
+         ? Math.ceil(from)
+         : Math.floor(from);
+    if (from < 0)
+      from += len;
+    for (; from < len; from++)
+    {
+      if (from in this &&
+          this[from] === elt)
+        return from;
+    }
+    return -1;
+  };
+}
+
+function CompPaper(){
+    var checks = getCookie('checks');
+    var check_list = checks.split(",");  
+    if(check_list.length<2){
+        alert("请至少选择2家经销商");
+    }else{
+        $("#paper_compare").attr('action',"/DealerReport/paperscompare");
+        $("#paper_compare").submit();
+    }
+}
+
+$.fn.dataTableExt.afnFiltering.push(
+    function( oSettings, aData, iDataIndex ) {
+        var iMin = '';
+        var iMax = '';
+        var iVersion = aData[8] == "-" ? 0 : aData[8];
+        if ( iMin == "" && iMax == "" )
+        {
+            return true;
+        }
+        else if ( "" == iMin && iMax != "" )
+        {
+            iVersion = iVersion*1
+            iMax = iMax*1
+            if (iVersion < iMax){
+                return true;
+            }
+            return false;
+        }
+        else if ( iMin != "" && "" == iMax )
+        {
+            iVersion = iVersion*1
+            iMin = iMin*1
+            if (iVersion > iMin){
+                return true;
+            }
+            return false;
+        }
+        else
+        {
+            iVersion = iVersion*1
+            iMin = iMin*1
+            iMax = iMax*1
+            if (iMin < iVersion && iMax > iVersion){
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+);
+</script>
+<link rel="stylesheet" href="/static/css/custom-theme/jquery-ui-1.8.9.custom.css" type="text/css" />
+<link rel="stylesheet" href="/static/data_table/css/demo_table_smk.css" type="text/css" />
+<form name="paper_compare" id="paper_compare" action="" method="post">
+{% csrf_token %}
+<table id="example" class="display tdBc" style="font-size:13px;border-left:1px #ccc solid;">
+    <thead>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <th><input type="checkbox" id="checkall" /></th>
+        <th><strong>经销商</strong> <br>Dealer</th>
+        <th><strong>经销商代码</strong> <br>Dealer Code</th>
+        <th><strong>总得分</strong> <br>Total Score</th>
+        <th><strong>当期单店报告</strong> <br>Current wave Dealer report</th>
+        <th><strong>年度成绩平均分</strong> <br>Score Ave.</th>
+        <th><strong>历史单店报告</strong> <br>History Dealer report</th>
+        <th><strong>大区</strong> <br>Region</th>
+        <th><strong>城市</strong> <br>City</th>
+        <th><strong>新店和老店</strong> <br>Old & new dealer</th>
+        <th><strong>经销商集团</strong> <br>Dealer Group</th>
+        <th><strong>与上期得分波动</strong> <br>Compared with last wave</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for report in report_list %}
+        <tr>
+            <td><input type="checkbox" name="paper" value="{{report.id}}" /></td>
+            <td>{{report.dealer.name_cn}}<br>{{report.dealer.name_en}}</td>
+            <td>{{report.dealer.name}}</td>
+            <td>{{report.score|floatformat}}</td>
+            <td>
+                <a href="/DealerReport/DetailDealerReport/{{report.id}}" target="_blank">点击查看报告<br>Click here for report</a>
+                </td>
+            <td>{{report.top3|floatformat}}</td>
+            <td>
+                {% if report.score %}
+                <a href="/DealerReport/downloadhistoryreport/{{report.dealer.id}}/{{report.term.id}}" target="_blank">点击下载历史报告<br>Download history report</a>
+                {%endif%}
+            </td>
+            <!--<td>
+                {% if report.score %}
+                <a href="/DealerReport/HNFDealerReport/{{report.id}}" target="_blank">点击查看数据<br>Click here for History & Current & Future Data</a>
+                {%endif%}
+            </td>-->
+            <td>{{report.dealer.parent.parent.name_cn}}<br>{{report.dealer.parent.parent.name_en}}</td>
+            <td>{{report.dealer.city_cn}}<br>{{report.dealer.city_en}}</td>
+            <td>{{report.dealer.newold|safe}}</td>
+            <td>{{report.dealer.jt_parent.name_cn}}<br>{{report.dealer.jt_parent.name_en}}</td>
+            <td>{{diffscore|floatformat}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<br>
+</form>

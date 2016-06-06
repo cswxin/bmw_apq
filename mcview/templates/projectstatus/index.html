@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block body %}
+  <div class="main01">
+    <h3><strong>进度查询</strong>&nbsp;&nbsp;&nbsp; Check Status &nbsp;&nbsp;&nbsp;</h3>
+    <div class="box forms05">
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
+			<tr>
+				<td ><a href='{% url ProjectStatus/national %}'>全国执行进度 <br>National Fieldwork Status</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url ProjectStatus/reginal %}'>BMW大区执行进度 <br>BMW Regional Fieldwork Status</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url ProjectStatus/dealer %}'>本期单店执行情况汇总<br>Current Wave BMW Detailed Fieldwork Status</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url ProjectStatus/mini %}'>本期MINI执行情况汇总<br>Current Wave MINI Detailed Fieldwork Status</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url ProjectStatus/others %}'>本期竞品执行情况汇总<br>Current Wave Competitors Detailed Fieldwork Status</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url ProjectStatus/route %}'>访问路线<br>Visit Route</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url ProjectStatus/paperconflict %}'>在线比对结果<br>Data Comparison</a></td>
+			</tr>
+		</table>
+    </div>
+  </div>
+  
+  
+  
+{% endblock %}

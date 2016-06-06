@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+{% endblock %}
+
+{% block body %}
+  
+{% if paper %}
+	<div class="main01">
+	    <h3><strong>2014年经销商售后服务评估结果</strong>&nbsp;&nbsp;&nbsp; Dealer After-sales Service Evaluation Result </h3>
+	    <div class="box">
+	      <div class="forms" style="width:920px; float:none; margin-top:8px;">
+	        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	      <tbody><tr>
+	        <td width="11%" class="td01"><strong>经销商名称：</strong><br>Dealar Name</td>
+	        <td colspan="3">{{dealer.name_cn}}<br>{{dealer.name_en}}</td>
+	        <td width="19%" class="td01"><strong>经销商编号：</strong><br>Dealer No. (CBU)</td>
+	        <td width="17%">{{dealer.name}}</td>
+	      </tr>
+	      <tr>
+	        <td class="td01"><strong>所在城市：</strong><br>City </td>
+	        <td colspan="3">{{dealer.city_cn}}<br>{{dealer.city_en}}</td>
+	        <td class="td01"><strong>所在省份：</strong><br>Province </td>
+	        <td>{{dealer.province_cn}}<br>{{dealer.province_en}}</td>
+	      </tr>
+	      <tr>
+	        <td class="td01"><strong>所属区域：</strong><br>Region</td>
+	        <td colspan="3">{{dealer.region.name_cn}}<br>{{dealer.region.name_en}}</td>
+	        <td class="td01"><strong>本期最终得分（{{term.name_cn}}）：</strong><br>Total score of&nbsp;&nbsp;{{term.name_en}}&nbsp;&nbsp;wave </td>
+	        <td id="TD_Dealer_Cent">{{paper.score|floatformat:1}}</td>
+	      </tr>
+	      <tr>
+	        <td class="td01"><strong>进店时间：</strong><br>
+	          Arrival time</td>
+	        <td width="10%">{{paper.visit_begin|time:"H:i"}}</td>
+	        <td width="15%" class="td01"><strong>离店时间：</strong><br>Departure time</td>
+	        <td width="28%">{{paper.visit_end|time:"H:i"}}</td>
+	        <td class="td01"><strong>访问时长：</strong><br>Visit duration</td>
+	        <td>{{paper.visit_minutes}}分钟<br>unit : min</td>
+	      </tr>
+	        </tbody></table>
+	      </div>
+	      <h5>每期评估结果概览  &nbsp;&nbsp; Overview for Total Score in Each Wave</h5>
+	      <div class="forms" style="width:920px; float:none; margin-top:8px;">
+		    <table width="100%">
+			  <tr>
+				<td>
+					<table width="250" border="0" cellspacing="0" cellpadding="0">
+					<tbody>
+					<tr>
+					<td align="center"><strong>期次&nbsp;&nbsp;Wave</strong></td>
+					<td align="center"><strong>最终得分<br></br>Total Score</strong></td>
+					</tr>
+					{% for term in term_list %}
+					<tr>
+						<td class="td01" align="center"><strong>{{term.name_cn}}</strong>&nbsp;&nbsp;{{term.name_en}}</td>
+						<td align="center">{% if term.dealer_score  %}{{term.dealer_score|floatformat:1}}{%endif%}</td>
+					</tr>{% endfor %}
+					</tbody>
+					</table>			
+				</td>
+				<td>
+					<img src="/static/mcview/images/chart/{{term_compare_chart_img}}"></img>
+	            </td>
+	            <td>
+	                <table>
+	                  <tr>
+	                    <td>上半年平均分<br>First half of year</br></td><td>{{first_half_score}}</td>
+	                  </tr>
+	                  <tr>
+	                    <td>下半年平均分<br>Second half of year</td><td>{{second_half_score}}</td>
+	                  </tr>
+	                </table>
+				</td>
+			  </tr>
+			</table>
+	      </div>
+	    </div>    
+	</div>
+	
+	<div class="main01">
+	    <h3><span><a href="#" onclick="top()"><img src="/static/mcview/images/icon08.gif" width="16" height="15" id="imgBASIC"></a></span><strong>按基本点查看详细评估结果 </strong>&nbsp;&nbsp;&nbsp; by basic </h3>
+	    <div class="box" id="DivBasic" style="display: block; ">
+	      <h5>经销商最终得分  &nbsp;&nbsp; Total Score</h5>
+	      <div class="box02">
+	        <img src="/static/mcview/images/chart/{{cp_total.chart_img}}"></img>
+	      </div>
+	      
+	      <h5>经销商各考察基本点得分    &nbsp;&nbsp; Basic Score</h5>
+	      
+	      {% for check_group in cp_group_list %}
+	      <div class="">
+	        <table width="100%">
+	            <tr>
+	                <td><strong>{{check_group.name}}.{{check_group.desc}}<br>{{check_group.desc_en}}</strong></td>
+	                <td align="right">&nbsp;</td>
+	            </tr>
+	        </table>        
+	      </div>
+	      <div class="box02">
+	        <img src="/static/mcview/images/chart/{{check_group.chart_img}}"></img>
+	      </div>
+	      <div style="height:20px;">&nbsp;
+	      </div>
+	      {% endfor %}
+		</div>
+	</div>
+	
+	<!-- 按考核点查看详细评估结果     by question BEGIN -->
+	<div class="main01">
+	<h3><span><a href="#" onclick="top()"><img src="/static/mcview/images/icon08.gif" width="16" height="15" id="imgQUESTION"></a></span><strong>按考核点查看详细评估结果  </strong>&nbsp;&nbsp;&nbsp; by question </h3>
+	<div class="box" id="DivQuestion" style="display: block; ">
+	  <h5>考核点详细评估结果      &nbsp;&nbsp; Detailed Evaluation Result by Question</h5>
+	  <div class="forms04">  
+	  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	      <tbody><tr>
+	        <td width="31%" valign="top"><strong>每题评分标准</strong><br>
+	          Evaluation Standard for each question</td>
+	        <td width="8%" valign="top"><strong>是</strong><br>
+	          Yes</td>
+	        <td width="10%" valign="top">= 100.0</td>
+	        <td width="9%" valign="top"><strong>否</strong><br>
+	          No</td>
+	        <td width="12%" valign="top"> =0.0</td>
+	        <td width="13%" valign="top"><strong>不涉及</strong><br>
+	          Not relevant</td>
+	        <td width="17%" valign="top"> = N/A(不计分)</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  </div>
+	   
+	  <div class="forms05">
+	    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	    <tbody><tr class="td01">
+	    <td valign="top" class="td03"><strong>题号</strong><br>
+	      No.</td>
+	    <td colspan="3" valign="top" style="text-align:right; line-height:24px;"><img src="/static/mcview/images/icon11_a.gif" width="8" height="11" align="absmiddle"> &nbsp;与区域均值比较 <br>Difference vs. Regional average<br>
+	      <img src="/static/mcview/images/icon11_b.gif" width="8" height="11" align="absmiddle"> &nbsp;与全国均值比较 <br>Difference vs. National average&nbsp;</td>
+	    <td width="6%" valign="top"><strong>经销商<br>
+	      得分</strong><br>
+	      Dealer<br>
+	      Score</td>
+	    <td width="6%" valign="top"><strong>区域<br>
+	      平均得分</strong><br>
+	      Regional<br>
+	      Average</td>
+	    <td width="6%" valign="top"><strong>全国<br>
+	      平均得分</strong><br>
+	      National<br>
+	      Average</td>
+	    <td width="6%" valign="top"><strong>小区<br>
+	      平均得分</strong><br>
+	      Xiaoqu<br>
+	      Average</td>
+	    <td width="6%" valign="top"><strong>城市<br>
+	      平均得分</strong><br>
+	      City<br>
+	      Average</td>
+	    <td width="6%" valign="top"><strong>省份<br>
+	      平均得分</strong><br>
+	      Province<br>
+	      Average</td>
+	    <td width="6%" valign="top"><strong>经销商集团<br>
+	      平均得分</strong><br>
+	      Dealers<br>
+	      Average</td>
+	    </tr>
+	    {% for cp in sub_cp_list %}
+	    <tr>
+	      <td valign="top" class="td04"><strong>{{cp.name_abbr}}</strong></td>
+	      <td align="right" class="td04">{{cp.desc}}<br>
+	        {{cp.desc_en}}<br></td>
+	      <td width="80px" class="td05 p0">
+			<div class="histogram">
+			  &nbsp;
+			  <div class="histogramAMT3" style="display:none">
+			     <div class="histogramBG r" style=" width:80px;">&nbsp;</div>
+				 <div class="histogramZI r">&nbsp;</div>
+			  </div>
+			   &nbsp;
+			  <div class="histogramAMT3" style="display:none">
+				 <div class="histogramBG histogramBG02 r" style=" width:80px;"></div>
+				 <div class="histogramZI r">&nbsp;</div>
+			  </div>
+			</div>
+		  </td>
+	      <td nowrap="nowrap" class="td05 p0">
+			<div class="histogram">
+			   <div class="histogramAMT3">
+			     <div class="histogramBG" style=" width:3.225807px;">&nbsp;</div>
+			     <div class="histogramZI">{{cp.compare_region}}</div>
+			    </div>
+			 
+			  <div class="histogramAMT3">
+			    <div class="histogramBG histogramBG02" style=" width:80px;"></div>
+			    <div class="histogramZI">{{cp.compare_nation}}</div>
+			  </div>
+			</div>
+		  </td>
+	      <td align="center">{{cp.dealer_score}}</td>
+	      <td align="center">{{cp.region_score}}</td>
+	      <td align="center">{{cp.nation_score}}</td>
+	      <td align="center">{{cp.xq_score}}</td>
+	      <td align="center">{{cp.city_score}}</td>
+	      <td align="center">{{cp.province_score}}</td>
+	      <td align="center">{{cp.jt_score}}</td>
+		</tr>
+	    <tr>
+	      <td colspan="2" align="right" valign="top" class=" td01 td03"><div style=" float:right; width:20px;"><img src="/static/mcview/images/icon06.gif" alt="" width="20" height="14"></div>
+	        <div class="p5 c003299 w360 l"> 本期评估选择“否/不涉及”的原因<br>
+	        Comments for "No/not relevant" for current wave evaluation result 
+			</div>
+		  </td>
+	      <td colspan="2" class="td01 p0">&nbsp;</td>
+	      <td colspan="7" valign="top" class="td01">{{cp.zero_reason}}<br>{{cp.zero_reason_en}}<br></td>
+	    </tr>
+		{% endfor %}
+		</tbody>
+	    </table>
+	  </div>
+	      <div class="" style="height:40px;margin-top:20px;">
+	        <div class="basicscoreL">客户反馈<br>BMW Customer Feedback</div>
+	      </div>
+	      <div class="box02">
+	      <!-- 评分标准 BEGIN-->
+	            <div class="forms04" style="padding-top:15px;">  
+	        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	          <tbody><tr>
+	            <td width="46%" valign="top"><div style=" float:right; width:20px;"><img src="/static/mcview/images/icon06.gif" alt="" width="20" height="14"></div><strong>评分标准：1-10分</strong></td>
+	            <td colspan="7" valign="top" style="padding:0;"><table width="100%" border="0" cellspacing="0" cellpadding="0" style="border:0;">
+	              <tbody><tr>
+	                <td width="8%" valign="top">1</td>
+	            <td width="7%" valign="top">2</td>
+	            <td width="9%" valign="top">3</td>
+	            <td width="6%" valign="top">4</td>
+	            <td width="8%" valign="top">5</td>
+	            <td width="9%" valign="top">6</td>
+	            <td width="8%" valign="top">7</td>
+	            <td width="7%" valign="top">8</td>
+	            <td width="6%" valign="top">9</td>
+	            <td width="32%" valign="top">10</td>
+	              </tr>
+	            </tbody></table></td>
+	          </tr>
+	          <tr>
+	            <td valign="top">Evaluation Standard (1-10 scale)</td>
+	            <td width="16%" valign="top"><strong>无法接受</strong><br>
+	            Unacceptable</td>
+	            <td colspan="5" valign="top"><strong>一般</strong><br>
+	            Average</td>
+	            <td width="18%" valign="top"><strong>非常好</strong><br>
+	            Outstanding</td>
+	          </tr>
+	        </tbody></table>
+	      </div>
+	      </div>
+	      <!-- 评分标准 END-->
+	      
+	       <!-- F38 BEGIN-->
+	      <div class="forms05">
+	       <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	          <tbody><tr>
+	            <td width="45%" align="right" valign="top" class=""><div style=" float:right; width:20px;"><img src="/static/mcview/images/icon06.gif" alt="" width="20" height="14"></div>
+	              <div class="p5 c003299 w360 l"> <strong>客户认为做得比较好的地方</strong><br>Dealer performance exceeded customer's expectation</div></td>
+	            <td class="td01 p0">{{customer_feedback.0.answer}}<br>{{customer_feedback.0.answer_en}}</td>
+	            </tr>
+	          <tr>
+	            <td align="right" valign="top" class=""><div class="p5 c003299 w360 l"><strong>客户认为有待改进的地方</strong><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dealer performance could be better improved</div><div style=" float:right; width:20px;"><img src="/static/mcview/images/icon06.gif" alt="" width="20" height="14"></div></td>
+	            <td class="td01 p0">{{customer_feedback.1.answer}}<br>{{customer_feedback.1.answer_en}}</td>
+	            </tr>
+	          </tbody>
+	       </table>
+	
+	      </div>
+	      <!-- F38 END-->
+	</div>
+	</div>
+    
+    <div class="main01">
+        <h3><span><a href="#" onclick="top()"><img src="/static/mcview/images/icon08.gif" width="16" height="15" id="imgQUESTION"></a></span><strong>下载经销店单店报告及访问资料      &nbsp;&nbsp; Download Dealer Report &amp; MS Interview Related Materials </h3>
+        <div class="box" id="DivQuestion" style="display: block; ">
+           <div>
+                <div><h5>下载报告 Download Report</a></h5></div>
+                <div style="padding-left:20px;"><a href="{% url DealerReport/downloadreport dealer.id paper.term.id%}">单店报告 &nbsp;&nbsp;Dealer Report</a></div>
+            </div>
+			{% if has_full_perm %}
+	            {% if images %}
+	            <div style="padding-top:10px;">
+	                <div><h5>图片文件</strong> &nbsp;&nbsp;Image file</h5></div>
+	                {% for image in images%}
+	                <div style="padding-left:20px;padding-top:5px;"><a href="{{image.image.url}}">图片{{forloop.counter}}. {{image.shortname}}</div>
+	                {%endfor %}
+	            </div>
+	            {%endif%}
+            
+	            {% if sounds %}
+	            <div style="padding-top:10px;">
+	                <div><h5>声音文件</strong> &nbsp;&nbsp;Sound file</h5></div>
+	                {% for s in sounds%}
+	                <div style="padding-left:20px;padding-top:5px;"><a href="{{s.sound.url}}">声音{{forloop.counter}}. {{s.shortname}}</div>
+	                {%endfor %}
+	            </div>
+	            {%endif%}
+            {%endif%}
+        </div>
+    </div>
+{% else %}
+  <div class="main01">
+	  <div class="box">
+		  <div class="forms" style="width:920px;text-align:center;">
+		 	 报告尚未生成  report not available now!
+		  </div>
+		  <div class="c"></div>
+	  </div>
+	  <div class="c"></div>
+  </div>
+  <p align="center">&nbsp;</p>
+  <div class="c"></div>
+	
+{% endif %}
+{% endblock %}

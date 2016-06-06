@@ -1,0 +1,617 @@
+{% extends "base.html" %}
+
+{% block css %}
+<style type="text/css">
+* {font-size:12px;}
+.hide {display:none;}
+dl {}
+dd {float:left;margin:0;}
+dt {float:left;}
+
+table.gray tbody td.dealer {text-align:left;}
+table.gray tbody td.leaf {padding-left:50px;text-align:right;}
+
+table.gray tr th.term {width:40px;}
+
+span.fold {cursor:pointer;padding:0 4px;font-size:16px;}
+
+#popup_div {
+width:100%;height:100%;position:absolute;top:0;left:0;z-index:1;background-color:#666666;filter:alpha(opacity=40);opacity:0.40;display:none;
+}
+#popup_inside {
+width:700px;height:510px;position:absolute; z-index:2; margin:auto auto;border:solid 3px #5F5F5F;background-color:#fff;display:none;
+}
+
+table.gray td {padding:0 2px;}
+
+.scroll_div {
+height:650px; overflow: auto; "
+}
+
+tr.even td {background-color:#EFEFEF}
+a {text-decoration: none;}
+
+</style>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/static/js/json.js"></script>
+<script type="text/javascript" src="/static/js/utils.js"></script>
+<script type="text/javascript" language="JavaScript">
+<!-->
+if(typeof String.prototype.trim !== 'function') {
+  String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/g, ''); 
+  }
+}
+
+div_dict = {};
+
+var term_id_list = {{total_term_id_list}};
+
+function show_popup(div_id) {
+    var div_info = div_dict[div_id];
+    if (div_info == null) {
+        div_info = new Object();
+        var $div =  $('#'+div_id);
+        div_info.div = $div;
+        div_info.width = $div.width();
+        div_info.height = $div.height();
+        div_dict[div_id] = div_info;
+    }
+    $("#popup_inside").width(div_info.width);
+    $("#popup_inside").height(div_info.height);
+    createIframe();
+    div_info.div.remove().show();
+    $("#popup_inside").empty().append(div_info.div);
+    return false;
+}
+
+function hide_popup(obj) {
+    $('#popup_div').hide();
+    $('#popup_inside').hide();
+}
+
+function createIframe(){ 
+    //mask遮罩层
+    newMask = $('#popup_div')[0];
+    _scrollWidth=Math.max(document.body.scrollWidth,document.documentElement.scrollWidth); 
+    _scrollHeight=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight);
+    newMask.style.width=_scrollWidth+"px"; 
+    newMask.style.height=_scrollHeight+"px"; 
+    var $objDiv = $("#popup_inside");
+    var left = (_scrollWidth-$objDiv.width())/2+"px";
+    var innerHeight = typeof window.innerHeight != 'undefined' ? window.innerHeight : document.documentElement.clientHeight;    
+    var top = (innerHeight-$objDiv.height())/2+"px";
+    $objDiv.css('left',left); 
+    $objDiv.css('top',top); 
+    $('#popup_div').show();
+    $('#popup_inside').show();
+}
+
+function init_div() {
+    var terms = '{{terms|default:""}}';
+    var heads = '{{heads|default:""}}';
+    if (terms != '') {
+        var term_list = terms.split(',');
+        for (i=0; i<term_list.length; i++) {
+            $("#term_"+term_list[i]).attr('checked',true);
+        }
+    }
+    if (heads != '') {
+        var head_name_list = heads.split(',');
+        for (i=0; i<head_name_list.length; i++) {
+            $("#head_name_"+head_name_list[i]).attr('checked',true);
+        }
+    }
+}
+
+function hide_child_row($row) {
+    var row_id = $row[0].id.replace('row_','');
+    ajaxGet('/report/ajax_get_sub_dealer_id_list/'+row_id+'/', on_hide_sub_row);
+    var $fold = $('#row_'+row_id+' span.fold');
+    $fold.removeClass('opened').addClass('closed').text('+');
+    //IE下, addClass的方法不知为何不起作用,改用直接设置css方法
+    for (var i=0;i<selected_dealer_list.length;i++) {
+        //$(selected_dealer_list[i]).removeClass('selected');
+        $(selected_dealer_list[i]).find('td').css('background-color','#fff');
+    }
+}
+
+function show_child_row($row) {
+    var row_id = $row[0].id.replace('row_','');
+    var $fold = $('#row_'+row_id+' span.fold');
+    $fold.removeClass('closed').addClass('opened').text('-');
+    //~ var filter_str = $("#search_str").val();
+    var filter_str = '';
+    $('tr.sub_'+row_id).each( function() {
+        if (!$(this).hasClass('leaf')) {
+            $(this).show();
+            return;
+        }
+        if (is_filtered($(this),filter_str)) {
+            $(this).hide();
+        }
+        else {
+            $(this).show();
+        }
+    });
+    $('tr.sub_'+row_id+' span.fold').removeClass('opened').addClass('closed').text('+');
+}
+
+function on_hide_sub_row(response) {
+    eval('var response = ' + response);
+    result = response[0];
+    if (!result) {
+        alert(response[1]);
+        return;
+    }
+    var sub_dealer_id_list = response[1];
+    var new_list = []
+    for (i=0;i<sub_dealer_id_list.length;i++) {
+        $('tr.sub_'+sub_dealer_id_list[i]).hide();
+    }
+}
+
+function on_show_sub_row(response) {
+    eval('var response = ' + response);
+    result = response[0];
+    if (!result) {
+        alert(response[1]);
+        return;
+    }
+    var sub_dealer_id_list = response[1];
+    var new_list = []
+    for (i=0;i<sub_dealer_id_list.length;i++) {
+        new_list.push('#row_'+sub_dealer_id_list[i]);
+    }
+    var id_list = new_list.join(',');
+    $(id_list).show();
+    for (i=0;i<id_list.length;i++) {
+        $(id_list[i]+' span.fold').removeClass('closed').addClass('opened').text('-');
+    }
+}
+
+function sel_all_cp() {
+    $(".checkbox_cp").attr('checked',true);
+}
+function sel_none_cp() {
+    $(".checkbox_cp").attr('checked',false);
+}
+function sel_rev_cp() {
+    $(".checkbox_cp").each( function() {
+        $(this).attr('checked',!$(this).attr('checked'));
+    });
+}
+
+function is_filtered($tr, filter_str) {
+    if (filter_str == '') {
+        return false;
+    }
+    var filter_arr = filter_str.split(/[ ,;]+/g);
+    var shop_name = $($tr.children()[1]).text();
+    for (i=0;i<filter_arr.length;i++) {
+        var search_str = filter_arr[i];
+        if (search_str.trim() == '') {
+            continue;
+        }
+        if (shop_name.indexOf(search_str) != -1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+var selected_dealer_list = [];
+function filter() {
+    //单店搜索功能, 隐藏所有子节点, 然后依次展开对应带点所在节点, 并将该单店标红
+    var filter_str = $("#search_str").val();
+    if (filter_str.trim() == '') {
+        return false;
+    }
+    
+    //IE下, addClass的方法不知为何不起作用,改用直接设置css方法
+    for (var i=0;i<selected_dealer_list.length;i++) {
+        //$(selected_dealer_list[i]).removeClass('selected');
+        $(selected_dealer_list[i]).find('td').css('background-color','#fff');
+    }
+    
+    selected_dealer_list = [];
+    
+    $('table.data tr.data').hide();
+    $('table.data tr.sub_None').show();
+    $('table.data tr.sub_1').show();
+    
+    $('tr.leaf').each( function() {
+
+        if (is_filtered($(this), filter_str)) {
+            //~ $(this).hide();
+        }
+        else {
+            //~ $(this).show();
+            selected_dealer_list.push(this);
+        }
+
+    });
+    
+    if (selected_dealer_list.length==0) {
+        alert('未找到匹配的单店');
+        return false;
+    }
+    
+    for (var i=0;i<selected_dealer_list.length;i++) {
+        expand_to_dealer(selected_dealer_list[i]);
+    }
+}
+
+function expand_to_dealer(dealer_row) {
+    //显示同级的单店
+    var className = dealer_row.className;
+    var class1 = className.split(/[ ,;]+/g)[0];
+    $('table.data tr.'+class1).show();
+    //IE下, addClass的方法不知为何不起作用,改用直接设置css方法
+    //$(dealer_row).addClass('selected');
+    $(dealer_row).find('td').css('background-color','#ACD2FD');    
+    
+    show_parent_node(dealer_row);
+}
+
+function show_parent_node(node){
+    //显示父亲节点
+    var className = node.className;
+    var class1 = className.split(/[ ,;]+/g)[0];
+    var parent_id = class1.replace('sub_','');
+    if (parent_id == 'None') {
+        return;
+    }
+    var parent = $('table.data tr#row_'+parent_id)[0];
+    $(parent).show();
+    $('table.data tr#row_'+parent_id+' span.fold').removeClass('closed').addClass('opened').text('-');
+    for (var i=0;i<term_id_list.length;i++) {
+        $('table.data tr#row_'+parent_id+'_'+term_id_list[i]).show();
+    }
+    show_parent_node(parent);
+}
+
+function show_chart_bar(chart_type) {
+    var $dealer_list = $('input.cb_dealer:checked');
+    if ($dealer_list.length < 2) {
+        alert('请选择两个或两个以上的单店进行对比');
+        return;
+    }
+    var $cb_list = $('input.cb_head:checked');
+    if ($cb_list.length < 1) {
+        alert('请至少选择一个检查点进行对比');
+        return;
+    }
+    var label_list = [];
+    var index_list = [];
+    $cb_list.each( function() {
+        //根据选中的行, 然后根据选中的列, 得到data_list.push({'value':[1,2,3,4,5],'name':'全国'+i});
+        var head_name = $(this).parent().text();
+        label_list.push(head_name);
+        index_list.push(parseInt(this.value));
+    });        
+    var label_str = label_list.join(',');
+    
+    var data_list = [];
+    $dealer_list.each( function () {
+        var data = {}
+        var $td = $(this).parent();
+        data['name'] = $td.next().text().replace('　','') + $td.next().next().text();
+        $td_list = $td.parent().children();
+        data['value'] = [];
+        for (i=0;i<index_list.length;i++) {
+            var index = index_list[i] + 3;
+            data['value'].push(parseFloat($($td_list[index]).text())||0);
+        }
+        data_list.push(data);
+    });
+
+    var $form = $("#form_chart");
+    var form = $form[0];
+    form.title.value = '';
+    form.labels.value = label_str;
+    form.data_list.value = toJSONString(data_list);
+    form.target="_blank";
+    form.chart_type.value = chart_type;
+    form.submit();
+}
+
+function show_chart_line() {
+    var $dealer_list = $('input.cb_dealer:checked');
+    if ($dealer_list.length < 2) {
+        alert('请选择两个或两个以上的单店进行对比');
+        return;
+    }
+    var $head_list = $('input.cb_head:checked');
+    if ($head_list.length < 1) {
+        alert('请至少选择一个检查点进行对比');
+        return;
+    }
+    
+    var label_list = [];
+    var dealer_name = null;
+    var $valid_dealer_list = [];
+    $dealer_list.each( function () {
+        var $td = $(this).parent();
+        var this_dealer_name = $td.next().text().replace('　','');
+        if (dealer_name == null) {
+            dealer_name = this_dealer_name;
+        }
+        else {
+            if (this_dealer_name != dealer_name) {
+                return;
+            }
+        }
+        var label =  $td.next().next().text();
+        label_list.push(label);
+        $valid_dealer_list.push($(this));
+    });
+    $dealer_list = $valid_dealer_list
+    
+    var label_str = label_list.join(',');
+    
+    var data_list = [];
+    $head_list.each( function() {
+        var data = {};
+        data['name'] = $(this).parent().text();
+        var index = parseInt(this.value)+3;
+        data['value'] = [];
+        jQuery.each($dealer_list, function () {
+            var $td = $(this).parent();
+            var $td_list = $td.parent().children();
+            data['value'].push(parseFloat($($td_list[index]).text())||0);
+        });
+        data_list.push(data);
+    });   
+
+    var $form = $("#form_chart");
+    var form = $form[0];
+    form.title.value = dealer_name;
+    form.labels.value = label_str;
+    form.data_list.value = toJSONString(data_list);
+    form.target="_blank";
+    form.chart_type.value = 'line';
+    form.submit();
+}
+
+function check_node() {
+    $('span.fold').each( function() {
+        var $tr = $(this).parent().parent();
+        var dealer_id = $tr.attr('id').replace('row_','');
+        if ($('tr.sub_'+dealer_id).length == 0) {
+            $(this).remove();
+        }
+    });
+}
+
+$(document).ready(function($) {
+    $("#btn_term").click( function() {
+        show_popup('term_div');
+    });
+    
+    $("#btn_head").click( function() {
+        show_popup('head_div');
+    });
+    
+    $("span.fold").click( function() {
+        var $tr = get_parent(this,'tr');
+        var id = $tr[0].id.replace('row_','');
+        if ($(this).hasClass('opened')) {
+            hide_child_row($tr);
+        }
+        else {
+            show_child_row($tr);
+        }
+    });
+    
+    $("#btn_search").click( filter );
+    
+    $("#btn_bar").click( function() {
+        show_chart_bar('bar');
+    });
+    
+    $("#btn_hbar").click( function() {
+        show_chart_bar('hbar');
+    });
+    
+    $("#btn_line").click( function() {
+        show_chart_bar('line');
+    });
+    
+    $("#btn_radar").click( function() {
+        show_chart_bar('radar');
+    });
+    
+    $("#btn_data_download").click( function() {
+        var $dealer_list = $('input.cb_dealer:checked');
+        if ($dealer_list.length < 1) {
+            alert('请至少选择一行进行数据下载');
+            return;
+        }
+        var $head_list = $('input.cb_head:checked');
+        if ($head_list.length < 1) {
+            alert('请至少选择一列进行数据下载');
+            return;
+        }
+       
+        var data_dict = {}
+        
+        var data_list = [];
+        
+        var head_data = [];
+        $head_list.each( function() {
+            head_data.push($(this).parent().text());
+        });
+        jQuery.each($dealer_list, function () {
+            var $td = $(this).parent();
+            var $td_list = $td.parent().children();
+            var row_data = [];
+            row_data.push($($td_list[1]).text());
+            row_data.push($($td_list[2]).text());
+            $head_list.each( function() {
+                var index = parseInt(this.value)+3;
+                row_data.push(parseFloat($($td_list[index]).text())||'-');
+            });
+            data_list.push(row_data);
+        });
+        
+        data_dict['head_data'] = head_data;
+        data_dict['data_list'] = data_list;
+       
+        
+        var $form = $("#form_data_download");
+        var form = $form[0];
+        form.data_list.value = toJSONString(data_dict);
+        form.target="_blank";
+        form.chart_type.value = 'line';
+        form.submit();
+        
+    });
+    
+    $("#btn_detail_report").click( function() {
+        //~ var $form = $("#form_detail_report");
+        //~ var form = $form[0];
+    });
+    
+    $("#dealer_select").click( function() {
+        $('input.cb_dealer:visible').attr('checked',$(this).attr('checked'));
+    });
+    
+    $("#checkpoint_select").click( function() {
+        $('input.cb_head:visible').attr('checked',$(this).attr('checked'));
+    });
+    
+    $("#row_1 td.dealer span.fold").removeClass('closed').addClass('opened').text('-');
+    init_div();
+    $("table.gray tr:even").addClass('even');
+    
+    //如果没有子节点, 不显示 + -
+    check_node();
+});
+
+</script>
+{% endblock %}
+
+{% block body %}
+<div style="margin-bottom:3px;">
+    <table width="100%">
+        <tr>
+            <td align="left">
+                {% if show_dealer_search_box %}
+                <dl class="padding-right:30px;">
+                    <dd><input type="text" name="search_str" id="search_str" value="{{search_str}}"/></dd>
+                    <dt style="padding-right:20px;"><input type="button" name="btn_search" id="btn_search" value="单店查询" title="Workshop Query"/></dt>
+                </dl>
+                {% endif %}
+                
+                <dl>
+                    <dd style="padding-right:20px;"><input type="button" name="btn_term" id="btn_term" value="选择周期" title="Wave Select"/></dd>
+                    <dd style="padding-right:20px;"><input type="button" name="btn_head" id="btn_head" value="选择检查点" title="Item Select"/></dd>
+                </dl>
+                <div style="clear:both;"></div>
+            </td>
+            <td style="text-align:right;vertical-align:bottom;">
+                <input type="button" name="btn_bar" id="btn_bar" value="柱状图" title="Histogram"/>
+                <input type="button" name="btn_hbar" id="btn_hbar" value="条形图" title="Bar Chart"/>
+                <input type="button" name="btn_line" id="btn_line" value="折线图" title="Line Chart"/>
+                {% if show_radar %}
+                    <input type="button" name="btn_radar" id="btn_radar" value="雷达图" title="Radar Chart"/> 
+                {% endif %}
+                <input type="button" name="btn_data_download" id="btn_data_download" value="数据下载" title="Data Download"/>
+            </td>
+        </tr>
+    </table>
+    
+</div>
+<div class="scroll_div" style="width:100%; text-align:center;">
+<table cellpadding="0" cellspacing="0" class="gray data" width="100%">
+    <tr>
+        <th><input id="dealer_select" type="checkbox" title="选中/不选中所有行"></input></th>
+        <th style="text-align:right;"><input id="checkpoint_select" type="checkbox" title="选中/不选中所有列(检查点)"></th>
+        <th class="term">Wave</th>
+        <th title="Score">得分<br><input type="checkbox" name="head_Total" class="cb_head" value="0"></th>
+        {% for head in head_list %}
+        <th title="{{head.desc}}&#10;{{head.desc_en}}">{{head.name_abbr}}<br><input type="checkbox" name="head_{{head.name}}" class="cb_head" value="{{forloop.counter}}"></th>
+        {% endfor %}
+    </tr>
+    {% for row in row_list %}
+    {{row|safe}}
+    {% endfor %}
+</table>
+</div>
+<div id="popup_div"></div>
+<div id="popup_inside"></div>
+
+<div id="term_div" style="width:400px;height:300px;display:none;text-align:center;">
+    <form name="form1" action="" method="post">
+        <div style="width:100px; margin:20px auto;">
+            <table width="100">
+            {% for term in term_list %}
+                <tr>
+                    <td style="width:15px;"><input type="checkbox" name="term_list" id="term_{{term.id}}" value="{{term.id}}"/></td>
+                    <td><label for="term_{{term.id}}">{{term.name}}</label></td>
+                </tr>
+            {% endfor %}
+            </table>    
+        </div>
+        <div style="margin-top:20px;">
+            <input type="submit" name="btn_term_submit" id="btn_term_submit" value="确定"/>
+            <input type="button" value="取消" onclick="hide_popup(this)"/>
+            <input type="hidden" name="heads" value="{{heads|default:""}}"/>
+        </div>
+    </form>
+</div>
+
+<div id="head_div" style="width:900px;height:400px;display:none;text-align:center;">
+    <div style="margin-top:20px;">
+        <input type="button" name="btn_sel_all" onclick="sel_all_cp();" value="全选"/>
+        <input type="button" name="btn_sel_rev" onclick="sel_rev_cp();" value="反选"/>
+        <input type="button" name="btn_sel_reset" onclick="sel_none_cp();" value="清除"/>
+    </div>
+    <form name="form2" action="" method="post">
+        <div style="margin:10px 10px;">
+            <table border="0">
+            {% for cp_group in cp_group_list %}
+                <tr>
+                    <td style="text-align:left;">
+                        <span style="font-size:14px;font-weight:bold;">{{cp_group.name_abbr}}</span><br>
+                        {% for cp in cp_group.child_list %}
+                            <input type="checkbox" name="head_name_list" id="head_name_{{cp.name}}" class="checkbox_cp" value="{{cp.name}}" title="{{cp.desc}}&#10;{{cp.desc_en}}"/><label for="head_name_{{cp.name}}" title="{{cp.desc}}&#10;{{cp.desc_en}}" style="">{{cp.name_abbr}}</label>
+                        {% endfor %}
+                        <div style="height:15px"></div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </table>    
+        </div>
+        <div style="margin-top:20px;">
+            <input type="submit" name="btn_head_submit" id="btn_head_submit" value="确定"/>
+            <input type="button" value="取消" onclick="hide_popup(this)"/>
+            <input type="hidden" name="terms" value="{{terms|default:""}}"/>
+        </div>
+    </form>
+</div>
+<div style="display:none;">
+    <form name="form_chart" id="form_chart" action="/report/chart/" method="post">
+        <input type="hidden" name="title" value=""/>
+        <input type="hidden" name="labels" value=""/>
+        <input type="hidden" name="data_list" value=""/>
+        <input type="hidden" name="chart_type" value=""/>
+    </form>
+</div>
+<div style="display:none;">
+        <form name="form_data_download" id="form_data_download" action="/report/data_download/" method="post">
+        <input type="hidden" name="title" value=""/>
+        <input type="hidden" name="labels" value=""/>
+        <input type="hidden" name="data_list" value=""/>
+        <input type="hidden" name="chart_type" value=""/>
+    </form>
+</div>
+<div style="display:none;">
+    <form name="form_detail_report" id="form_detail_report" action="/report/detail_report/" method="post">
+        <input type="hidden" name="dealer_id" value=""/>
+    </form>
+</div>
+{% endblock %}

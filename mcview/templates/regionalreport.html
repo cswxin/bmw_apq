@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block body %}
+  
+	<div class="main01">
+		<h3><strong>北部区域 </strong>&nbsp;&nbsp;&nbsp;North China </h3>
+		<div class="box">
+		<div class="forms" style="width:920px;">
+			{% for report in north_reports %}
+			  <a href='{{report.document.url}}' style='color:#003299;text-decoration:underline;line-height:24px;' target='_blank'>{{report.title}}</a><br>
+			{% endfor %}
+		</div>
+		<div class="c"></div>
+		</div>
+		<div class="c"></div>
+	</div>
+	
+	<div class="main01">
+		<h3><strong>东部区域 </strong>&nbsp;&nbsp;&nbsp;East China </h3>
+		<div class="box">
+		<div class="forms" style="width:920px;">
+			{% for report in east_reports %}
+			  <a href='{{report.document.url}}' style='color:#003299;text-decoration:underline;line-height:24px;' target='_blank'>{{report.title}}</a><br>
+			{% endfor %}
+		</div>
+		<div class="c"></div>
+		</div>
+		<div class="c"></div>
+	</div>
+	
+	<div class="main01">
+		<h3><strong>南部区域 </strong>&nbsp;&nbsp;&nbsp;South China </h3>
+		<div class="box">
+		<div class="forms" style="width:920px;">
+			{% for report in south_reports %}
+			  <a href='{{report.document.url}}' style='color:#003299;text-decoration:underline;line-height:24px;' target='_blank'>{{report.title}}</a><br>
+			{% endfor %}
+		</div>
+		<div class="c"></div>
+		</div>
+		<div class="c"></div>
+	</div>
+	
+	<div class="main01">
+		<h3><strong>西部区域 </strong>&nbsp;&nbsp;&nbsp;West China </h3>
+		<div class="box">
+		<div class="forms" style="width:920px;">
+			{% for report in west_reports %}
+			  <a href='{{report.document.url}}' style='color:#003299;text-decoration:underline;line-height:24px;' target='_blank'>{{report.title}}</a><br>
+			{% endfor %}
+		</div>
+		<div class="c"></div>
+		</div>
+		<div class="c"></div>
+	</div>
+	
+	<p align="center">&nbsp;</p>
+	<div class="c"></div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/mcview/js/mcview.js"></script>
+{% endblock %}
+
+{% block body %}
+  <div class="main01">
+    <h3><strong>其他高级分析</strong>&nbsp;&nbsp;&nbsp;Other Advanced Analysis</h3>
+    <div class="box forms05">
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
+			<tr>
+				<td><a href='{% url DealerReport/advancedsearch regional_name %}'>大区数据对比和历史/现在/未来<br>Region Data Comparison And History/Current/Future</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url DealerReport/advancedsearch province_name %}'>省份数据对比和历史/现在/未来<br>Province Data Comparison And History/Current/Future</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url DealerReport/advancedsearch city_name %}'>城市数据对比和历史/现在/未来<br>City Data Comparison And History/Current/Future</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url DealerReport/advancedsearch subdistrict_name %}'>小区数据对比和历史/现在/未来<br>Sub district Data Comparison And History/Current/Future</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url DealerReport/advancedsearch dealergroup_name %}'>经销商集团数据对比和历史/现在/未来<br>Dealer Group Data Comparison And History/Current/Future</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url DealerReport/allfilter user_name %}'>评估员数据对比<br>Auditor Data Comparison</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url DealerReport/allfilter num_name %}'>进店人数数据对比<br>No. of visitor Data Comparison</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url DealerReport/allfilter newold_name %}'>新店和老店数据对比<br>Old & new dealer Data Comparison</a></td>
+			</tr>
+			<tr>
+				<td><a href='{% url DealerReport/advancedbrand %}'>品牌数据对比<br>Brand Data Comparison</a></td>
+			</tr>
+		</table>
+    </div>
+  </div>
+{% endblock %}

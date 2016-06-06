@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block js %}
+	<script type="text/javascript" src="/static/js/jquery-ui-1.8.9.custom.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/jquery.dataTables.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/ZeroClipboard.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/data_table/js/TableTools.js"></script>
+{% endblock %}
+{% block doc_ready %}
+function ajaxFilter(form, divOrHandler) {
+    form = form[0];
+    if(form.Term.value == ""){
+        alert("请选择期数");
+        return false;
+    }
+    $.ajax({
+       type: form.method,
+       url: form.action,
+       data: $(form).serialize(),
+       success: function(msg){
+            if (typeof(divOrHandler) == "undefined") {
+                alert(msg);
+            }
+            else if (typeof(divOrHandler) == "string") {
+                $("#"+divOrHandler).html(msg);
+            }
+            else if (typeof(divOrHandler) == "function") {
+                divOrHandler(msg,btn);
+            }
+       }
+    });
+    return false;
+};
+{% endblock %}
+{% block body %}
+  <div class="main01">
+    <h3><strong>{{item_name}}数据对比和历史/现在/未来</strong>&nbsp;&nbsp;&nbsp;{{item_name_en}} Data Comparison And History/Current/Future</h3>
+    <div class="box"> 
+		<form id="filterform" action="{% url DealerReport/ajaxbrandresult %}" method="post">
+			{% csrf_token %}
+			<input type="hidden" name="kind" value="{{kind_id}}" />
+		<div class="selectMain">
+          <select name="Term" size="1" class="select01 FL">
+            <option value="">选择期数please select term</option>
+            {% for term in terms %}
+            <option value="{{term.id}}">{{term.name_cn}}</option>
+            {% endfor %}
+          </select>
+        <img class="search" src="/static/mcview/images/butSearch.gif" width="100" height="30" onclick="return ajaxFilter($('#filterform'),'filter_result');" style="cursor:pointer;"/>
+        </div>
+		</form>
+    </div>
+    <center><div id="filter_result"   class="forms05 dataContent " ></div></center>
+    <br>
+  </div>
+{% endblock %}
